@@ -448,18 +448,6 @@ function New-MSIXPortalPage {
 
 
 
-
-$res = Get-ChildItem D:\GithubProjekte\MSIXForcelets\AppBotPortal\NewMSIXPackages\*.msix -Recurse | ForEach-Object { Get-AppXManifestInfo $_ }
-
-<#
-New-MSIXPortalPage -TemplatePath "D:\GithubProjekte\MSIXForcelets\AppBotPortal" -Packages $res `
-  -OutputPath "D:\GithubProjekte\MSIXForcelets\AppBotPortal" -CopyPackages -WebServerBaseURL "https://www.appbot.de"
-
-  #>
-
-  New-MSIXPortalPage -TemplatePath "D:\GithubProjekte\MSIXForcelets\AppBotPortal\AppBotPortal.Template" -Packages $res `
-  -OutputPath "D:\GithubProjekte\MSIXForcelets\AppBotPortal" -CopyPackages -WebServerBaseURL '\\192.168.10.153\Autosequencer\Deployment\'
-
   
 
 

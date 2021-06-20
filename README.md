@@ -1,20 +1,43 @@
 # MSIXForcelets
 Additional PowerShell Commands for Microsoft MSIX
-
 This is a working beta version. Included is also a newer version of the PFS framework, which we compiled ourselves. Use at your own risk.
+currently this is not a real module but only a working version, but it is fully functional and is already used by and for packaging. Until the completion is still missing some
+
+## Function
 > Analysis of MSIX packages
 > Adding PSF fixes
-
 
 ## How does it work?
 First the module must be imported. This can also be in the module memory, for example. I am also planning to store a version in the PowerShell gallery.
 
 ```powershell
 #In the Script folder
-Import-Module $($PSScriptRoot +'\MSIXForcelets')
-Import-Module 'YOURPATH\'+'\MSIXForcelets') 
+Import-Module <PATH>\MSIXForcelets.ps1
+Import-Module <PATH>\MSIXPackaging.ps1
+````
+## Test MSIXForcelets (for Infos)
+
+```powershell
+Import-Module $PSScriptRoot\..\MSIXForcelets.ps1
+Get-AppXManifestInfo \\Server\autosequencer\MSIXPackages\Blender-x64-2.91.2.msix
+<#
+Name                  : Blender-x64
+DisplayName           : Blender-x64-2.91.2
+Publisher             : CN=Nick Informationstechnik GmbH, O=Nick Informationstechnik GmbH, STREET=Dribusch 2, L=Hannover, S=Niedersachsen, PostalCode=30539, C=DE    
+ProcessorArchitecture : x64
+Version               : 2.91.2.0
+Description           :
+ConfigPath            : \\192.168.10.153\autosequencer\MSIXPackages\Blender-x64-2.91.2\Blender-x64-2.91.2.msix
+UncompressedSize      : 552922446
+MaxfileSize           : 165234632
+MaxfilePath           : Blender%20Foundation/Blender%202.91/blender.exe
+FileCount             : 4118
+Applications          : {@{Id=Blender; Executable=Blender Foundation\Blender 2.91\blender.exe; VisualElements=}}
+#>
 ````
 
+## Test MSIX Packaging
+Import-Module <PATH>\MSIXPackaging.ps1
 ## Some Examples
 ```powershell
 #Header
