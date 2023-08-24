@@ -1,14 +1,18 @@
-#$ScriptPath = (Get-Location).Path
+
 $ScriptPath = $PSScriptRoot
-#$Script:PSFVersion = "2.0"
-$Script:PSFVersion = "Beta"
-$Script:MSIXPSFURL = "https://github.com/microsoft/MSIX-PackageSupportFramework/releases/download/v2.0/PSFBinaries.zip"
-$Script:MSIXPSFFilename = "PSFBinaries.zip"
+
+#Info
+$PSFVersions = @("MicrosoftPSF", "TimManganPSF-2023-8-13")
 
 
+
+#$Script:MSIXPSFURL = "https://github.com/microsoft/MSIX-PackageSupportFramework/releases/download/v2.0/PSFBinaries.zip"
+#$Script:MSIXPSFFilename = "PSFBinaries.zip"
 #Version 1.4
-$Script:MSIXToolkitURL = "https://github.com/microsoft/MSIX-Toolkit/releases/download/1.4/MSIX-Toolkit.x64.zip"
-$Script:MSIXToolkitFilename = "MSIX-Toolkit.x64_1.4.zip"
+#$Script:MSIXToolkitURL = "https://github.com/microsoft/MSIX-Toolkit/releases/download/1.4/MSIX-Toolkit.x64.zip"
+#$Script:MSIXToolkitFilename = "MSIX-Toolkit.x64_1.4.zip"
+
+
 
 #Namespaces
 $AppXNamespaces = [ordered]@{
@@ -119,59 +123,65 @@ $Script:SystemKnownFolders = [ordered] @{
     'Windows'               = 'F38BF404-1D43-42F2-9305-67DE0B28FC23';
 }
 
+$Script:MSFMonitorFiles = @("Dia2Lib.dll",
+"DynamicLibraryFixup32.dll",
+"DynamicLibraryFixup64.dll",
+"KernelTraceControl.dll",
+"KernelTraceControl.Win61.dll",
+"Microsoft.Diagnostics.FastSerialization.dll",
+"Microsoft.Diagnostics.Tracing.TraceEvent.dll",
+"msdia140.dll",
+"OSExtensions.dll",
+"PsfMonitor.exe",
+"PsfMonitorX64.exe",
+"PsfMonitorX86.exe")
+
+
 function Get-MSIXToolkit {
     [CmdletBinding()]
     param()  
-
-    #Version 1.4
-    #$MSIXToolkitURL = "https://github.com/microsoft/MSIX-Toolkit/releases/download/1.4/MSIX-Toolkit.x64.zip"
-    #$MSIXToolkitFilename = "MSIX-Toolkit.x64_1.4.zip"
-    if (-not (Test-Path (Join-Path $ScriptPath -childPath "MSIX-Toolkit"))) { New-Item (Join-Path $ScriptPath -childPath "MSIX-Toolkit" ) -ItemType Directory }
     
-    if (-Not (Test-Path (Join-Path $ScriptPath -childPath "MSIX-Toolkit\$MSIXToolkitFilename"))) {
-        Write-Verbose "Download MSIX-Toolkit 64 Bit to MSIX-Toolkit\$MSIXToolkitFilename"
-        Invoke-WebRequest -Uri $MSIXToolkitURL -OutFile  (Join-Path $ScriptPath -childPath "MSIX-Toolkit\$MSIXToolkitFilename")
-        Expand-Archive -LiteralPath  (Join-Path $ScriptPath -childPath "MSIX-Toolkit\$MSIXToolkitFilename") -DestinationPath   (Join-Path $ScriptPath -childPath "MSIX-Toolkit")
+    if(-not (Test-Path $Script:MSIXToolkitPath )){
+
+        Write-Warning "MSIX Toolkit not exist in $($Script:MSIXToolkitPath) - please Download" 
     }
     else {
-        Write-Verbose "MSIX Toolkit already exist - skip download" 
 
+        Write-Verbose "Assign Alias" 
+        if (!(get-alias makeappx -ErrorAction SilentlyContinue)) {
+            Write-Verbose "Create alias MakeAppx" 
+            New-Alias -Name MakeAppx -value (Join-Path $Script:MSIXToolkitPath -childPath "makeappx.exe") -Scope Script
+        }
+    
+
+        if (!(get-alias signtool -ErrorAction SilentlyContinue)) {
+            $apath = (Join-Path $Script:MSIXToolkitPath -childPath "signtool.exe")
+            Write-Verbose "Create alias signtool to $apath" 
+            New-Alias -Name signtool -Value $apath -Scope Script #Global
+        }
     }
 
-    Write-Verbose "Assign Alias" 
-    if (!(get-alias makeappx -ErrorAction SilentlyContinue)) {
-        Write-Verbose "Create alias MakeAppx" 
-        New-Alias -Name MakeAppx -value (Join-Path $ScriptPath -childPath "MSIX-Toolkit\MSIX-Toolkit.x64\makeappx.exe") -Scope Script
-        
-    }
-    if (!(get-alias signtool -ErrorAction SilentlyContinue)) {
-        $apath = (Join-Path $ScriptPath -childPath "MSIX-Toolkit\MSIX-Toolkit.x64\signtool.exe")
-        Write-Verbose "Create alias signtool to $apath" 
-        New-Alias -Name signtool -Value $apath -Scope Script #Global
-        
-    }
 }
 
-function Get-MSIXPSF {
-    [CmdletBinding()]
+
+function Set-ActivePSFFramework {
     param (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("MicrosoftPSF", "TimManganPSF-2023-8-13")]
+        [string] $version
         
     )
-    if ($PSFVersion -ne "Beta") {
-        if (-not (Test-Path (Join-Path $ScriptPath -childPath "MSIXPSF"))) { New-Item (Join-Path $ScriptPath -childPath "MSIXPSF" ) -ItemType Directory }
-        if (-not (Test-Path (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion"))) { New-Item (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion" ) -ItemType Directory }
-        if (-Not (Test-Path (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion\$MSIXPSFFilename"))) {
-            Write-Verbose "Download MSIX Package Support Framework to XMSIXPSF\$PSFVersion\$MSIXPSFFilename"
-            Invoke-WebRequest -Uri   $MSIXPSFURL -OutFile  (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion\$MSIXPSFFilename")
-            Expand-Archive -LiteralPath (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion\$MSIXPSFFilename") -DestinationPath  (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion")
-        }
-        else {
-            Write-Verbose "MSIX PSF in $PSFVersion already exist - skip download" 
-        }
-    } else {
-        Write-Verbose "Beta Version skip Download" 
+
+    $Script:PSFVersion = $version
+
+    $Script:PsfBasePath = (Join-Path $MSIXPSFPath -childPath "$PSFVersion")
+    if(-not (Test-Path $PsfBasePath)){
+        Write-Warning "MSIX PSF not exist in $($PsfBasePath) - please Download" 
     }
 }
+
+
+
 
   
 
@@ -350,7 +360,7 @@ $MSIXCapability = @("runFullTrust", "allowElevation", "internetClient", "interne
 function Add-DisableVREGOrRegistryWrite {
     <#
     .SYNOPSIS
-    Disables  VFS and VREG in einem MSIX / APPX package
+    Disables  VFS and VREG in MSIX / APPX package
     
     .DESCRIPTION
     Disables  VFS and VREG in einem MSIX / APPX package.
@@ -670,7 +680,31 @@ function Open-MSIXPackage {
             New-Item $MSIXFolder -ItemType Directory -force:$Force | Out-Null
         }
 
-        MakeAppx unpack -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Default
+        <#
+        Options:
+        --------
+            /pfn: Unpacks all files to a subdirectory under the specified output path,
+                named after the package full name.
+            /nv, /noValidation: Skips validation that ensures the package will be
+                installable on Windows. The validation include: existence of files
+                referenced in manifest, ContentGroupMap correctness, and additional
+                manifest validation on Protocols and FileTypeAssociation. By default,
+                all semantic validation is performed.
+            /kf: Use this option to encrypt or decrypt the package or bundle using a
+                key file. This option cannot be combined with /kt.
+            /kt: Use this option to encrypt or decrypt the package or bundle using the
+                global test key. This option cannot be combined with /kf.
+            /nd: Skips decryption when unpacking an encrypted package or bundle.
+            /o, /overwrite: Forces the output to overwrite any existing files with the
+                same name. By default, the user is asked whether to overwrite existing
+                files with the same name. You can't use this option with /no.
+            /no, /noOverwrite: Prevents the output from overwriting any existing files
+                with the same name. By default, the user is asked whether to overwrite
+                existing files with the same name. You can't use this option with /o.
+            /v, /verbose: Enables verbose output of messages to the console.
+          
+        #>      
+        MakeAppx unpack -o -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Default
         if ($lastexitcode -ne 0) {
 
             Write-Error "ERROR: MSIX Cannot open Package"
@@ -704,9 +738,9 @@ function Close-MSIXPackage {
         }
         else {
             #Create config.json
-            Convert-MSIXPSFXML2JSON -xml (Join-Path $MSIXFolder -ChildPath "config.json.xml") -xsl (Join-Path $ScriptPath -ChildPath "Data\Format.xsl") -output (Join-Path $MSIXFolder -ChildPath "config.json")
+            Convert-MSIXPSFXML2JSON -xml (Join-Path $MSIXFolder -ChildPath "config.json.xml") -xsl (Join-Path (Split-path $ScriptPath -Parent) -ChildPath "Data\Format.xsl") -output (Join-Path $MSIXFolder -ChildPath "config.json")
             
-            MakeAppx pack -p $MsixFile.FullName -d  $MSIXFolder.FullName 
+            MakeAppx pack -o -p $MsixFile.FullName -d  $MSIXFolder.FullName 
             #-l 
             if ($lastexitcode -ne 0) {
                 Write-Error "ERROR: MSIX Cannot close Package"
@@ -770,7 +804,7 @@ function Set-MSIXSignature {
         
         #signtool sign /v /fd SHA256 /a /f 'C:\temp\zertifikate\NIT-Signatur-2020-08-17.pfx' /tr 'http://timestamp.entrust.net/TSS/RFC3161sha2TS' /p 'C' "C:\Users\Andreas\Desktop\WinZinsen.msix"
 
-        signtool sign /v /fd SHA256 /a /f $PfxCert /tr $TimeStampServer /p $UnsecurePassword $MSIXFile.Fullname  
+        signtool sign /v /td SHA256 /fd SHA256 /a /f $PfxCert /tr $TimeStampServer /p $UnsecurePassword $MSIXFile.Fullname  
         if ($lastexitcode -ne 0) {
             Write-Error "ERROR: MSIX Cannot sign package $($MSIXFile)"
             return $false
@@ -853,6 +887,67 @@ function Set-MSIXPublisher {
     }
 }
 
+function Set-MSIXVersion {
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            #ValueFromPipelineByPropertyName = $true,
+            Position = 0)]
+        [System.IO.DirectoryInfo] $MSIXFolder,
+        [version] $MSVersion = "1.0.0.0"
+    )
+
+    process {
+        if (-not (Test-Path $MSIXFolder)) {
+            Write-Error "The MSIX temporary folder not exist"
+            return $null
+        }
+        else {
+            $xml = New-Object xml
+            $xml.Load((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
+            if ($null -ne $xml) {
+                $xml.Package.Identity.Version=  $MSVersion.ToString()
+                $xml.Save((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
+            }
+            Else {
+                Write-Error "Cannod load AppXManifest.xml"
+            }
+        }
+    }
+}
+function Get-MSIXVersion {
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            #ValueFromPipelineByPropertyName = $true,
+            Position = 0)]
+        [System.IO.DirectoryInfo] $MSIXFolder
+    )
+
+    process {
+        if (-not (Test-Path $MSIXFolder)) {
+            Write-Error "The MSIX temporary folder not exist"
+            return $null
+        }
+        else {
+            $xml = New-Object xml
+            $xml.Load((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
+            if ($null -ne $xml) {
+                return $xml.Package.Identity.Version
+            }
+            Else {
+                Write-Error "Cannod load AppXManifest.xml"
+                return $null
+            }
+        }
+    }
+}
+
+
 <#
 .SYNOPSIS
     Short description
@@ -883,18 +978,20 @@ function Add-MSIXPsfFrameworkFiles {
             return $null
         }
         else {
-            $PsfBBasePath = (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion\Bin")
+            #$PsfBBasePath = (Join-Path $ScriptPath -childPath "MSIXPSF\$PSFVersion")
             if (($PSFArchitektur -eq '64And32Bit') -or ($PSFArchitektur -eq '64Bit')) {
-                Copy-Item "$PsfBBasePath\*64*" -Destination $MSIXFolder -Verbose:$verbose | Out-Null
+                Copy-Item "$PsfBasePath\*64*" -Destination $MSIXFolder -Verbose:$verbose | Out-Null
             }
             if (($PSFArchitektur -eq '64And32Bit') -or ($PSFArchitektur -eq '32Bit')) {
-                Copy-Item "$PsfBBasePath\*32*" -Destination $MSIXFolder -Verbose:$verbose | Out-Null
+                Copy-Item "$PsfBasePath\*32*" -Destination $MSIXFolder -Verbose:$verbose | Out-Null
             }
 
-            Copy-Item "$PsfBBasePath\StartingScriptWrapper.ps1" -Destination $MSIXFolder | Out-Null
+            Copy-Item "$PsfBasePath\StartingScriptWrapper.ps1" -Destination $MSIXFolder | Out-Null
 
             if ($IncludePSFMonitor) {
-                Copy-Item "$PsfBBasePath\PSFMonitor\*" -Destination $MSIXFolder -Recurse | Out-Null
+                Foreach($file in $Script:MSFMonitorFiles){
+                    Copy-Item "$PsfBasePath\$file" -Destination $MSIXFolder  | Out-Null
+                }
             }
         } 
     }
@@ -910,18 +1007,7 @@ function Remove-PSFMonitorFiles {
         [System.IO.DirectoryInfo] $MSIXFolder  
     )
     Begin {
-        $MSFMonitorFiles = @("Dia2Lib.dll",
-            "DynamicLibraryFixup32.dll",
-            "DynamicLibraryFixup64.dll",
-            "KernelTraceControl.dll",
-            "KernelTraceControl.Win61.dll",
-            "Microsoft.Diagnostics.FastSerialization.dll",
-            "Microsoft.Diagnostics.Tracing.TraceEvent.dll",
-            "msdia140.dll",
-            "OSExtensions.dll",
-            "PsfMonitor.exe",
-            "PsfMonitorX64.exe",
-            "PsfMonitorX86.exe")
+       
     }    
 
     process {
@@ -1040,8 +1126,8 @@ function Start-MSIXPSFMonitor{
         $Architektur = '64'
     )
 
-    $Path = Join-Path -Path $ScriptPath -ChildPath $('MSIXPSF\' + $PSFVersion + '\bin\PSFMonitor')
-    Start-Process $($Path + '\PsfMonitorx' + $Architektur + '.exe')
+    #$Path = Join-Path -Path $ScriptPath -ChildPath $($Script:PsfBBasePath + '\PSFMonitor')
+    Start-Process $($Script:PsfBBasePath + '\PsfMonitorx' + $Architektur + '.exe')
     
 }
 
@@ -1980,8 +2066,5 @@ function Add-MSIXPSFTracing {
     }
 }
 
-
-    Get-MSIXToolkit -verbose
-    Get-MSIXPSF -Verbose
 
 

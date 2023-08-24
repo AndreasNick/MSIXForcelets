@@ -28,3 +28,13 @@ $funcs = Get-ChildItem Function: | Where-Object { $sysfuncs -notcontains $_ }
 # export the module's public functions
 Export-ModuleMember -Function ($funcs.Name)
 
+$Script:MSIXToolkitPath = "$PSScriptRoot\MSIX-Toolkit\WindowsSDK\11\10.0.22000.0\x64"
+Write-Verbose "Use Toolkit Path $($Script:MSIXToolkitPath)" 
+$Script:MSIXPSFPath = "$PSScriptRoot\MSIXPSF"
+Write-Verbose "Use PSF Path $($Script:MSIXPSFPath)" 
+
+Get-MSIXToolkit
+
+#Set Default PSF
+Set-ActivePSFFramework -version "MicrosoftPSF"
+
