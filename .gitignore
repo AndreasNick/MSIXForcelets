@@ -2,9 +2,10 @@
 /AppBotPortal/MSIXPackages
 /AppBotPortal/NewMSIXPackages
 /AppBotPortal/NewMSIXPackages_v1
-/MSIX-Toolkit
+/src/MSIX-Toolkit
 /DebugView
-/MSIXPSF
+/srv/MSIXPSF
 /DebugView
 /Test
+/Trash
 workspace.code-workspace
