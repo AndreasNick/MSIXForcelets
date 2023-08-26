@@ -667,12 +667,20 @@ function Open-MSIXPackage {
         [System.IO.FileInfo]
         $MsixFile,
         [System.IO.DirectoryInfo] $MSIXFolder = ($env:Temp + "\MSIX_TEMP_" + [system.guid]::NewGuid().ToString()),
+        [bool] $ClearOutputFolder = $false,
         [Switch] $Force
     )
      
     process {
         if (-not (Test-Path $MsixFile )) {
             Write-Warning "the  file $($MsixFile.FullName) not exist"
+        }
+
+        if ((Test-Path $MSIXFolder) -and $ClearOutputFolder) {
+            #Check there is an AppxManifest
+            if(Test-Path (Join-Path -Path $MSIXFolder -ChildPath AppxManifest.xml)){
+                Remove-Item -Path $MSIXFolder -Recurse -Force
+            }
         }
 
         if (-not (Test-Path $MSIXFolder)) {
@@ -748,7 +756,10 @@ function Close-MSIXPackage {
             }
             else {
                 if (-Not $KeepMSIXFolder) {
-                    Remove-Item $MSIXFolder -Recurse -Confirm:$false
+                    Remove-Item $MSIXFolder -Recurse -Confirm:$false -ErrorAction SilentlyContinue
+                    if(Test-Path $MSIXFolder){
+                        & Cmd.exe /C rmdir /S /Q "$MSIXFolder"
+                    }
                 }
             }
             
