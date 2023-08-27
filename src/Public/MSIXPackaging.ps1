@@ -758,7 +758,7 @@ function Close-MSIXPackage {
                 if (-Not $KeepMSIXFolder) {
                     Remove-Item $MSIXFolder -Recurse -Confirm:$false -ErrorAction SilentlyContinue
                     if(Test-Path $MSIXFolder){
-                        & Cmd.exe /C rmdir /S /Q "$MSIXFolder"
+                        & Cmd.exe /C rmdir /S /Q "$MSIXFolder" 2>$null
                     }
                 }
             }

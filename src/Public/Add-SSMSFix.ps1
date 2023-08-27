@@ -6,23 +6,22 @@ function Add-SSMSFix {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 0)]
-        [System.IO.FileInfo]
-        $MsixFile,
+        [System.IO.FileInfo] $MsixFile,
         [System.IO.DirectoryInfo] $MSIXFolder = ($env:Temp + "\MSIX_TEMP_" + [system.guid]::NewGuid().ToString()),
         [Switch] $Force,
-        [String] $OutputFilePath = "",
+        [System.IO.FileInfo] $OutputFilePath = $null,
         [String] $Subject = ""
 
     )      
  
-    if ($OutputFileName -eq "") {
-        $OutputFileName = $MsixFile
+    if ($null -eq $OutputFilePath) {
+        $OutputFilePath = $MsixFile
     }
 
     $Package = Open-MSIXPackage -MsixFile $MsixFile -Force:$force -MSIXFolder $MSIXFolder
 
     
-    #Close-MSIXPackage -MSIXFolder 'c:\temp\ssms' -MSIXFile $OutputFilePath
+    
     #break
 
     if ($Subject -ne "") {
@@ -77,9 +76,12 @@ function Add-SSMSFix {
                 # Start the new PowerShell instance with the encoded command
                 Start-Process powershell.exe -ArgumentList " -encodedCommand $encodedCommand" -Verb RunAs -Wait #-noexit
 
+                Start-Sleep -seconds 2
+
                 $bytes2 = [System.Text.Encoding]::Unicode.GetBytes($UnloadRegHive)
                 $encodedCommand2 = [Convert]::ToBase64String( $bytes2 )
                 Start-Process powershell.exe -ArgumentList " -encodedCommand $encodedCommand2"  -Verb RunAs -Wait 
+				
 
             }
             else {
@@ -89,10 +91,28 @@ function Add-SSMSFix {
             }
         }
         else {
+           
+            $scriptContent = $SetACLScriptBlock.ToString()
+            $fullCommand = "& { $scriptContent } '$MSIXFolder'"
+
+            # Convert the command to bytes and then to a Base64 string
+            $bytes = [System.Text.Encoding]::Unicode.GetBytes($fullCommand)
+            $encodedCommand = [Convert]::ToBase64String($bytes)
+            Start-Process powershell.exe -ArgumentList " -encodedCommand $encodedCommand" -Wait #-noexit
+
+            Start-Sleep -seconds 2
+            $bytes2 = [System.Text.Encoding]::Unicode.GetBytes($UnloadRegHive)
+            $encodedCommand2 = [Convert]::ToBase64String( $bytes2 )
+            Start-Process powershell.exe -ArgumentList " -encodedCommand $encodedCommand2"  -Wait 
+				
+            <# Not working - file lock
             & $SetACLScriptBlock $MSIXFolder
+            Start-Sleep -seconds 2
+            & $UnloadRegHive
+            #>
         }
 
-        Start-Sleep -Seconds 2
+        Start-Sleep -Seconds 4
 
         # NOT Working:Move SSMS.exe to the top in AppxManifest.xml
         <#
@@ -105,10 +125,14 @@ function Add-SSMSFix {
         $xml.Save($xmlPath)
         #>
 
+        Write-Host "Create fixed MSIX" -ForegroundColor Green
+        Write-Host "MSIX Folder: $($Package.FullName)" -ForegroundColor Green
+        Write-Host "MSIX OutFile: $OutputFilePath" -ForegroundColor Green
+
         Close-MSIXPackage -MSIXFolder $($Package.FullName) -MSIXFile $OutputFilePath
     }
     catch {
-        Write-Verbose "Error adding SSMS Fix" -Verbose
+        Write-Error "Error adding SSMS Fix" 
         "Error $_"
     }
 
