@@ -25,99 +25,6 @@ foreach ($item in $IconInfo) {
   Update-TypeData @IconConfig -MemberName $item -force
 }
 
-function Get-ReadAllBytes([System.IO.BinaryReader] $reader) {
-  
-  $bufferSize = 4096
-  $ms = New-object System.IO.MemoryStream
-  $buffer = new-Object byte[] $bufferSize
-  $count = 0
-  do {
-    $count = $reader.Read($buffer, 0, $buffer.Length)
-    If ($count -gt 0) { 
-      $ms.Write($buffer, 0, $count)
-    }
-  } While ($count -ne 0)
-
-  
-  $ms.Close()
-  return $ms.ToArray()
-}
-
-function Get-BitmapAsIconStream {
-  <#
-      .SYNOPSIS
-      Helper funtions. Icons are not supportet from a dotnet class    
-    
-      .DESCRIPTION
-      Helper funtions. Icons are not supportet from a dotnet class   
-    
-      .PARAMETER SourceBitmap
-      A Bitmap Image
-    
-      .PARAMETER Fs
-      fs [System.IO.MemoryStream
-    
-      .NOTES
-      https://stackoverflow.com/questions/11434673/bitmap-save-to-save-an-icon-actually-saves-a-png
-    #>
-    
-  param (
-    [Parameter( Position = 0, Mandatory = $true, ValueFromPipelineByPropertyName = $True)] 
-    [System.Drawing.Bitmap] $SourceBitmap, 
-    [Parameter( Position = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $True)] 
-    [System.IO.MemoryStream] $Fs
-  )
-    
-  # ICO header
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(1) 
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(1) 
-  $Fs.WriteByte(0)
-
-  # Image size
-  $Fs.WriteByte([byte] $SourceBitmap.Width)
-    
-  $Fs.WriteByte([byte] $SourceBitmap.Height)
-  # Palette
-  $Fs.WriteByte(0)
-  # Reserved
-  $Fs.WriteByte(0)
-  # Number of color planes
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-  # Bits per pixel
-  $Fs.WriteByte(32)
-  $Fs.WriteByte(0)
-
-  # Data size, will be written after the data
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-
-  # Offset to image data, fixed at 22
-  $Fs.WriteByte(22)
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-  $Fs.WriteByte(0)
-
-  # Writing actual data
-  $null = $SourceBitmap.Save($Fs, [System.Drawing.Imaging.ImageFormat]::png)
-
-  # Getting data length (file length minus header)
-  [long] $Len = $FS.Length - 22
-
-  # Write it in the correct place
-  $null = $Fs.Seek(14, [System.IO.SeekOrigin]::Begin)
-  $Fs.WriteByte([byte] ($Len -band 0x00ff))
-  $Fs.WriteByte([byte] ($Len -shr 8))
-  $Fs.WriteByte([byte] ($Len -shr 16))
-  $Fs.WriteByte([byte] ($Len -shr 25))
-
-  #$Fs.Close()
-}
 
 
 function Get-MSIXIconsFromPackage {
@@ -132,16 +39,17 @@ function Get-MSIXIconsFromPackage {
       Parameter description
 
       .PARAMETER Applist
-      
+      a list of applications from the AppXManifestInfo (Get-AppVManifestInfo)
+
       .PARAMETER Type
-      type to return
+      [System.Collections.arrayList] with ichon informations
 
       .EXAMPLE
-      $IconList = Get-AppVManifestInfo  C:\temp\test\PowerDirector12-Spezial.appv | Select-Object -Property Shortcuts
-      Get-AppVIconsFromPackage -Path C:\temp\test\PowerDirector12-Spezial.appv -Iconlist $IconList
+      $AppList = Get-AppXManifestInfo  C:\temp\test\PowerDirector12-Spezial.msix | Select-Object -Property Shortcuts
+      Get-AppVIconsFromPackage -Path C:\temp\test\PowerDirector12-Spezial.msix -Applist $AppList
 
       .NOTES
-      https://www.software-virtualisierung.de
+      https://www.nick-it.de
       Andreas Nick, 2019/2020
   #>
   [CmdletBinding()]
@@ -162,7 +70,7 @@ function Get-MSIXIconsFromPackage {
     Write-Verbose "Process for Icons - MSIX Path: $($Path.FullName) "
     $resultlist = New-Object System.Collections.ArrayList
     try {
-      $ResultList = new-Object System.Collections.ArrayList
+      $ResultList = New-Object System.Collections.ArrayList
       if (Test-Path $Path.FullName) {
         [System.IO.Compression.zipArchive] $arc = [System.IO.Compression.ZipFile]::OpenRead($Path.FullName)
         foreach ($icon in @($Applist)) {
@@ -179,13 +87,13 @@ function Get-MSIXIconsFromPackage {
               [byte[]] $bytes = Get-ReadAllBytes -reader $appvfile
               $iconBase64 = [Convert]::ToBase64String($bytes)
               
-              write-verbose $("Extract image file " + $icon.Icon + " with " + $bytes.count + " bytes") 
+              Write-Verbose $("Extract image file " + $icon.Icon + " with " + $bytes.count + " bytes") 
               
               $MSIXIconInfo = "" | Select-Object -Property  Target, Base64Image, ImageType
               $MSIXIconInfo.Base64Image = $iconBase64
               $MSIXIconInfo.Target = $icon.Executable
               $MSIXIconInfo.ImageType = 'png'
-              $null = $resultlist.add($MSIXIconInfo)
+              $null = $resultlist.Add($MSIXIconInfo)
               $appvfile.Close()
             }
           }
@@ -390,6 +298,8 @@ function New-AppInstallerConfiguration {
   Write-Output $StringWriter.ToString() | Out-File -Encoding utf8  -FilePath (Join-path $OutputPath -ChildPath $($ApplicationName + '.appinstaller')) 
 
 }
+
+
 
 function New-MSIXPortalPage {
   param(
