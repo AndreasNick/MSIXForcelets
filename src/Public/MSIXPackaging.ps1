@@ -778,6 +778,62 @@ function Close-MSIXPackage {
 .EXAMPLE
     Another example of how to use this cmdlet
 #>
+
+function Set-MSIXSignature {
+    [CmdletBinding(DefaultParameterSetName='PFX')]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true,
+            Position = 0)]
+        [System.IO.FileInfo] $MSIXFile,
+
+        [Parameter(Mandatory = $true, ParameterSetName='PFX')]
+        [System.IO.FileInfo] $PfxCert,
+
+        [Parameter(Mandatory = $true, ParameterSetName='PFX')]
+        [securestring] $CertPassword,
+
+        [Parameter(Mandatory = $true, ParameterSetName='Thumbprint')]
+        [string] $CertThumbprint,
+
+        [ValidateSet('http://timestamp.entrust.net/TSS/RFC3161sha2TS', 'http://time.certum.pl', 'http://timestamp.comodoca.com?td=sha256', 'http://timestamp.apple.com/ts01', 'http://zeitstempel.dfn.de')]
+        $TimeStampServer = 'http://timestamp.entrust.net/TSS/RFC3161sha2TS',
+
+        [switch] $force
+    )
+    
+    process {
+        # Your initial code and checks...
+        $addParams = ""
+        if ($force) {
+            if (Test-Signature -MSIXFile $MSIXFile) {
+                signtool remove $MSIXFile.FullName
+            }
+        }
+        switch ($PSCmdlet.ParameterSetName) {
+            'PFX' {
+                $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($CertPassword)
+                $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+                signtool sign /v /td SHA256 /fd SHA256 /a /f $PfxCert /tr $TimeStampServer /p $UnsecurePassword $MSIXFile.Fullname 
+            }
+            'Thumbprint' {
+                signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname 
+            }
+        }
+        
+        if ($lastexitcode -ne 0) {
+            Write-Error "ERROR: MSIX Cannot sign package $($MSIXFile)"
+            return $false
+        }
+        else {
+            return $true
+        }
+    }
+}
+
+
+<#
 function Set-MSIXSignature {
     [CmdletBinding()]
     [OutputType([int])]
@@ -827,6 +883,7 @@ function Set-MSIXSignature {
     }
 
 }
+#>
 
 <#
 .SYNOPSIS
