@@ -27,6 +27,7 @@ foreach ($item in $IconInfo) {
 
 
 
+
 function Get-MSIXIconsFromPackage {
   <#
       .SYNOPSIS

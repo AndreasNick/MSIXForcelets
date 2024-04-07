@@ -28,6 +28,7 @@ $AppXNamespaces = [ordered]@{
     "mobile" = "http://schemas.microsoft.com/appx/manifest/mobile/windows10"
     "iot" = "http://schemas.microsoft.com/appx/manifest/iot/windows10"
     "desktop" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+    "desktop7" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/7"
     "rescap" = "http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
 }
 
