@@ -1,8 +1,3 @@
-<<<<<<< HEAD:src/Public/Add-MSIXGimpFix.ps1
-function Add-MSIXGimpFix {
-=======
-
-
 function Add-MSIXGimpFix {
 <#
 .SYNOPSIS
@@ -41,7 +36,6 @@ Author: Andreas Nick
 Date: 01/09/2023
 https://www.nick-it.de
 #>    
->>>>>>> e62f2928578ea05159492fe447f94c528234072b:src/Public/Add-GimpFix.ps1
     [CmdletBinding()]
   
     param(
