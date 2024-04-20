@@ -1,4 +1,4 @@
-function Set-ActivePSFFramework {
+function Set-MSIXActivePSFFramework {
     <#
     .SYNOPSIS
     Sets the active PSF (Package Support Framework) framework.
@@ -19,7 +19,6 @@ function Set-ActivePSFFramework {
             [Parameter(Mandatory = $true)]
             [ValidateSet("MicrosoftPSF", "TimManganPSF")]
             [string] $version
-            
         )
     
         $Script:PSFVersion = $version

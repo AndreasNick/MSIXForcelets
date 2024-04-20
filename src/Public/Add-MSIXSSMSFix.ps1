@@ -1,4 +1,5 @@
-function Add-SSMSFix {
+# Fix for Microsoft SQL Server Management Studio (SSMS) MSIX package
+function Add-MSIXSSMSFix {
     [CmdletBinding()]
   
     param(

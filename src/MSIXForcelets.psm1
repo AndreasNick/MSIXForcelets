@@ -5,7 +5,7 @@ $Script:MSIXPSFPath = "$PSScriptRoot\MSIXPSF"
 $Script:ScriptPath = $PSScriptRoot
 
 #Info
-$PSFVersions = @("MicrosoftPSF", "TimManganPSF-2023-8-13")
+$PSFVersions = @("MicrosoftPSF", "TimManganPSF")
 
 #$Script:MSIXPSFURL = "https://github.com/microsoft/MSIX-PackageSupportFramework/releases/download/v2.0/PSFBinaries.zip"
 #$Script:MSIXPSFFilename = "PSFBinaries.zip"
@@ -124,18 +124,6 @@ $Script:SystemKnownFolders = [ordered] @{
     'Windows'               = 'F38BF404-1D43-42F2-9305-67DE0B28FC23';
 }
 
-$Script:MSFMonitorFiles = @("Dia2Lib.dll",
-"DynamicLibraryFixup32.dll",
-"DynamicLibraryFixup64.dll",
-"KernelTraceControl.dll",
-"KernelTraceControl.Win61.dll",
-"Microsoft.Diagnostics.FastSerialization.dll",
-"Microsoft.Diagnostics.Tracing.TraceEvent.dll",
-"msdia140.dll",
-"OSExtensions.dll",
-"PsfMonitor.exe",
-"PsfMonitorX64.exe",
-"PsfMonitorX86.exe")
 
 
 # load binaries
@@ -172,6 +160,6 @@ Write-Host "Use default Toolkit Path $($MSIXToolkitPath)"  -ForegroundColor Gree
 Write-Host "Use default PSF Path $($MSIXPSFPath)" -ForegroundColor Green
 
 #Set Default PSF
-Set-ActivePSFFramework -version "MicrosoftPSF"
-Set-MSIXToolkit
+Set-MSIXActivePSFFramework -version "MicrosoftPSF"
+Set-MSIXToolkit 
 
