@@ -1,5 +1,23 @@
-# Start the PSF Monitor external
+
 function Start-MSIXPSFMonitor{
+<#
+.SYNOPSIS
+Starts the PSF Monitor external.
+
+.DESCRIPTION
+This function starts the PSF Monitor external application. The PSF Monitor is responsible for monitoring and intercepting calls made by MSIX packaged applications.
+
+.PARAMETER Architektur
+Specifies the architecture of the PSF Monitor to start. Valid values are '64' and '32'. The default value is '64'.
+
+.EXAMPLE
+Start-MSIXPSFMonitor -Architektur 32
+Starts the PSF Monitor with the 32-bit architecture.
+
+.EXAMPLE
+Start-MSIXPSFMonitor
+Starts the PSF Monitor with the default 64-bit architecture.
+#>    
     param(
         [ValidateSet('64', '32')]
         $Architektur = '64'
@@ -14,4 +32,3 @@ function Start-MSIXPSFMonitor{
     Start-Process $MonitorPath
     
 }
-

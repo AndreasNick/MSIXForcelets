@@ -1,4 +1,53 @@
+
 function Set-MSIXVisualElements {
+<#
+.SYNOPSIS
+Sets the visual elements of an MSIX application.
+
+.DESCRIPTION
+The Set-MSIXVisualElements function is used to update the visual elements of an MSIX application specified by the ApplicationId. It modifies the AppxManifest.xml file located in the MSIXFolder to reflect the changes.
+
+.PARAMETER MSIXFolder
+Specifies the folder path where the MSIX application is located.
+
+.PARAMETER ApplicationId
+Specifies the unique identifier of the MSIX application.
+
+.PARAMETER Description
+Specifies the description of the MSIX application.
+
+.PARAMETER AppListEntry
+Specifies the AppListEntry value of the MSIX application. Valid values are 'default' or 'none'.
+
+.PARAMETER Square150x150Logo
+Specifies the path to the Square150x150Logo image file.
+
+.PARAMETER Square44x44Logo
+Specifies the path to the Square44x44Logo image file.
+
+.PARAMETER Wide310x150Logo
+Specifies the path to the Wide310x150Logo image file.
+
+.PARAMETER Square310x310Logo
+Specifies the path to the Square310x310Logo image file.
+
+.PARAMETER Square71x71Logo
+Specifies the path to the Square71x71Logo image file.
+
+.PARAMETER BackgroundColor
+Specifies the background color of the MSIX application. Valid values are 'transparent', 'aliceBlue', 'antiqueWhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedAlmond', 'blue', or 'red'.
+
+.PARAMETER DisplayName
+Specifies the display name of the MSIX application.
+
+.EXAMPLE
+Set-MSIXVisualElements -MSIXFolder "C:\MyApp" -ApplicationId "MyApp" -Description "My App Description" -AppListEntry "default" -Square150x150Logo "C:\MyApp\Logo.png" -BackgroundColor "blue" -DisplayName "My App"
+This example sets the visual elements of the MSIX application located in "C:\MyApp". It updates the description, AppListEntry, Square150x150Logo, background color, and display name.
+
+.NOTES
+This function requires the AppxManifest.xml file to be present in the specified MSIXFolder. If the file does not exist, an error will be thrown.
+#>
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true,
