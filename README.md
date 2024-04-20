@@ -12,13 +12,15 @@ First the module must be imported. This can also be in the module memory, for ex
 
 ```powershell
 #In the Script folder
-Import-Module <PATH>\MSIXForcelets.ps1
-Import-Module <PATH>\MSIXPackaging.ps1
+Import-Module "MSIXForcelets.psm1" -verbose -Force 
+
 ````
 ## Test MSIXForcelets (for Infos)
 
 ```powershell
-Import-Module $PSScriptRoot\..\MSIXForcelets.ps1
+#Import-Module $PSScriptRoot\..\MSIXForcelets.ps1
+Import-Module "<PathTo>\MSIXForcelets.psm1" -verbose -Force 
+
 Get-AppXManifestInfo \\Server\autosequencer\MSIXPackages\Blender-x64-2.91.2.msix
 <#
 Name                  : Blender-x64
