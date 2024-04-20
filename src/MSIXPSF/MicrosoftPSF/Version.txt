@@ -1,4 +1,0 @@
-Microsoft PSF from Github  
-
-Date: 12.2.2024
-PSF release : version 1.0.240212.1
