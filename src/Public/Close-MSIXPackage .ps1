@@ -47,9 +47,19 @@ This example closes the MSIX package located at "C:\Temp\MyApp.msix" by packing 
             return $null
         }
         else {
+            $configFile = Join-Path $MSIXFolder -ChildPath "config.json.xml"
             #Create config.json
-            Convert-MSIXPSFXML2JSON -xml (Join-Path $MSIXFolder -ChildPath "config.json.xml") -xsl (Join-Path -path $Script:ScriptPath -ChildPath "Data\Format.xsl") -output (Join-Path $MSIXFolder -ChildPath "config.json")
-            MakeAppx pack -o -p $MsixFile.FullName -d  $MSIXFolder.FullName 
+            if(Test-Path $configFile){
+                Convert-MSIXPSFXML2JSON -xml $configFile -xsl (Join-Path -path $Script:ScriptPath -ChildPath "Data\Format.xsl") -output (Join-Path $MSIXFolder -ChildPath "config.json")
+            } else {
+                Write-Warning "No config.json.xml found. A config.json is not created."
+            }
+            if($VerbosePreference -eq 'Continue'){
+                MakeAppx pack -o -p $MsixFile.FullName -d  $MSIXFolder.FullName | Out-Default
+            } else {
+                MakeAppx pack -o -p $MsixFile.FullName -d  $MSIXFolder.FullName | Out-Null
+            }
+            
             #-l 
             if ($lastexitcode -ne 0) {
                 Write-Error "ERROR: MSIX Cannot close Package"
@@ -57,8 +67,10 @@ This example closes the MSIX package located at "C:\Temp\MyApp.msix" by packing 
             }
             else {
                 if (-Not $KeepMSIXFolder) {
+                    Write-Verbose "Remove MSIX temp folder $MSIXFolder"
                     Remove-Item $MSIXFolder -Recurse -Confirm:$false -ErrorAction SilentlyContinue
                     if(Test-Path $MSIXFolder){
+                        Write-Verbose "Force remove MSIX temp folder $MSIXFolder"
                         & Cmd.exe /C rmdir /S /Q "$MSIXFolder" 2>$null
                     }
                 }

@@ -82,14 +82,26 @@ https://www.nick-it.de
             /v, /verbose: Enables verbose output of messages to the console.
           
         #>      
-        MakeAppx unpack -o -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Default
+
+        #Test the common verbose switch is set
+        
+
+
+        if($VerbosePreference -eq 'Continue'){
+            MakeAppx unpack -o -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Default
+        } else {
+            MakeAppx unpack -o -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Null
+        }
+        
+
+
         if ($lastexitcode -ne 0) {
 
             Write-Error "ERROR: MSIX Cannot open Package"
             Return $Null
         }
 
-        return $MSIXFolder
+        return  $MSIXFolder
     }
 }
 

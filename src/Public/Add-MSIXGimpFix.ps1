@@ -61,7 +61,8 @@ https://www.nick-it.de
     }
 
     try {
-        [System.IO.DirectoryInfo] $Package = Open-MSIXPackage -MsixFile $MsixFile -Force:$force -MSIXFolder $MSIXFolder
+        #[System.IO.DirectoryInfo] 
+        $Package = Open-MSIXPackage -MsixFile $MsixFile -Force:$force -MSIXFolder $MSIXFolder
 
         if ($Subject -ne "") {
             Set-MSIXPublisher -MSIXFolder $MsixFolder -PublisherSubject $Subject
@@ -70,11 +71,27 @@ https://www.nick-it.de
         #ToFind needed DLL Files
         Add-MSIXloaderSearchPathOverride -FolderPaths "Bin" -MSIXFolderPath $MsixFolder
 
+        # 2024-01-09 Andreas Nick 
+        # Disable Update Search
+        # (check-updates yes) to (check-updates no)
+        $gimpRcPath = "$MsixFolder\etc\gimp\2.0\gimprc" 
+        $content = Get-Content $gimpRcPath -Raw
+        #Replace check-updates yes with check-updates no
+        if ($content -match "check-updates yes") {
+            $content = $content -replace "check-updates yes", "check-updates no"
+            # Write back to file
+            Set-Content $gimpRcPath -Value $content
+            Write-Verbose "Update-Checks in GIMP is deactivated."
+        }
+        else {
+            Write-Verbose "No changes in GIMP Update settings."
+        }
+        
         #Remove Twain Driver
         Write-Information "Remove Folder lib\gimp\2.0\plug-ins\twain"
-        Remove-Item -Path (Join-Path -Path $MsixFolder -ChildPath '\lib\gimp\2.0\plug-ins\twain') -Recurse -Force -Confirm:$false
+        Remove-Item -Path (Join-Path -Path $MsixFolder -ChildPath '\lib\gimp\2.0\plug-ins\twain') -Recurse -Force -Confirm:$false 
 
-        Close-MSIXPackage -MSIXFolder $MsixFolder -MSIXFile $OutputFilePath
+        Close-MSIXPackage -MSIXFolder $MsixFolder -MSIXFile $OutputFilePath 
     }
     catch {
         Write-Error "Error adding Gimp Fix" 

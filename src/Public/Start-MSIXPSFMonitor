@@ -1,0 +1,17 @@
+# Start the PSF Monitor external
+function Start-MSIXPSFMonitor{
+    param(
+        [ValidateSet('64', '32')]
+        $Architektur = '64'
+    )
+
+    #$Path = Join-Path -Path $ScriptPath -ChildPath $($Script:PsfBBasePath + '\PSFMonitor')
+    $MonitorPath =  Join-Path -Path $Script:MSIXPSFPath -ChildPath 'amd64\PSFMonitor.exe'
+    if($Architektur -eq '32'){
+        $MonitorPath =  $MonitorPath -replace 'amd64', 'win32'
+    }
+    
+    Start-Process $MonitorPath
+    
+}
+

@@ -1,0 +1,40 @@
+
+<#
+.SYNOPSIS
+    Tests the signature of an MSIX file.
+
+.DESCRIPTION
+    The Test-Signature function checks whether the specified MSIX file is signed or not.
+
+.PARAMETER MSIXFile
+    Specifies the MSIX file to be checked for signature.
+
+.OUTPUTS
+    Returns 1 if the MSIX file is not signed, otherwise returns 0.
+
+.EXAMPLE
+    Test-Signature -MSIXFile "C:\Path\To\MyApp.msix"
+
+    Description
+    -----------
+    Checks the signature of the MyApp.msix file.
+
+#>
+
+function Test-Signature {
+    [CmdletBinding()]
+    [OutputType([boolean])]
+    param(
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true,
+            Position = 0)]
+        [System.IO.FileInfo] $MSIXFile
+    )
+    
+    process {
+        (Get-AuthenticodeSignature $MSIXFile.FullName).Status -eq "NotSigned"    
+    }
+    
+    end {
+    }
+}
