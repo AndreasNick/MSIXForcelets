@@ -1,3 +1,4 @@
 Firewall CmdLet
 Set-MSIXPSFFileRedirectionFixup
 Get-MSIXFixup
+New-MSIXAppAttachVHD

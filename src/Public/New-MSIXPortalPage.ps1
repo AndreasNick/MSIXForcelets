@@ -25,7 +25,10 @@ A switch parameter indicating whether to copy the packages to the output path.
 .EXAMPLE
 New-MSIXPortalPage -WebServerBaseURL "http://example.com/" -TemplatePath "C:\Templates\portal-template.html" -Packages $packages -OutputPath "C:\Output" -CopyPackages
 This example creates a new MSIX portal page using the specified web server base URL, template path, packages, output path, and copies the packages to the output path.
-
+.NOTES
+# Work with user rights!
+https://www.nick-it.de
+Andreas Nick, 2024
 #>
   param(
     [URI] $WebServerBaseURL,

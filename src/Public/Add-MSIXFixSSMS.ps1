@@ -1,7 +1,6 @@
 # Fix for Microsoft SQL Server Management Studio (SSMS) MSIX package
-function Add-MSIXSSMSFix {
+function Add-MSIXFixSSMS {
     [CmdletBinding()]
-  
     param(
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,

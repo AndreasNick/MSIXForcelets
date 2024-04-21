@@ -1,10 +1,10 @@
-function Add-MSIXGimpFix {
+function Add-MSIXFixGimp {
 <#
 .SYNOPSIS
 Adds a GIMP fix to an MSIX package.
 
 .DESCRIPTION
-The Add-MSIXGimpFix function adds a GIMP fix to an MSIX package. It performs the following steps:
+The Add-MSIXFixGimp function adds a GIMP fix to an MSIX package. It performs the following steps:
 1. Opens the MSIX package.
 2. Sets the publisher subject if provided.
 3. Adds a search path override for DLL files.
@@ -27,7 +27,7 @@ The path to the output MSIX file. If not provided, the input MSIX file will be u
 The publisher subject to set.
 
 .EXAMPLE
-Add-MSIXGimpFix -MsixFile "C:\Path\To\Package.msix" -OutputFilePath "C:\Path\To\Output.msix" -Subject "My Publisher"
+Add-MSIXFixGimp  -MsixFile "C:\Path\To\Package.msix" -OutputFilePath "C:\Path\To\Output.msix" -Subject "My Publisher"
 
 This example adds a GIMP fix to the specified MSIX package, sets the publisher subject, and saves the modified package to the specified output file.
 .NOTES

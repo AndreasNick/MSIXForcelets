@@ -154,6 +154,113 @@ foreach ($item in $IconInfo) {
   Update-TypeData @IconConfig -MemberName $item -force
 }
 
+# For direct registry.dat file operations
+$RawRegFileCode = @"
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+using Microsoft.Win32; 
+
+public static class Win32Apis {
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegLoadAppKey(string lpFile, out IntPtr phkResult, int samDesired, int dwOptions, int Reserved);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegOpenKeyEx(IntPtr hKey, string subKey, uint options, int samDesired, out IntPtr phkResult);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    public static extern int RegCloseKey(IntPtr hKey);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegQueryInfoKey(
+        IntPtr hKey, 
+        StringBuilder lpClass, 
+        ref uint lpcbClass, 
+        IntPtr lpReserved, 
+        out uint lpcSubKeys, 
+        out uint lpcbMaxSubKeyLen, 
+        out uint lpcbMaxClassLen, 
+        out uint lpcValues, 
+        out uint lpcbMaxValueNameLen, 
+        out uint lpcbMaxValueLen, 
+        out uint lpcbSecurityDescriptor, 
+        out FILETIME lpLastWriteTime);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegEnumKeyEx(
+        IntPtr hKey, 
+        uint index, 
+        StringBuilder lpName, 
+        ref uint lpcbName, 
+        IntPtr lpReserved, 
+        StringBuilder lpClass, 
+        ref uint lpcbClass, 
+        out FILETIME lpftLastWriteTime);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegQueryValueEx(
+        IntPtr hKey,
+        string lpValueName,
+        int lpReserved,
+        out uint lpType,
+        [Out] byte[] lpData,
+        ref uint lpcbData);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegEnumValue(
+        IntPtr hKey,
+        uint dwIndex,
+        StringBuilder lpValueName,
+        ref uint lpcbValueName,
+        IntPtr lpReserved,
+        out uint lpType,
+        byte[] lpData,
+        ref uint lpcbData);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegCreateKeyEx(
+        IntPtr hKey,
+        string lpSubKey,
+        uint Reserved,
+        string lpClass,
+        uint dwOptions,
+        uint samDesired,
+        IntPtr lpSecurityAttributes,
+        out IntPtr phkResult,
+        out uint lpdwDisposition);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int RegSetValueEx(
+        IntPtr hKey,
+        string lpValueName,
+        int Reserved,
+        RegistryValueKind dwType,
+        byte[] lpData,
+        int cbData);
+
+  [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegDeleteKeyEx(
+        IntPtr hKey,
+        string lpSubKey,
+        uint samDesired,
+        uint Reserved);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegDeleteValue(
+        IntPtr hKey,
+        string lpValueName);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILETIME {
+        public uint dwLowDateTime;
+        public uint dwHighDateTime;
+    }
+}
+"@;
+
+Add-Type -TypeDefinition $RawRegFileCode -Language CSharp
+
 
 #
 # load Assembly binaries
@@ -191,6 +298,8 @@ Write-Host "loaded MSIXForcelets" -ForegroundColor Green
 Write-Host "===============================" -ForegroundColor Green
 Write-Host "Use default Toolkit Path $($MSIXToolkitPath)"  -ForegroundColor Green
 Write-Host "Use default PSF Path $($MSIXPSFPath)" -ForegroundColor Green
+Write-Host "(c) 2020-2024 Andreas Nick" -ForegroundColor Green
+Write-Host "Use at your own risk without any guarantee or warranty1" -ForegroundColor Red
 
 #Set Default PSF
 Set-MSIXActivePSFFramework -version "MicrosoftPSF"

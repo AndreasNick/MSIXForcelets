@@ -7,8 +7,9 @@ if($PSScriptRoot -eq $null) {
 }
 
 Import-Module "$PSScriptRoot\..\src\MSIXForcelets.psm1" -verbose -Force 
-$msixFilePath = "$env:Userprofile\Desktop\Gimp-x64.msix"
-$msixOutFilePath = "$env:Userprofile\Desktop\Gimp-x64_fixed.msix"
+$msixFilePath = "$env:Userprofile\Desktop\AdobeAcrobatReaderDC-x86-Multi.msix"
+$msixOutFilePath = "$env:Userprofile\Desktop\AdobeAcrobatReaderDC-x86-Multi_fixed.msix"
+
 
 $CertPassword = 'mypass' | ConvertTo-SecureString -Force -AsPlainText
 $CertPath = "$PSScriptRoot\..\test\NewSelfSigningCert.pfx" #Selfsigned Cert for example
@@ -18,7 +19,7 @@ $Subject = (Get-PfxData -FilePath $CertPath -Password $CertPassword).EndEntityCe
 
 # Add the GIMP fix and a new subject
 #Start-Transcript -Path $env:Userprofile\Desktop\Gimp-x64_fixed.log -Force
- Add-MSIXFixGimp -MsixFile $msixFilePath -OutputFilePath $msixOutFilePath -Subject $Subject -Force  -Verbose
+ Add-MSIXFixAcrobatReaderDC -MsixFile $msixFilePath  -OutputFilePath $msixOutFilePath -Subject $Subject -Force -Verbose 
 #Stop-Transcript
 
 # Sign the package
