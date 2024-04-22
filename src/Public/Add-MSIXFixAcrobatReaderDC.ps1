@@ -78,13 +78,20 @@ function Add-MSIXFixAcrobatReaderDC {
         $IsForce = $PSCmdlet.MyInvocation.BoundParameters["Force"].IsPresent -eq $true
         Add-MSIXRegAccessFix -MSIXFolder $MSIXFolder -force:$IsForce -Verbose #Change registry user rights, onlay as admin! 
 
-        # Set Keys in the virtual HKLM Reg
-        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
-        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
-        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
-        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        # Set Keys in the virtual HKLM Reg                                                                                                                                                                    
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
 
+        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
 
+        # Adobe Acrobat Keys
+        <#
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        #>
 
         # Script for the user.dat (wrong hive)
         <#

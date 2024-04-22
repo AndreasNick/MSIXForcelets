@@ -7,8 +7,10 @@ if($PSScriptRoot -eq $null) {
 }
 
 Import-Module "$PSScriptRoot\..\src\MSIXForcelets.psm1" -verbose -Force 
-$msixFilePath = "$env:Userprofile\Desktop\AdobeAcrobatReaderDC-x86-Multi.msix"
-$msixOutFilePath = "$env:Userprofile\Desktop\AdobeAcrobatReaderDC-x86-Multi_fixed.msix"
+
+
+$msixFilePath = "$env:Userprofile\Desktop\AcroRdrDCx86enUS.msix"
+$msixOutFilePath = "$env:Userprofile\Desktop\AcroRdrDCx86enUS_fixed.msix"
 
 
 $CertPassword = 'mypass' | ConvertTo-SecureString -Force -AsPlainText
@@ -24,5 +26,4 @@ $Subject = (Get-PfxData -FilePath $CertPath -Password $CertPassword).EndEntityCe
 
 # Sign the package
 Set-MSIXSignature -MSIXFile $msixOutFilePath -PfxCert $CertPath -CertPassword $CertPassword 
-
 
