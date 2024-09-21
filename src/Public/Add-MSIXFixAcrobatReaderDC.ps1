@@ -82,8 +82,8 @@ function Add-MSIXFixAcrobatReaderDC {
         Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
         Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bEnableProtectedModeAppContainer" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
 
-        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
-        #Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        Set-MSIXVirtualRegistryKey -HiveFilePath (Join-Path $Package -ChildPath "Registry.dat") -KeyPath "REGISTRY\MACHINE\SOFTWARE\WOW6432Node\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -ValueName "bProtectedMode" -ValueData "0" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
 
         # Adobe Acrobat Keys
         <#

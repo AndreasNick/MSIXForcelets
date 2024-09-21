@@ -118,7 +118,8 @@ Andreas Nick, 2022
                     }
 
                     $r.id = $MISXAppID
-                    $r.executable = $($Executable -replace '\\', '/')
+                    #$r.executable = $($Executable -replace '\\', '/')
+                    $r.executable = $($Executable -replace '\\', '\\')
                     $approot.AppendChild($r) | Out-Null
                     #Save config
                     $conxml.PreserveWhiteSpace = $false

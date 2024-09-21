@@ -40,7 +40,7 @@ $WorkingDirectory = 'C:/Program Files (x86)/FreeOrion'
 
 
 foreach($app in $apps) {
-    Update-MSIXVisualElements -MSIXFolder $Package  -ApplicationId $app.ID -AppListEntry "default"
+    Set-MSIXVisualElements -MSIXFolder $Package  -ApplicationId $app.ID -AppListEntry "default"
     
     $exe = Join-Path -Path $Package -ChildPath $app.Executable
     if((Get-MSIXAppExeArchitectureType $exe ) -eq 'I386') {
