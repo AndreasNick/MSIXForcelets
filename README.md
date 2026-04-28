@@ -161,14 +161,20 @@ Add-MSIXPSFFileRedirectionFixup -MSIXFolder $pkg `
 
 ---
 
-### PSF — registry and MFR fixups (Tim Mangan PSF)
+### PSF — registry fixups (Microsoft PSF and Tim Mangan PSF)
 
 ```powershell
-# Default HKCU/HKLM access normalisation rules
+# Default HKCU/HKLM access normalisation rules — works with both PSF variants
 Add-MSIXPSFDefaultRegLegacy -MSIXFolder $pkg
+```
 
+---
+
+### PSF — MFR and DLL fixups (Tim Mangan PSF only)
+
+```powershell
 # Modern file redirection fixup (replaces FileRedirectionFixup)
-# Use -IlvAware:$true when Add-MSIXInstalledLocationVirtualization is also active
+# Use -IlvAware 'true' when Add-MSIXInstalledLocationVirtualization is also active
 Add-MSIXPSFMFRFixup -MSIXFolder $pkg -IlvAware 'true'
 
 # Register all package DLLs so PSF can resolve load requests

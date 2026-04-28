@@ -1,21 +1,13 @@
 ﻿function Add-MSIXPSFMFRFixup {
 <#
 .SYNOPSIS
-    Adds a Tim Mangan MFRFixup configuration to an MSIX package.
+    Adds MFRFixup, a fix from Tim Mangan, to an MSIX package.
 
 .DESCRIPTION
     Writes an MFRFixup entry into config.json.xml. MFRFixup (Modern File
     Redirection) is a Tim Mangan PSF component that intercepts 30+ Windows
     file-system APIs and handles Copy-on-Write redirection more efficiently
     than the standard FileRedirectionFixup.
-
-    This function requires the Tim Mangan PSF to be active
-    (Set-MSIXActivePSFFramework -version TimManganPSF). It will terminate
-    with an error when the Microsoft PSF is selected.
-
-    The PSF launcher selects the correct architecture-specific DLL at runtime;
-    config.json always references MFRFixup.dll without an architecture suffix.
-
     Do not combine MFRFixup with FileRedirectionFixup on the same process entry.
 
 .PARAMETER MSIXFolder
