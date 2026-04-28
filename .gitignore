@@ -1,0 +1,15 @@
+/AppBotPortal
+/src/Libs/MSIXPackaging
+/src/Libs/MSIXCore
+/src/MSIXPSF
+/MsixContextMenuHandler
+/MsixModernContextMenuHandler
+/DebugView
+/DebugView
+/Trash
+/Test
+workspace.code-workspace
+CLAUDE.md
+Project.md
+.claude/
+.vscode/

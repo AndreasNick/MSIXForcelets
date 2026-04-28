@@ -1,0 +1,72 @@
+{
+  "clsid": "{4A7B3C1D-E2F5-4689-ABCD-EF1234567891}",
+  "menuTitle": "WinRAR",
+  "executable": "VFS\\ProgramFilesX64\\WinRAR\\WinRAR.exe",
+  "psfLauncher": "",
+  "icon": "VFS\\ProgramFilesX64\\WinRAR\\WinRAR.exe",
+  "iconIndex": 0,
+  "iconSize": 0,
+  "archiveExtension": "",
+  "debug": true,
+  "allFiles": true,
+  "folders": true,
+  "background": false,
+  "recycleBin": false,
+  "fileTypes": [],
+  "entries": [
+    {
+      "id": "addToArchive",
+      "label": "Add to archive...",
+      "labelWithFile": "",
+      "args": "{files}",
+      "filesOnly": false,
+      "useShellExecute": true,
+      "extensions": []
+    },
+    {
+      "id": "addToRar",
+      "label": "Add to RAR archive",
+      "labelWithFile": "Add to \"{archive}.rar\"",
+      "args": "a -ep1 \"{folder}\\{archive}.rar\" {files}",
+      "filesOnly": false,
+      "useShellExecute": false,
+      "extensions": []
+    },
+    {
+      "id": "addToZip",
+      "label": "Add to ZIP archive",
+      "labelWithFile": "Add to \"{archive}.zip\"",
+      "args": "a -afzip \"{folder}\\{archive}.zip\" {files}",
+      "filesOnly": false,
+      "useShellExecute": false,
+      "extensions": []
+    },
+    {
+      "id": "extractHere",
+      "label": "Extract here",
+      "labelWithFile": "Extract here",
+      "args": "x -o+ {files} \"{folder}\\\"",
+      "filesOnly": true,
+      "useShellExecute": false,
+      "extensions": [".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz", ".cab", ".arj"]
+    },
+    {
+      "id": "extractTo",
+      "label": "Extract to folder",
+      "labelWithFile": "Extract to \"{folder}\\\"",
+      "args": "x -o+ -ad {files} \"{folder}\\\"",
+      "filesOnly": true,
+      "useShellExecute": false,
+      "extensions": [".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz", ".cab", ".arj"]
+    },
+    {
+      "id": "openArchive",
+      "label": "Open with WinRAR",
+      "labelWithFile": "Open \"{archive}.rar\" with WinRAR",
+      "args": "{files}",
+      "filesOnly": true,
+      "useShellExecute": false,
+      "extensions": [".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz", ".cab", ".arj"]
+    }
+  ]
+}

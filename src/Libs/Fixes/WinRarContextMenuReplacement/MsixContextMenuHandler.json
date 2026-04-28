@@ -1,0 +1,53 @@
+{
+  "menuTitle": "WinRAR",
+  "executable": "WinRAR.exe",
+  "icon": "WinRAR.exe",
+  "iconIndex": 0,
+  "iconSize": 20,
+  "archiveExtension": ".rar",
+  "entries": [
+    {
+      "id": "addDialog",
+      "label": "Add to archive...",
+      "args": "{files}",
+      "useShellExecute": true
+    },
+    {
+      "id": "addAuto",
+      "label": "Add to archive",
+      "labelWithFile": "Add to \"{archive}\"",
+      "args": "a -o+ \"{folder}\\{archive}\" {files}"
+    },
+    {
+      "id": "emailAuto",
+      "label": "Add to archive and email",
+      "labelWithFile": "Add to \"{archive}\" and email",
+      "args": "a -o+ -ieml \"{folder}\\{archive}\" {files}"
+    },
+    {
+      "id": "emailDialog",
+      "label": "Compress and email...",
+      "args": "a -o+ -ieml \"{folder}\\{archive}\" {files}"
+    },
+    {
+      "id": "extractHere",
+      "label": "Extract here",
+      "args": "x -o+ {files} \"{folder}\\\"",
+      "filesOnly": true,
+      "extensions": [ ".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz" ]
+    },
+    {
+      "id": "extractTo",
+      "label": "Extract to folder",
+      "labelWithFile": "Extract to \"{folder}\\\"",
+      "args": "x -o+ -ad {files} \"{folder}\\\"",
+      "filesOnly": true,
+      "extensions": [ ".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz" ]
+    }
+  ],
+  "fileTypes": [ ".rar", ".zip", ".7z", ".tar", ".gz", ".bz2", ".xz" ],
+  "allFiles": true,
+  "folders": true,
+  "background": false,
+  "debug": true
+}
