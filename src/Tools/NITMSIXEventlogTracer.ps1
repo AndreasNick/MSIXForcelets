@@ -67,9 +67,9 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     $scriptPath = $MyInvocation.MyCommand.Path
     if ($scriptPath) {
         $psExe = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-        $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+        $argList = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$scriptPath`""
         if ($DebugLog) { $argList += ' -DebugLog' }
-        Start-Process -FilePath $psExe -ArgumentList $argList -Verb RunAs
+        Start-Process -FilePath $psExe -ArgumentList $argList -Verb RunAs -WindowStyle Hidden
         if ($DebugLog) { try { Stop-Transcript | Out-Null } catch {} }
         exit
     }
