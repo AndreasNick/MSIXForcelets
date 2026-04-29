@@ -11,23 +11,66 @@
     Run as Administrator for full diagnostic channel access (wevtutil requires elevation).
     Read-only event queries work without elevation.
 
+.PARAMETER DebugLog
+    Writes a transcript with identity, environment variables, and self-elevation
+    trace to $env:APPDATA\NITTracer-debug.log (with fallback paths). Off by default.
+
 .EXAMPLE
     . D:\...\NITMSIXEventlogTracer.ps1
+
+.EXAMPLE
+    .\NITMSIXEventlogTracer.ps1 -DebugLog
 
 .NOTES
     Andreas Nick, 2026 - https://www.nick-it.de
     Keyboard shortcuts: F5 = Start/Stop recording  |  Ctrl+F = Focus search  |  Escape = Clear search
 #>
+[CmdletBinding()]
+param(
+    [switch] $DebugLog
+)
+
+if ($DebugLog) {
+    $BeaconPaths = @(
+        "$env:APPDATA\NITTracer-debug.log",
+        "$env:LOCALAPPDATA\NITTracer-debug.log",
+        "$env:TEMP\NITTracer-debug.log",
+        "$env:USERPROFILE\Desktop\NITTracer-debug.log",
+        'C:\Windows\Temp\NITTracer-debug.log'
+    )
+    $TranscriptLog = $null
+    foreach ($p in $BeaconPaths) {
+        try {
+            "$(Get-Date -Format 'HH:mm:ss.fff') beacon PID=$PID path=$p" | Add-Content -LiteralPath $p -ErrorAction Stop
+            if ($null -eq $TranscriptLog) { $TranscriptLog = $p }
+        } catch {}
+    }
+    try { Start-Transcript -Path $TranscriptLog -Append -Force -ErrorAction SilentlyContinue | Out-Null } catch {}
+    "$(Get-Date -Format 'HH:mm:ss.fff') === Tracer started ===" | Out-Host
+    "  PID            : $PID"                                   | Out-Host
+    "  Identity       : $([Security.Principal.WindowsIdentity]::GetCurrent().Name)" | Out-Host
+    "  IsAdmin        : $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrator'))" | Out-Host
+    "  ScriptPath     : $($MyInvocation.MyCommand.Path)"          | Out-Host
+    "  PSVersion      : $($PSVersionTable.PSVersion)"             | Out-Host
+    "  CWD            : $((Get-Location).Path)"                   | Out-Host
+    '  --- env: ---'                                              | Out-Host
+    Get-ChildItem env: | Sort-Object Name | ForEach-Object {
+        "    {0,-32} = {1}" -f $_.Name, $_.Value | Out-Host
+    }
+    '  --- /env ---'                                              | Out-Host
+}
 
 # Self-elevate via UAC when not running as Administrator.
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
         [Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    if ($DebugLog) { "  -> not admin, attempting Start-Process -Verb RunAs" | Out-Host }
     $scriptPath = $MyInvocation.MyCommand.Path
     if ($scriptPath) {
         $psExe = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-        Start-Process -FilePath $psExe `
-            -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" `
-            -Verb RunAs
+        $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+        if ($DebugLog) { $argList += ' -DebugLog' }
+        Start-Process -FilePath $psExe -ArgumentList $argList -Verb RunAs
+        if ($DebugLog) { try { Stop-Transcript | Out-Null } catch {} }
         exit
     }
     # Dot-sourced without a resolvable path: continue without elevation; status bar will warn.
