@@ -91,6 +91,12 @@ function Add-MSXIXPSFShim {
 
         [String] $Arguments = '',
 
+        # Overrides config.json's executable field. Use this to point at a system
+        # tool (e.g. powershell.exe) when Application/@Executable is just a
+        # script that needs an interpreter. The manifest still references the
+        # renamed PsfLauncher; only config.json gets the override.
+        [String] $LauncherExecutable = '',
+
         # Valid values: Auto | x64 | x86. When omitted, PSFDefaultArchitecture from module config is used.
         [ValidateSet('Auto', 'x64', 'x86')]
         [String] $PSFArchitektur,
@@ -236,16 +242,23 @@ function Add-MSXIXPSFShim {
             $idEl.InnerText = $newAppId
             $r.AppendChild($idEl) | Out-Null
 
+            # Pre-escape inner double-quotes to \" so Convert-MSIXPSFXML2JSON's
+            # XSLT->JSON pipeline produces valid JSON (the XSLT does not escape
+            # values; backslashes are normalised post-transform but quotes are not).
             $exeEl = $conxml.CreateElement('executable')
-            $exeEl.InnerText = $originalExecutable -replace '\\', '\\'
+            $exeForConfig = if ([string]::IsNullOrEmpty($LauncherExecutable)) { $originalExecutable } else { $LauncherExecutable }
+            $exeEl.InnerText = $exeForConfig.Replace('"', '\"')
             $r.AppendChild($exeEl) | Out-Null
+            if ($LauncherExecutable -ne '') {
+                Write-Verbose "config.json executable overridden: $LauncherExecutable"
+            }
 
             $argEl = $conxml.CreateElement('arguments')
-            $argEl.InnerText = $Arguments
+            $argEl.InnerText = $Arguments.Replace('"', '\"')
             $r.AppendChild($argEl) | Out-Null
 
             $wdEl = $conxml.CreateElement('workingDirectory')
-            $wdEl.InnerText = $WorkingDirectory
+            $wdEl.InnerText = $WorkingDirectory.Replace('"', '\"')
             $r.AppendChild($wdEl) | Out-Null
 
             if ($isTimMangan) {
