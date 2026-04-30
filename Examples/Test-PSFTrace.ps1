@@ -40,7 +40,7 @@ Backup-MSIXManifest -MSIXFolder $Package
 $apps = Get-MSIXApplications -MSIXFolder $Package
 
 foreach ($app in $apps) {
-    Set-MSIXVisualElements -MSIXFolder $Package -ApplicationId $app.Id -AppListEntry 'default'
+    Set-MSIXApplicationVisualElements -MSIXFolderPath $Package -Id $app.Id -AppListEntry 'default'
 
     $exe = Join-Path -Path $Package -ChildPath $app.Executable
     $arch = if ((Get-MSIXAppExeArchitectureType $exe) -eq 'I386') { '32Bit' } else { '64Bit' }

@@ -276,7 +276,7 @@ function Add-MSIXFixWinRARModernShell {
             }
 
             Add-MSIXPSFDefaultRegLegacy -MSIXFolder $MSIXFolder
-            Add-MSIXPSFMFRFixup -MSIXFolder $MSIXFolder -IlvAware 'true'
+            Add-MSIXPSFMFRFixup -MSIXFolder $MSIXFolder -IlvAware $true
 
             # Move IExplorerCommand extensions to a hidden Application to suppress the
             # Windows 11 Application-level grouping flyout. 

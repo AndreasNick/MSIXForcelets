@@ -174,8 +174,8 @@ Add-MSIXPSFDefaultRegLegacy -MSIXFolder $pkg
 
 ```powershell
 # Modern file redirection fixup (replaces FileRedirectionFixup)
-# Use -IlvAware 'true' when Add-MSIXInstalledLocationVirtualization is also active
-Add-MSIXPSFMFRFixup -MSIXFolder $pkg -IlvAware 'true'
+# Use -IlvAware $true when Add-MSIXInstalledLocationVirtualization is also active
+Add-MSIXPSFMFRFixup -MSIXFolder $pkg -IlvAware $true
 
 # Register all package DLLs so PSF can resolve load requests
 Add-MSIXPSFDynamicLibraryFixup -MSIXFolder $pkg

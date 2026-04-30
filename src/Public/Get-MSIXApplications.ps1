@@ -1,61 +1,62 @@
+function Get-MSIXApplications {
 <#
 .SYNOPSIS
-Retrieves information about MSIX applications from a specified expanded MSIX package folder.
+    Retrieves the Application entries from an expanded MSIX package's manifest.
 
 .DESCRIPTION
-The Get-MSIXApplications function Retrieves information about MSIX applications inside the AppXManifest from a specified expanded MSIX package folder. It reads the AppxManifest.xml file in the folder and returns an array of objects containing the application ID, executable, and entry point.
+    Reads AppxManifest.xml from the specified expanded MSIX package folder and
+    returns one object per Application entry, exposing Id, Executable, EntryPoint
+    and the source folder. Designed to feed Set-MSIXApplicationVisualElements,
+    Add-MSXIXPSFShim and similar cmdlets via the pipeline.
 
 .PARAMETER MSIXFolder
-specified expanded MSIX package folder path where the MSIX AppXManifest.xml are located.
+    Path to the expanded MSIX package folder containing AppxManifest.xml.
 
 .EXAMPLE
-Get-MSIXApplications -MSIXFolder "C:\MSIXApplications"
-This example retrieves information about MSIX applications located in the "C:\MSIXApplications" folder.
+    Get-MSIXApplications -MSIXFolder "C:\MSIXTemp\App"
+
+.EXAMPLE
+    # Pipe into a manifest mutator
+    Get-MSIXApplications -MSIXFolder $folder |
+        Set-MSIXApplicationVisualElements -AssetId 'MyApp'
 
 .OUTPUTS
+    PSCustomObject with properties: Id, Executable, EntryPoint, MSIXFolderPath.
+    The MSIXFolderPath property is named so it binds to the MSIXFolderPath
+    parameter of downstream cmdlets via ValueFromPipelineByPropertyName.
 
 .NOTES
-Author: Your Name
-Date: Today's Date
+    https://www.nick-it.de
+    Andreas Nick, 2026
 #>
-
-function Get-MSIXApplications {
     [CmdletBinding()]
-    #[OutputType([int])]
     param(
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
-            #ValueFromPipelineByPropertyName = $true,
             Position = 0)]
-        [System.IO.DirectoryInfo] $MSIXFolder  
+        [System.IO.DirectoryInfo] $MSIXFolder
     )
-    
-    begin {
-    }
-    
-    process {
-        if (-not (Test-Path (Join-Path $MSIXFolder -ChildPath "AppxManifest.xml") )) {
-            Write-Error "The MSIX temporary folder does not exist"
-            throw "The MSIX temporary folder does not exist"
-            #return $null
-        }
-        else {
 
-            $AppxManigest = New-Object xml
-            $AppxManigest.Load((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
-            $result = @()
-            foreach ($app in $AppxManigest.Package.Applications.Application) {
-                Write-Verbose "Found application $($app.Id)"
-                $AppObj = "" | Select-Object -Property Id, Executable, EntryPoint, MSIXFolderPath
-                $AppObj.Id = $app.Id
-                $AppObj.Executable = $app.Executable
-                $AppObj.EntryPoint = $app.EntryPoint
-                $AppObj.MSIXFolderPath = $MSIXFolder.FullName
-                $result += $AppObj
+    process {
+        $manifestPath = Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"
+        if (-not (Test-Path $manifestPath)) {
+            Write-Error "The MSIX folder does not contain AppxManifest.xml: $($MSIXFolder.FullName)"
+            return
+        }
+
+        $appxManifest = New-Object xml
+        $appxManifest.Load($manifestPath)
+
+        $result = @()
+        foreach ($app in $appxManifest.Package.Applications.Application) {
+            Write-Verbose "Found application $($app.Id)"
+            $result += [PSCustomObject]@{
+                Id             = $app.Id
+                Executable     = $app.Executable
+                EntryPoint     = $app.EntryPoint
+                MSIXFolderPath = $MSIXFolder.FullName
             }
-            return $result
-        } 
-    }
-    end {
+        }
+        return $result
     }
 }

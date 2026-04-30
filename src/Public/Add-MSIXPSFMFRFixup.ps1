@@ -18,10 +18,10 @@
 
 .PARAMETER IlvAware
     Controls InstalledLocationVirtualization (ILV) awareness.
-    "true"  — assumes the ILV extension is present in AppxManifest; ILV
-              handles Copy-on-Write, MFRFixup provides path interception only.
-    "false" — MFRFixup handles all Copy-on-Write internally (no ILV required).
-    Default: "true".
+    $true  - assumes the ILV extension is present in AppxManifest; ILV
+             handles Copy-on-Write, MFRFixup provides path interception only.
+    $false - MFRFixup handles all Copy-on-Write internally (no ILV required).
+    Default: $true.
 
 .PARAMETER OverrideCOW
     Controls Copy-on-Write override behaviour. Default: "default".
@@ -30,7 +30,7 @@
     Add-MSIXPSFMFRFixup -MSIXFolder "C:\MSIXTemp\MyApp"
 
 .EXAMPLE
-    Add-MSIXPSFMFRFixup -MSIXFolder "C:\MSIXTemp\MyApp" -IlvAware "false"
+    Add-MSIXPSFMFRFixup -MSIXFolder "C:\MSIXTemp\MyApp" -IlvAware $false
 
 .NOTES
     Tim Mangan MFRFixup: https://github.com/TimMangan/MSIX-PackageSupportFramework/wiki/Fixup:-MfrFixup
@@ -44,8 +44,7 @@
 
         [String] $Executable = '.*',
 
-        [ValidateSet('true', 'false')]
-        [String] $IlvAware = 'true',
+        [bool] $IlvAware = $true,
 
         [String] $OverrideCOW = 'default'
     )
@@ -108,7 +107,8 @@
 
         $cfgEl  = $conxml.CreateElement('config')
         $ilvEl  = $conxml.CreateElement('ilvAware')
-        $ilvEl.InnerText = $IlvAware
+        # Lowercase 'true'/'false' so the XSL can emit a JSON boolean literal
+        $ilvEl.InnerText = if ($IlvAware) { 'true' } else { 'false' }
         $cowEl  = $conxml.CreateElement('overrideCOW')
         $cowEl.InnerText = $OverrideCOW
         $cfgEl.AppendChild($ilvEl) | Out-Null

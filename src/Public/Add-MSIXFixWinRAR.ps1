@@ -227,7 +227,7 @@ function Add-MSIXFixWinRAR {
 
             Add-MSIXPSFDefaultRegLegacy -MSIXFolder $MSIXFolder
 
-            Add-MSIXPSFMFRFixup -MSIXFolder $MSIXFolder -IlvAware 'true'
+            Add-MSIXPSFMFRFixup -MSIXFolder $MSIXFolder -IlvAware $true
 
             Add-MSIXPSFDynamicLibraryFixup -MSIXFolder $MSIXFolder
 

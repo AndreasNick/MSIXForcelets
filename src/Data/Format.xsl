@@ -196,10 +196,11 @@
                         }
                     </xsl:if>
                     <!-- Andreas Nick 2026.04.22: Tim Mangan MFR Fixup - ilvAware / overrideCOW -->
+                    <!-- ilvAware is a JSON boolean (no quotes); overrideCOW remains a string. -->
                     <xsl:if test="contains($dllName, 'MFRFixup') and config/ilvAware">
                         ,"config":
                         {
-                            "ilvAware": "<xsl:value-of select="config/ilvAware"/>"
+                            "ilvAware": <xsl:value-of select="config/ilvAware"/>
                             ,"overrideCOW": "<xsl:value-of select="config/overrideCOW"/>"
                         }
                     </xsl:if>
@@ -275,24 +276,23 @@
                                                 </xsl:for-each>
                                             ]
 											<!-- Andreas Nick 2021.02.19 -->
-											
+
 											<xsl:if test="pathConfig/isExclusion">
 											, "isExclusion": <xsl:value-of select="pathConfig/isExclusion"/>
 											</xsl:if>
-											
+
 											<xsl:if test="pathConfig/redirectTargetBase">
 											, "redirectTargetBase": "<xsl:value-of select="pathConfig/redirectTargetBase"/>"
 											</xsl:if> <!-- -->
-											
+
                                         }
 									     <!-- Andreas Nick 2021.02.19 -->
 										 <xsl:if test="position()!=last()">,</xsl:if>
                                     </xsl:for-each>
                                     ]
-                                    ,
                                 </xsl:if>
-                                <xsl:choose>
-                                    <xsl:when test="config/redirectedPaths/packageDriveRelative">
+                                <xsl:if test="config/redirectedPaths/packageDriveRelative">
+                                    <xsl:if test="config/redirectedPaths/packageRelative">,</xsl:if>
                                     "packageDriveRelative": [
                                     <xsl:for-each select="config/redirectedPaths/packageDriveRelative">
                                         {
@@ -316,13 +316,9 @@
                                         <xsl:if test="position()!=last()">,</xsl:if>
                                     </xsl:for-each>
                                     ]
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                    "packageDriveRelative": []
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                </xsl:if>
                                 <xsl:if test="config/redirectedPaths/knownFolders">
-                                    ,
+                                    <xsl:if test="config/redirectedPaths/packageRelative or config/redirectedPaths/packageDriveRelative">,</xsl:if>
                                 </xsl:if>
                                 <xsl:if test="config/redirectedPaths/knownFolders">
                                     "knownFolders": [
