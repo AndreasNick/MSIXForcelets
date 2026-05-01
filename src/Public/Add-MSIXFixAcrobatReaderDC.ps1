@@ -6,12 +6,7 @@ function Add-MSIXFixAcrobatReaderDC {
     Adds a fix for Acrobat Reader DC to an MSIX package.
 
 .DESCRIPTION
-    This function adds a fix for Acrobat Reader DC to an MSIX package. It performs the following steps:
-    1. Opens the MSIX package using the Open-MSIXPackage function.
-    2. Sets the publisher subject using the Set-MSIXPublisher function, if a subject is provided.
-    3. Adds a registry access fix using the Add-MSIXRegAccessFix function.
-    4. Sets a virtual registry key using the Set-MSIXVirtualRegistryKey function.
-    5. Closes the MSIX package using the Close-MSIXPackage function.
+    This function adds a fix for Acrobat Reader DC to an MSIX package. 
 
 .PARAMETER MsixFile
     Specifies the MSIX file to which the fix should be added. This parameter is mandatory.
@@ -29,17 +24,9 @@ function Add-MSIXFixAcrobatReaderDC {
     Specifies the publisher subject to set for the MSIX package.
 
 .PARAMETER DisableFirstRunScreen
-    Suppresses the splash screen, accepts the EULA, and clears the
-    "What's New" / "Try Acrobat Studio" promotional flags so that
-    Adobe Acrobat DC starts without any first-run dialogs.
-    Registry keys are written to User.dat (virtual HKCU) so that every
-    user who receives the package gets the correct default state.
-    Defaults to $true.
-
+    # Suppresses the "Always open PDFs in Acrobat Reader" dialog.
 .PARAMETER DisableAutoUpdate
-    Disables automatic background downloads and the built-in updater via
-    Group Policy registry keys (cUpdate\bAutoDownload and bUpdater).
-    Defaults to $true.
+    Disables automatic background downloads and the built-in updater
 
 .PARAMETER SuppressDefaultHandlerDialog
     Suppresses the "Always open PDFs in Acrobat Reader" dialog. Inside an
@@ -47,17 +34,17 @@ function Add-MSIXFixAcrobatReaderDC {
     timeout and a Windows default-apps prompt. Defaults to $true.
 
 .PARAMETER DisablePremiumTools
-    Hides premium / subscription-only tools from the Tools panel
-    (Organize Pages, Request e-Signatures, Scan & OCR, Protect, Redact,
-    Compress, Prepare a Form) via the cAcroApp\cDisabled registry entries.
-    Defaults to $true.
+    Hides premium / subscription-only tools .
 
 .PARAMETER DisableCloudServices
-    Disables the Adobe Document Cloud integration, collaboration sync, web connectors,
-    and the Adobe ID sign-in prompt. This prevents AcroCEF.exe (Chromium Embedded
-    Framework used for online features) and AdobeCollabSync.exe from launching.
-    For MSIX App Attach / AVD scenarios where only local PDF viewing is needed.
-    Defaults to $true.
+    Disables the Adobe Document Cloud integration
+
+.PARAMETER DisableReaderMode
+    Force Adobe Acrobat
+
+.PARAMETER KeepSetupCache
+    Keep Adobe's MSI repair cache (VFS\ProgramFilesCommonX64\Adobe\Acrobat\Setup,
+    ~1.4 GB) in the package. Useless inside MSIX (no msiexec repair). Default $false.
 
 .EXAMPLE
     Add-MSIXFixAcrobatReaderDC -MsixFile "C:\Path\To\Package.msix" -OutputFilePath "C:\Path\To\ModifiedPackage.msix" -Subject "CN=MyPublisher"
@@ -65,13 +52,17 @@ function Add-MSIXFixAcrobatReaderDC {
     This example adds a fix for Acrobat Reader DC to the specified MSIX package. It sets the publisher subject to "CN=MyPublisher" and saves the modified package to the specified output file path.
 
 .NOTES
-    source url's for the solution: 
+    source url's for the solution:
     https://techcommunity.microsoft.com/t5/modern-work-app-consult-blog/packaging-adobe-reader-dc-for-avd-msix-appattach/ba-p/3572098
     https://www.advancedinstaller.com/package-adobe-reader-dc-for-avd-msix-appattach.html
     >> someone has made a copy ;-)
-    
+
+    Reader-vs-Pro branding (unified app from v24+):
+    https://community.adobe.com/t5/acrobat-reader-discussions/how-to-disable-new-acrobat-reader-using-regedit-or-gpo/td-p/14008678
+    https://helpx.adobe.com/enterprise/kb/acrobat-64-bit-for-enterprises.html
+
     https://www.nick-it.de
-    Andreas Nick, 2024
+    Andreas Nick, 2026
 #>
 
     [CmdletBinding()]
@@ -91,14 +82,15 @@ function Add-MSIXFixAcrobatReaderDC {
 
         [bool] $DisableAutoUpdate = $true,
 
-        # Suppresses the "Always open PDFs in Acrobat Reader" dialog.
-        # Attempting to set the default handler from inside an MSIX container
-        # causes a long timeout followed by a Windows default-apps prompt.
         [bool] $SuppressDefaultHandlerDialog = $true,
 
         [bool] $DisablePremiumTools = $true,
 
-        [bool] $DisableCloudServices = $true
+        [bool] $DisableCloudServices = $true,
+
+        [bool] $DisableReaderMode = $false,
+
+        [bool] $KeepSetupCache = $false
 
     )
     if ($null -eq $OutputFilePath) {
@@ -120,6 +112,18 @@ function Add-MSIXFixAcrobatReaderDC {
 
         $IsForce = $PSCmdlet.MyInvocation.BoundParameters["Force"].IsPresent -eq $true
         Add-MSIXRegAccessFix -MSIXFolder $MSIXFolder -force:$IsForce -Verbose
+
+        # internetClient: required for Adobe license-activation roundtrip (Reader-vs-Pro
+        # branding on v24+ unified app) and Document Cloud features.
+        Add-MSIXCapabilities -MSIXFolder $MSIXFolder -Capabilities 'internetClient'
+
+        if (-not $KeepSetupCache) {
+            $setupCache = Join-Path $Package.FullName 'VFS\ProgramFilesCommonX64\Adobe\Acrobat\Setup'
+            if (Test-Path $setupCache) {
+                Remove-Item $setupCache -Recurse -Force
+                Write-Verbose 'Removed Adobe MSI setup cache.'
+            }
+        }
 
         $registryDatPath = Join-Path $Package.FullName -ChildPath "Registry.dat"
         if (-not (Test-Path $registryDatPath)) {
@@ -161,6 +165,19 @@ function Add-MSIXFixAcrobatReaderDC {
         Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathARw -ValueName "bAcroSuppressUpsell" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
         Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathAA  -ValueName "bAcroSuppressUpsell" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
         Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathAAw -ValueName "bAcroSuppressUpsell" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+
+        # bIsSCReducedModeEnforcedEx=1 forces Reader mode on the v24+ unified app —
+        # without it the same binary boots as "Adobe Acrobat" (Pro trial) when the
+        # license activation roundtrip is unavailable or fails inside the container.
+        # Written to all four FeatureLockDown paths (Acrobat Reader / Adobe Acrobat,
+        # native + WOW6432Node) so the policy applies regardless of how the package
+        # was built or which architecture path the app reads.
+        if (-not $DisableReaderMode) {
+            Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathAR  -ValueName "bIsSCReducedModeEnforcedEx" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+            Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathARw -ValueName "bIsSCReducedModeEnforcedEx" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+            Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathAA  -ValueName "bIsSCReducedModeEnforcedEx" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+            Set-MSIXVirtualRegistryKey -HiveFilePath $registryDatPath -KeyPath $policyPathAAw -ValueName "bIsSCReducedModeEnforcedEx" -ValueData "1" -ValueType ([Microsoft.Win32.RegistryValueKind]::DWord)
+        }
 
         # Both product-name variants are written to cover x86 ("Acrobat Reader") and x64 ("Adobe Acrobat").
         $userProductPaths = @('Software\Adobe\Adobe Acrobat\DC', 'Software\Adobe\Acrobat Reader\DC')
