@@ -9,7 +9,7 @@
     RootModule = 'MSIXForcelets.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.5.0'
+    ModuleVersion = '1.0.0'
 
     # ID used to uniquely identify this module
     GUID = '799e7b14-d939-43b3-845e-6cf1be49c36b'
@@ -18,7 +18,7 @@
     Author = 'Andreas Nick'
 
     # Copyright statement for this module
-    Copyright = 'Copyright (c) 2020-2023 Andreas Nick'
+    Copyright = 'Copyright (c) 2020-2026 Andreas Nick'
 
     # Description of the functionality provided by this module
     Description = 'Framework for MSIX Packaging and PSF Injection'
