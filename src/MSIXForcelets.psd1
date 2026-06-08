@@ -10,7 +10,7 @@
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
     Copyright            = 'Copyright (c) 2020-2026 Andreas Nick'
-    Description          = 'PowerShell framework for MSIX/AppX packaging and Package Support Framework (PSF) injection: edit captured packages, add/repair PSF fixups, manage shortcuts/services/dependencies, generate assets, sign and publish.'
+    Description          = 'PowerShell framework for MSIX/AppX packaging and Package Support Framework (PSF) injection: edit captured packages, add/repair PSF fixups, manage shortcuts/services/dependencies, generate assets, sign and publish. Docs: https://msixforcelets.nick-it.de — Source on GitHub: https://github.com/AndreasNick/MSIXForcelets'
 
     PowerShellVersion    = '5.1'
     CompatiblePSEditions = @('Desktop', 'Core')
@@ -107,7 +107,7 @@
             Tags         = @('MSIX', 'AppX', 'PSF', 'PackageSupportFramework', 'Packaging',
                              'WindowsApps', 'MSIXPackagingTool')
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
-            ProjectUri   = 'https://github.com/AndreasNick/MSIXForcelets'
+            ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
             ReleaseNotes = @'
 1.0.0 - Initial PowerShell Gallery release.
@@ -130,7 +130,9 @@ Highlights:
   these cmdlets and are NOT shipped in this package.
 
 Compatible with Windows PowerShell 5.1 and PowerShell 7.x on Windows.
-Project page: https://github.com/AndreasNick/MSIXForcelets
+
+Docs:    https://msixforcelets.nick-it.de
+Source:  https://github.com/AndreasNick/MSIXForcelets
 '@
         }
     }
