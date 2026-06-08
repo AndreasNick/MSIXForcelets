@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MSIXForcelets — an MSIX packaging framework for PowerShell with ready-made app fixes</title>
+  <meta name="description" content="MSIXForcelets is an open-source PowerShell framework to open, repack, sign and fix MSIX packages. 80+ cmdlets for the Package Support Framework, desktop7 shortcuts, virtual registry and capabilities, plus ready-made fixes for WinRAR, Notepad++, GIMP, LibreOffice, Acrobat Reader DC and SSMS.">
+  <meta name="keywords" content="MSIX, PowerShell, MSIX framework, Package Support Framework, PSF, MSIX repackaging, desktop7 shortcut, virtual registry, app packaging, WinRAR MSIX, Notepad++ MSIX, SSMS MSIX, Tim Mangan">
+  <meta name="author" content="Andreas Nick">
+  <link rel="canonical" href="https://msixforcelets.nick-it.de/">
+  <meta name="theme-color" content="#0d1117">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MSIXForcelets — MSIX packaging framework for PowerShell">
+  <meta property="og:description" content="Open, repack, sign and fix MSIX packages from PowerShell. 80+ cmdlets and ready-made fixes for common applications.">
+  <meta property="og:url" content="https://msixforcelets.nick-it.de/">
+  <meta property="og:site_name" content="MSIXForcelets">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MSIXForcelets — MSIX packaging framework for PowerShell">
+  <meta name="twitter:description" content="Open, repack, sign and fix MSIX packages from PowerShell — with ready-made app fixes.">
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "MSIXForcelets",
+    "description": "PowerShell framework to open, repack, sign and fix MSIX packages with ready-made application fixes.",
+    "codeRepository": "https://github.com/AndreasNick/MSIXForcelets",
+    "programmingLanguage": "PowerShell",
+    "operatingSystem": "Windows",
+    "author": { "@type": "Person", "name": "Andreas Nick", "url": "https://www.nick-it.de" }
+  }
+  </script>
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
+      <div class="nav-links">
+        <a href="quickstart.html">Quickstart</a>
+        <a href="build-your-own-fix.html">Build a fix</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="about.html">About</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <p class="eyebrow">PowerShell &bull; MSIX packaging framework</p>
+      <h1>Automate your <span class="accent">MSIX</span> &amp; PSF fixes</h1>
+      <p class="lead">
+        MSIXForcelets started out to automate Package Support Framework and MSIX fixes &mdash; and to
+        take the pain out of repackaging. 80+ PowerShell cmdlets cover the whole pipeline (open, edit,
+        repack, re-sign), and <strong>ready-made fixes for common applications</strong> sit on top.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="quickstart.html">Quickstart</a>
+        <a class="btn btn-ghost" href="build-your-own-fix.html">Build a fix</a>
+        <a class="btn btn-ghost" href="cmdlets.html">Cmdlets</a>
+      </div>
+      <pre class="hero-code"><code><span class="c-cmd">Install-Module</span> <span class="c-arg">-Name</span> MSIXForcelets</code></pre>
+    </div>
+  </header>
+
+  <main>
+    <section id="fixes" class="section">
+      <h2>Ready-made fixes for common apps</h2>
+      <p class="section-sub">One cmdlet per application &mdash; the packaging know-how is baked in.</p>
+      <div class="grid">
+        <article class="card fix"><h3>WinRAR</h3><p>PSF injection for the 64-bit MSIX, plus a modern Windows&nbsp;11 context-menu variant.</p><code><a href="cmdlets.html#add-msixfixwinrar">Add-MSIXFixWinRAR</a></code></article>
+        <article class="card fix"><h3>Notepad++</h3><p>PSF and shell-extension fixes for the Notepad++ MSIX.</p><code><a href="cmdlets.html#add-msixfixnotepadplusplus">Add-MSIXFixNotepadPlusPlus</a></code></article>
+        <article class="card fix"><h3>GIMP</h3><p>GIMP-specific MSIX fix.</p><code><a href="cmdlets.html#add-msixfixgimp">Add-MSIXFixGimp</a></code></article>
+        <article class="card fix"><h3>LibreOffice</h3><p>LibreOffice-specific MSIX fixes.</p><code><a href="cmdlets.html#add-msixfixlibreoffice">Add-MSIXFixLibreOffice</a></code></article>
+        <article class="card fix"><h3>Acrobat Reader DC</h3><p>Adobe Acrobat Reader DC MSIX fix.</p><code><a href="cmdlets.html#add-msixfixacrobatreaderdc">Add-MSIXFixAcrobatReaderDC</a></code></article>
+        <article class="card fix"><h3>SSMS</h3><p>SQL Server Management Studio MSIX fix.</p><code><a href="cmdlets.html#add-msixfixssms">Add-MSIXFixSSMS</a></code></article>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <h2>What the framework covers</h2>
+      <div class="grid">
+        <article class="card"><h3>Open, repack &amp; sign</h3><p>Expand to a working folder, edit, repack and re-sign with your certificate.</p></article>
+        <article class="card"><h3>Package Support Framework</h3><p>PSF launcher wiring plus Tim&nbsp;Mangan MFR / RegLegacy fixups (HKLM&rarr;HKCU).</p></article>
+        <article class="card"><h3>Shortcuts &amp; shell</h3><p>desktop7 shortcuts, context-menu handlers and shell-extension fixes.</p></article>
+        <article class="card"><h3>Registry, capabilities &amp; App&nbsp;Attach</h3><p>Virtual-registry edits, capabilities, write-virtualization and VHD/CIM images.</p></article>
+      </div>
+      <p class="more"><a class="btn btn-ghost" href="cmdlets.html">Browse all 84 cmdlets &rarr;</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a> &bull; PowerShell 5.1 &amp; 7</span>
+      <span class="footer-links">
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+        <a href="https://www.powershellgallery.com/packages/MSIXForcelets">Gallery</a>
+        <a href="legal.html">Legal</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+  <script defer src="consent.js"></script>
+</body>
+</html>

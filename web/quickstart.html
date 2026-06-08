@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quickstart — MSIXForcelets</title>
+  <meta name="description" content="Get started with MSIXForcelets: install from the PowerShell Gallery, fetch the packaging tooling and Package Support Framework, then open, fix, repack and sign an MSIX package.">
+  <meta name="keywords" content="MSIXForcelets quickstart, install MSIXForcelets, MSIX PowerShell getting started, Package Support Framework download">
+  <meta name="author" content="Andreas Nick">
+  <link rel="canonical" href="https://msixforcelets.nick-it.de/quickstart.html">
+  <meta name="theme-color" content="#0d1117">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Quickstart — MSIXForcelets">
+  <meta property="og:description" content="Install, fetch the tooling, then open, fix, repack and sign an MSIX package.">
+  <meta property="og:url" content="https://msixforcelets.nick-it.de/quickstart.html">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero hero-slim">
+    <nav class="nav">
+      <a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
+      <div class="nav-links">
+        <a href="quickstart.html">Quickstart</a>
+        <a href="build-your-own-fix.html">Build a fix</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+      </div>
+    </nav>
+    <div class="hero-content">
+      <p class="eyebrow">Guide</p>
+      <h1>Quickstart</h1>
+      <p class="lead">From zero to a fixed, signed MSIX in three steps.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <ol class="steps">
+        <li>
+          <h3>Install from the PowerShell Gallery</h3>
+          <pre><code><span class="c-cmd">Install-Module</span> <span class="c-arg">-Name</span> MSIXForcelets <span class="c-arg">-Scope</span> CurrentUser
+<span class="c-cmd">Import-Module</span> MSIXForcelets</code></pre>
+        </li>
+        <li>
+          <h3>Fetch the tooling (one-time)</h3>
+          <p>The published module stays lean &mdash; the Windows SDK packaging tools and the
+             Package Support Framework binaries are downloaded on demand:</p>
+          <pre><code><span class="c-cmd">Update-MSIXTooling</span>        <span class="c-cmt"># Windows SDK: makeappx, signtool, msixmgr</span>
+<span class="c-cmd">Update-MSIXTMPSF</span>          <span class="c-cmt"># Tim Mangan Package Support Framework</span>
+<span class="c-cmd">Update-MSIXMicrosoftPSF</span>   <span class="c-cmt"># Microsoft Package Support Framework</span></code></pre>
+        </li>
+        <li>
+          <h3>Open, fix, repack &amp; sign</h3>
+          <pre><code><span class="c-var">$cert</span> = <span class="c-cmd">New-MSIXSelfSigningCert</span> <span class="c-arg">-Subject</span> <span class="c-str">'CN=Contoso'</span> <span class="c-arg">-Password</span> <span class="c-str">'pw'</span>
+<span class="c-var">$pkg</span>  = <span class="c-cmd">Open-MSIXPackage</span> <span class="c-arg">-MsixFile</span> <span class="c-str">'C:\Apps\WinRAR.msix'</span> <span class="c-arg">-Force</span>
+
+<span class="c-cmt"># apply a ready-made fix...</span>
+<span class="c-cmd">Add-MSIXFixWinRAR</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$pkg</span>.FullName
+
+<span class="c-cmd">Close-MSIXPackage</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$pkg</span>.FullName <span class="c-arg">-MSIXFile</span> <span class="c-str">'C:\Apps\WinRAR_fixed.msix'</span>
+<span class="c-cmd">Set-MSIXSignature</span> <span class="c-arg">-MSIXFile</span> <span class="c-str">'C:\Apps\WinRAR_fixed.msix'</span> <span class="c-arg">-PfxCert</span> <span class="c-var">$cert</span></code></pre>
+        </li>
+      </ol>
+      <p class="more">
+        <a class="btn btn-primary" href="build-your-own-fix.html">Build your own fix &rarr;</a>
+        <a class="btn btn-ghost" href="cmdlets.html">Cmdlet reference</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a></span>
+      <span class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+        <a href="legal.html">Legal</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+  <script defer src="consent.js"></script>
+</body>
+</html>

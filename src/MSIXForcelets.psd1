@@ -108,7 +108,7 @@
                              'WindowsApps', 'MSIXPackagingTool')
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://github.com/AndreasNick/MSIXForcelets'
-            IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/icon.png'
+            IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
             ReleaseNotes = @'
 1.0.0 - Initial PowerShell Gallery release.
 

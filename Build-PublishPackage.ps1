@@ -6,12 +6,11 @@
 # the staged module folder. Validates the manifest, imports the staged module and
 # verifies the exported function count, and optionally runs PSScriptAnalyzer.
 #
-# This script does NOT publish - that is a manual step at the end (requires your
 # NuGet API key from powershellgallery.com).
 
 [CmdletBinding()]
 param(
-    [string] $StageRoot  = (Join-Path $env:Temp 'MSIXForcelets_publish'),
+    [string] $StageRoot  = 'C:\temp',
     [switch] $SkipAnalyzer
 )
 

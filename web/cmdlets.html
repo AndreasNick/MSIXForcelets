@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cmdlet reference - MSIXForcelets (84 cmdlets)</title>
+  <meta name="description" content="Complete cmdlet reference for MSIXForcelets: open, repack, sign and fix MSIX packages, Package Support Framework, desktop7 shortcuts, virtual registry, capabilities and pre-built application fixes.">
+  <link rel="canonical" href="https://msixforcelets.nick-it.de/cmdlets.html">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero hero-slim">
+    <nav class="nav"><a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
+      <div class="nav-links"><a href="quickstart.html">Quickstart</a><a href="build-your-own-fix.html">Build a fix</a><a href="cmdlets.html">Cmdlets</a><a href="about.html">About</a><a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a></div></nav>
+    <div class="hero-content"><h1>Cmdlet reference</h1>
+    <p class="lead">84 cmdlets, grouped by task. Each links to its source on GitHub (ref <code>master</code>).</p></div>
+  </header>
+  <main class="section">
+  <nav class="toc">
+    <a href="#open-build-sign-validate">Open, build, sign &amp; validate</a>
+    <a href="#pre-built-application-fixes">Pre-built application fixes</a>
+    <a href="#package-support-framework-psf">Package Support Framework (PSF)</a>
+    <a href="#applications-services-dependencies">Applications, services &amp; dependencies</a>
+    <a href="#shortcuts-shell-context-menus">Shortcuts, shell &amp; context menus</a>
+    <a href="#capabilities-virtualization-registry">Capabilities, virtualization &amp; registry</a>
+    <a href="#assets-visual-elements">Assets &amp; visual elements</a>
+    <a href="#app-attach-deployment">App Attach &amp; deployment</a>
+    <a href="#diagnostics-inspection">Diagnostics &amp; inspection</a>
+    <a href="#setup-tooling-configuration">Setup, tooling &amp; configuration</a>
+  </nav>
+  <section class="cat"><h2 id="open-build-sign-validate">Open, build, sign &amp; validate</h2><div class="grid">
+    <article class="card cmd" id="open-msixpackage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Open-MSIXPackage.ps1" title="View source on GitHub">Open-MSIXPackage</a></h3>
+      <p>Opens an MSIX package and unpacks its contents to a specified folder.</p></article>
+    <article class="card cmd" id="close-msixpackage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Close-MSIXPackage.ps1" title="View source on GitHub">Close-MSIXPackage</a></h3>
+      <p>Packs an expanded MSIX folder back into a signed .msix file.</p></article>
+    <article class="card cmd" id="new-msixpackage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXPackage.ps1" title="View source on GitHub">New-MSIXPackage</a></h3>
+      <p>Creates an empty MSIX skeleton folder from the bundled template.</p></article>
+    <article class="card cmd" id="backup-msixmanifest">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Backup-MSIXManifest.ps1" title="View source on GitHub">Backup-MSIXManifest</a></h3>
+      <p>Backs up the AppxManifest.xml file in the specified MSIX folder.</p></article>
+    <article class="card cmd" id="copy-tomsixpackage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Copy-ToMSIXPackage.ps1" title="View source on GitHub">Copy-ToMSIXPackage</a></h3>
+      <p>Copies files into an expanded MSIX package at a package-root-relative path.</p></article>
+    <article class="card cmd" id="set-msixpublisher">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXPublisher.ps1" title="View source on GitHub">Set-MSIXPublisher</a></h3>
+      <p>Sets the publisher information for an MSIX package.</p></article>
+    <article class="card cmd" id="set-msixsignature">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXSignature.ps1" title="View source on GitHub">Set-MSIXSignature</a></h3>
+      <p>Sets the signature for an MSIX file.</p></article>
+    <article class="card cmd" id="test-msixsignature">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Test-MSIXSignature.ps1" title="View source on GitHub">Test-MSIXSignature</a></h3>
+      <p>Tests whether an MSIX file has a valid Authenticode signature.</p></article>
+    <article class="card cmd" id="get-msixpackageversion">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXPackageVersion.ps1" title="View source on GitHub">Get-MSIXPackageVersion</a></h3>
+      <p>Retrieves the version of an MSIX package.</p></article>
+    <article class="card cmd" id="set-msixpackageversion">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXPackageVersion.ps1" title="View source on GitHub">Set-MSIXPackageVersion</a></h3>
+      <p>Sets the version of an MSIX package by updating the AppxManifest.xml file.</p></article>
+    <article class="card cmd" id="test-msixmanifest">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Test-MSIXManifest.ps1" title="View source on GitHub">Test-MSIXManifest</a></h3>
+      <p>Validates an AppxManifest.xml against the schemas embedded in AppxPackaging.dll.</p></article>
+    <article class="card cmd" id="new-msixselfsigningcert">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXSelfSigningCert.ps1" title="View source on GitHub">New-MSIXSelfSigningCert</a></h3>
+      <p>Creates a self-signed code-signing certificate (PFX) for test-signing MSIX packages.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="pre-built-application-fixes">Pre-built application fixes</h2><div class="grid">
+    <article class="card cmd" id="add-msixfixacrobatreaderdc">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixAcrobatReaderDC.ps1" title="View source on GitHub">Add-MSIXFixAcrobatReaderDC</a></h3>
+      <p>Adds a fix for Acrobat Reader DC to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixgimp">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixGimp.ps1" title="View source on GitHub">Add-MSIXFixGimp</a></h3>
+      <p>Adds a GIMP fix to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixlibreoffice">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixLibreOffice.ps1" title="View source on GitHub">Add-MSIXFixLibreOffice</a></h3>
+      <p>Applies LibreOffice-specific fixes to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixnotepadplusplus">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixNotepadPlusPlus.ps1" title="View source on GitHub">Add-MSIXFixNotepadPlusPlus</a></h3>
+      <p>Applies PSF and shell extension fixes to a Notepad++ MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixssms">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixSSMS.ps1" title="View source on GitHub">Add-MSIXFixSSMS</a></h3>
+      <p>Pre-built fix for SQL Server Management Studio (SSMS) MSIX packages.</p></article>
+    <article class="card cmd" id="add-msixfixwinrar">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixWinRAR.ps1" title="View source on GitHub">Add-MSIXFixWinRAR</a></h3>
+      <p>Injects the Package Support Framework into a WinRAR 64-bit MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixwinrarmodernshell">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixWinRARModernShell.ps1" title="View source on GitHub">Add-MSIXFixWinRARModernShell</a></h3>
+      <p>Replaces the WinRAR classic context menu with MsixModernContextMenuHandler for the Windows 11 modern context menu (top section, IExplorerCommand).</p></article>
+  </div></section>
+  <section class="cat"><h2 id="package-support-framework-psf">Package Support Framework (PSF)</h2><div class="grid">
+    <article class="card cmd" id="set-msixactivepsfframework">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXActivePSFFramework.ps1" title="View source on GitHub">Set-MSIXActivePSFFramework</a></h3>
+      <p>Sets the active PSF (Package Support Framework) used by all PSF cmdlets.</p></article>
+    <article class="card cmd" id="get-msixpsfframeworkpath">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXPSFFrameworkPath.ps1" title="View source on GitHub">Get-MSIXPSFFrameworkPath</a></h3>
+      <p>Get-MSIXPSFFrameworkPath</p></article>
+    <article class="card cmd" id="add-msixpsfframeworkfiles">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPsfFrameworkFiles.ps1" title="View source on GitHub">Add-MSIXPsfFrameworkFiles</a></h3>
+      <p>Adds MSIX PSF framework files to a specified MSIX folder.</p></article>
+    <article class="card cmd" id="add-msxixpsfshim">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSXIXPSFShim.ps1" title="View source on GitHub">Add-MSXIXPSFShim</a></h3>
+      <p>Wires an MSIX application entry through the PSF launcher.</p></article>
+    <article class="card cmd" id="add-msixpsfmfrfixup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFMFRFixup.ps1" title="View source on GitHub">Add-MSIXPSFMFRFixup</a></h3>
+      <p>Adds MFRFixup, a fix from Tim Mangan, to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixpsfreglegacyfixup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFRegLegacyFixup.ps1" title="View source on GitHub">Add-MSIXPSFRegLegacyFixup</a></h3>
+      <p>Adds a RegLegacyFixups remediation entry to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixpsfdefaultreglegacy">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFDefaultRegLegacy.ps1" title="View source on GitHub">Add-MSIXPSFDefaultRegLegacy</a></h3>
+      <p>Adds a standard RegLegacyFixups configuration to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixpsfdefaultfrf">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFDefaultFRF.ps1" title="View source on GitHub">Add-MSIXPSFDefaultFRF</a></h3>
+      <p>Adds a standard FileRedirectionFixup configuration to an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixpsffileredirectionfixup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFFileRedirectionFixup.ps1" title="View source on GitHub">Add-MSIXPSFFileRedirectionFixup</a></h3>
+      <p>Adds a FileRedirectionFixup entry (package-relative or known-folder paths) to the PSF config.</p></article>
+    <article class="card cmd" id="add-msixpsfdynamiclibraryfixup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFDynamicLibraryFixup.ps1" title="View source on GitHub">Add-MSIXPSFDynamicLibraryFixup</a></h3>
+      <p>Adds a DynamicLibraryFixup configuration entry for all package DLLs to config.json.xml.</p></article>
+    <article class="card cmd" id="add-msixpsfenvvarfixup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFEnvVarFixup.ps1" title="View source on GitHub">Add-MSIXPSFEnvVarFixup</a></h3>
+      <p>Adds an EnvVarFixup entry to an MSIX package PSF configuration.</p></article>
+    <article class="card cmd" id="add-msixpsfftacom">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFFtaCom.ps1" title="View source on GitHub">Add-MSIXPSFFtaCom</a></h3>
+      <p>Moves shell extension entries from an existing Application to a new PsfFtaCom surrogate.</p></article>
+    <article class="card cmd" id="add-msixpsftracing">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFTracing.ps1" title="View source on GitHub">Add-MSIXPSFTracing</a></h3>
+      <p>Adds tracing configuration for a specific executable in an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixpsfmonitor">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFMonitor.ps1" title="View source on GitHub">Add-MSIXPSFMonitor</a></h3>
+      <p>Adds a PSF Monitor configuration to the MSIX config.json.xml file.</p></article>
+    <article class="card cmd" id="add-msixpsfpowershellscript">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFPowerShellScript.ps1" title="View source on GitHub">Add-MSIXPSFPowerShellScript</a></h3>
+      <p>Configures PSF start/end PowerShell scripts for a packaged application.</p></article>
+    <article class="card cmd" id="remove-msixpsffiles">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPsfFiles.ps1" title="View source on GitHub">Remove-MSIXPsfFiles</a></h3>
+      <p>Removes MSIX PSF files.</p></article>
+    <article class="card cmd" id="remove-msixpsfmonitorfiles">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPSFMonitorFiles.ps1" title="View source on GitHub">Remove-MSIXPSFMonitorFiles</a></h3>
+      <p>Removes PSFMonitor files from the specified MSIX folder.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="applications-services-dependencies">Applications, services &amp; dependencies</h2><div class="grid">
+    <article class="card cmd" id="add-msixapplication">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXApplication.ps1" title="View source on GitHub">Add-MSIXApplication</a></h3>
+      <p>Adds an Application entry (with VisualElements) to an MSIX package's manifest.</p></article>
+    <article class="card cmd" id="get-msixapplications">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXApplications.ps1" title="View source on GitHub">Get-MSIXApplications</a></h3>
+      <p>Retrieves the Application entries from an expanded MSIX package's manifest.</p></article>
+    <article class="card cmd" id="remove-msixapplications">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXApplications.ps1" title="View source on GitHub">Remove-MSIXApplications</a></h3>
+      <p>Removes an MSIX application from the AppxManifest.xml tn the specified MSIX folder.</p></article>
+    <article class="card cmd" id="new-msixapplicationvariant">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXApplicationVariant.ps1" title="View source on GitHub">New-MSIXApplicationVariant</a></h3>
+      <p>Clones an Application entry in AppxManifest.xml under a new Id.</p></article>
+    <article class="card cmd" id="add-msixappexecutionalias">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXAppExecutionAlias.ps1" title="View source on GitHub">Add-MSIXAppExecutionAlias</a></h3>
+      <p>Adds an App Execution Alias to an MSIX application.</p></article>
+    <article class="card cmd" id="get-msixservices">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXServices.ps1" title="View source on GitHub">Get-MSIXServices</a></h3>
+      <p>Lists windows.service declarations in an MSIX manifest (one object per service, incl. ApplicationId, ServiceName, StartAccount, HasComServer).</p></article>
+    <article class="card cmd" id="remove-msixservices">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXServices.ps1" title="View source on GitHub">Remove-MSIXServices</a></h3>
+      <p>Removes windows.service declarations (+ matching COM ServiceServer and empty service-host apps) from an MSIX manifest. Once no service remains, the localSystemServices/packagedServices capabilities are dropped too (keeps the install dialog from demanding admin) - unless -KeepServiceCapabilities.</p></article>
+    <article class="card cmd" id="get-msixdependencies">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXDependencies.ps1" title="View source on GitHub">Get-MSIXDependencies</a></h3>
+      <p>Lists PackageDependency entries in an MSIX manifest (TargetDeviceFamily excluded).</p></article>
+    <article class="card cmd" id="remove-msixdependencies">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXDependencies.ps1" title="View source on GitHub">Remove-MSIXDependencies</a></h3>
+      <p>Removes PackageDependency entries from an MSIX manifest. TargetDeviceFamily is never touched.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="shortcuts-shell-context-menus">Shortcuts, shell &amp; context menus</h2><div class="grid">
+    <article class="card cmd" id="add-msixdesktop7shortcut">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXDesktop7Shortcut.ps1" title="View source on GitHub">Add-MSIXDesktop7Shortcut</a></h3>
+      <p>Adds a working desktop7:Shortcut to an MSIX app: PNG icon (never exe) + physical .lnk written into the package. -Location tab-completes the folders.</p></article>
+    <article class="card cmd" id="get-msixdesktop7shortcut">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXDesktop7Shortcut.ps1" title="View source on GitHub">Get-MSIXDesktop7Shortcut</a></h3>
+      <p>Lists the desktop7:Shortcut entries from an MSIX manifest.</p></article>
+    <article class="card cmd" id="remove-msixdesktop7shortcut">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXDesktop7Shortcut.ps1" title="View source on GitHub">Remove-MSIXDesktop7Shortcut</a></h3>
+      <p>Removes desktop7:Shortcut entries (+ the physical .lnk) from an MSIX package.</p></article>
+    <article class="card cmd" id="repair-msixdesktop7shortcut">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Repair-MSIXDesktop7Shortcut.ps1" title="View source on GitHub">Repair-MSIXDesktop7Shortcut</a></h3>
+      <p>Relocates desktop7:Shortcut entries from the all-users Start Menu ([{Common Programs}]) to the per-user Start Menu ([{Programs}]).</p></article>
+    <article class="card cmd" id="convert-msixclassiccontextmenutoverbs">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Convert-MSIXClassicContextMenuToVerbs.ps1" title="View source on GitHub">Convert-MSIXClassicContextMenuToVerbs</a></h3>
+      <p>Converts classic COM-based context menu verbs to modern executable-based uap3 verbs.</p></article>
+    <article class="card cmd" id="remove-msixclassicshellextension">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXClassicShellExtension.ps1" title="View source on GitHub">Remove-MSIXClassicShellExtension</a></h3>
+      <p>Removes classic COM-based shell extension declarations from AppxManifest.xml.</p></article>
+    <article class="card cmd" id="import-msixsparseshellextension">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Import-MSIXSparseShellExtension.ps1" title="View source on GitHub">Import-MSIXSparseShellExtension</a></h3>
+      <p>Merges shell extension declarations from an inner sparse MSIX into the main AppxManifest.xml.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="capabilities-virtualization-registry">Capabilities, virtualization &amp; registry</h2><div class="grid">
+    <article class="card cmd" id="add-msixcapabilities">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXCapabilities.ps1" title="View source on GitHub">Add-MSIXCapabilities</a></h3>
+      <p>Adds capabilities to an expanded MSIX package manifest.</p></article>
+    <article class="card cmd" id="add-msixflexiblevirtualization">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFlexibleVirtualization.ps1" title="View source on GitHub">Add-MSIXFlexibleVirtualization</a></h3>
+      <p>Configures registry and file system write virtualization pass-through in AppxManifest.xml.</p></article>
+    <article class="card cmd" id="add-msixdisablevregorregistrywrite">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXDisableVREGOrRegistryWrite.ps1" title="View source on GitHub">Add-MSIXDisableVREGOrRegistryWrite</a></h3>
+      <p>Disables VFS and VREG in MSIX / APPX package</p></article>
+    <article class="card cmd" id="add-msixinstalledlocationvirtualization">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXInstalledLocationVirtualization.ps1" title="View source on GitHub">Add-MSIXInstalledLocationVirtualization</a></h3>
+      <p>Adds InstalledLocationVirtualization element to the AppxManifest.xml file in the specified MSIX folder path.</p></article>
+    <article class="card cmd" id="add-msixloadersearchpathoverride">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXloaderSearchPathOverride.ps1" title="View source on GitHub">Add-MSIXloaderSearchPathOverride</a></h3>
+      <p>Adds a search path override to the LoaderSearchPathEntry element in the AppxManifest.xml file of an MSIX package.</p></article>
+    <article class="card cmd" id="add-msixregaccessfix">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXRegAccessFix.ps1" title="View source on GitHub">Add-MSIXRegAccessFix</a></h3>
+      <p>Adds registry access fix for an expanded MSIX folder.</p></article>
+    <article class="card cmd" id="remove-msixpackageintegrity">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPackageIntegrity.ps1" title="View source on GitHub">Remove-MSIXPackageIntegrity</a></h3>
+      <p>Disables MSIX package content integrity enforcement.</p></article>
+    <article class="card cmd" id="add-msixfirewallrule">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFirewallRule.ps1" title="View source on GitHub">Add-MSIXFirewallRule</a></h3>
+      <p>Adds a Windows Firewall rule (windows.firewallRules) for a packaged executable.</p></article>
+    <article class="card cmd" id="add-msixsharedcontainer">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXSharedContainer.ps1" title="View source on GitHub">Add-MSIXSharedContainer</a></h3>
+      <p>Creates a Windows shared package container by name, accepting wildcard patterns or literal PackageFamilyNames.</p></article>
+    <article class="card cmd" id="add-msixsharedfonts">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXSharedFonts.ps1" title="View source on GitHub">Add-MSIXSharedFonts</a></h3>
+      <p>Adds found font files to the AppxManifest.xml under the uap7:SharedFonts section.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="assets-visual-elements">Assets &amp; visual elements</h2><div class="grid">
+    <article class="card cmd" id="new-msixassetfrom">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAssetFrom.ps1" title="View source on GitHub">New-MSIXAssetFrom</a></h3>
+      <p>Generates MSIX asset PNGs (tile/logo icons) from an exe, dll, ico or png source.</p></article>
+    <article class="card cmd" id="set-msixapplicationvisualelements">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXApplicationVisualElements.ps1" title="View source on GitHub">Set-MSIXApplicationVisualElements</a></h3>
+      <p>Sets or removes visual element attributes (and optionally generates new asset images) on Application entries in AppxManifest.xml.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="app-attach-deployment">App Attach &amp; deployment</h2><div class="grid">
+    <article class="card cmd" id="new-msixappattachimage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppAttachImage.ps1" title="View source on GitHub">New-MSIXAppAttachImage</a></h3>
+      <p>Unpacks an MSIX package into a VHD, VHDX or CIM App Attach image.</p></article>
+    <article class="card cmd" id="new-msixdynamicappattachdisk">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXDynamicAppAttachDisk.ps1" title="View source on GitHub">New-MSIXDynamicAppAttachDisk</a></h3>
+      <p>Creates an empty, formatted, dynamic VHD or VHDX disk image for App Attach.</p></article>
+    <article class="card cmd" id="invoke-msixcreateimage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppAttachImage.ps1" title="View source on GitHub">Invoke-MSIXCreateImage</a></h3>
+      <p>Creates an App Attach image (VHD/VHDX/CIM) from an MSIX via msixmgr.</p></article>
+    <article class="card cmd" id="new-msixappinstallerconfiguration">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppInstallerConfiguration.ps1" title="View source on GitHub">New-MSIXAppInstallerConfiguration</a></h3>
+      <p>Generates an .appinstaller configuration for auto-update deployment.</p></article>
+    <article class="card cmd" id="new-msixportalpage">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXPortalPage.ps1" title="View source on GitHub">New-MSIXPortalPage</a></h3>
+      <p>Creates a new MSIX portal page.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="diagnostics-inspection">Diagnostics &amp; inspection</h2><div class="grid">
+    <article class="card cmd" id="start-msixtracing">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Start-MSIXTracing.ps1" title="View source on GitHub">Start-MSIXTracing</a></h3>
+      <p>Starts an ETW trace session for MSIX diagnostics.</p></article>
+    <article class="card cmd" id="stop-msixtracing">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Stop-MSIXTracing.ps1" title="View source on GitHub">Stop-MSIXTracing</a></h3>
+      <p>Stops the MSIX ETW trace session and converts the ETL to a readable log.</p></article>
+    <article class="card cmd" id="wait-msixtracing">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Wait-MSIXTracing.ps1" title="View source on GitHub">Wait-MSIXTracing</a></h3>
+      <p>Starts MSIX tracing, waits for user input, then stops and parses the trace.</p></article>
+    <article class="card cmd" id="get-msixvirtualprocess">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXVirtualProcess.ps1" title="View source on GitHub">Get-MSIXVirtualProcess</a></h3>
+      <p>Retrieves information about virtual processes associated with MSIX packages.</p></article>
+    <article class="card cmd" id="get-msixappmachinetype">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXAppMachineType.ps1" title="View source on GitHub">Get-MSIXAppMachineType</a></h3>
+      <p>Retrieves the architecture type for a given executable file or dll.</p></article>
+    <article class="card cmd" id="get-msixappexedetailinfo">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXAppExeDetailInfo.ps1" title="View source on GitHub">Get-MSIXAppExeDetailInfo</a></h3>
+      <p>Retrieves detailed information about the executable file.</p></article>
+    <article class="card cmd" id="get-appxmanifestinfo">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-AppXManifestInfo.ps1" title="View source on GitHub">Get-AppXManifestInfo</a></h3>
+      <p>Get and anylyse a the AppXanifest.xml inside a App-V Package</p></article>
+    <article class="card cmd" id="invoke-msixcleanup">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Invoke-MSIXCleanup.ps1" title="View source on GitHub">Invoke-MSIXCleanup</a></h3>
+      <p>Removes unsupported or unnecessary artifacts from an expanded MSIX package.</p></article>
+    <article class="card cmd" id="find-msixfonts">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Find-MSIXFonts.ps1" title="View source on GitHub">Find-MSIXFonts</a></h3>
+      <p>This function checks for font files within an unpacked MSIX package directory.</p></article>
+  </div></section>
+  <section class="cat"><h2 id="setup-tooling-configuration">Setup, tooling &amp; configuration</h2><div class="grid">
+    <article class="card cmd" id="update-msixtooling">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Update-MSIXTooling.ps1" title="View source on GitHub">Update-MSIXTooling</a></h3>
+      <p>Downloads and installs the latest MSIX packaging tools.</p></article>
+    <article class="card cmd" id="update-msixmicrosoftpsf">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Update-MSIXMicrosoftPSF.ps1" title="View source on GitHub">Update-MSIXMicrosoftPSF</a></h3>
+      <p>Downloads and organises the latest Microsoft MSIX Package Support Framework from NuGet.</p></article>
+    <article class="card cmd" id="update-msixtmpsf">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Update-MSIXTMPSF.ps1" title="View source on GitHub">Update-MSIXTMPSF</a></h3>
+      <p>Downloads and organises the latest Tim Mangan MSIX Package Support Framework release.</p></article>
+    <article class="card cmd" id="set-msixcore">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXCore.ps1" title="View source on GitHub">Set-MSIXCore</a></h3>
+      <p>Registers the msixmgr.exe alias for the current session.</p></article>
+    <article class="card cmd" id="get-msixforceletsconfiguration">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXForceletsConfiguration.ps1" title="View source on GitHub">Get-MSIXForceletsConfiguration</a></h3>
+      <p>Returns the current MSIXForcelets module configuration.</p></article>
+    <article class="card cmd" id="set-msixforceletsconfiguration">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXForceletsConfiguration.ps1" title="View source on GitHub">Set-MSIXForceletsConfiguration</a></h3>
+      <p>Changes one or more MSIXForcelets module configuration values.</p></article>
+  </div></section>
+  </main>
+  <footer class="footer"><div class="footer-inner"><span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a></span>
+  <span class="footer-links"><a href="index.html">Home</a><a href="cmdlets.html">Cmdlets</a><a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a><a href="legal.html">Legal</a><a href="privacy.html">Privacy</a><a href="datenschutz.html">Datenschutz</a></span></div></footer>
+<script defer src="consent.js"></script></body></html>

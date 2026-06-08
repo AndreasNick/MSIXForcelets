@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://msixforcelets.nick-it.de/sitemap.xml

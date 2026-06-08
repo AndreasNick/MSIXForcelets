@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Build your own MSIX fix — MSIXForcelets</title>
+  <meta name="description" content="Step-by-step guide to authoring your own MSIX fix with MSIXForcelets: open a package, apply Package Support Framework, shortcuts, capabilities and registry fixups, then repack and sign. Includes a ready-to-copy Add-MSIXFix function skeleton.">
+  <meta name="keywords" content="MSIX fix, build MSIX fix, Package Support Framework tutorial, Add-MSIXFix, MSIX repackaging guide, PSF shim, PowerShell MSIX">
+  <meta name="author" content="Andreas Nick">
+  <link rel="canonical" href="https://msixforcelets.nick-it.de/build-your-own-fix.html">
+  <meta name="theme-color" content="#0d1117">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Build your own MSIX fix — MSIXForcelets">
+  <meta property="og:description" content="Author a custom Add-MSIXFix function: open, apply PSF and fixups, repack and sign.">
+  <meta property="og:url" content="https://msixforcelets.nick-it.de/build-your-own-fix.html">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Build your own MSIX fix with MSIXForcelets",
+    "description": "Author a custom Add-MSIXFix function that opens an MSIX package, applies the Package Support Framework and other fixups, then repacks and signs it.",
+    "step": [
+      { "@type": "HowToStep", "name": "Open the package" },
+      { "@type": "HowToStep", "name": "Apply the building blocks" },
+      { "@type": "HowToStep", "name": "Repack and sign" },
+      { "@type": "HowToStep", "name": "Test and diagnose" }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="hero hero-slim">
+    <nav class="nav">
+      <a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
+      <div class="nav-links">
+        <a href="quickstart.html">Quickstart</a>
+        <a href="build-your-own-fix.html">Build a fix</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+      </div>
+    </nav>
+    <div class="hero-content">
+      <p class="eyebrow">Guide</p>
+      <h1>Build your own <span class="accent">fix</span></h1>
+      <p class="lead">
+        A &ldquo;fix&rdquo; in MSIXForcelets is just a function that opens an MSIX package,
+        applies a handful of framework cmdlets and repacks it. The built-in fixes
+        (<code>Add-MSIXFixWinRAR</code>, <code>Add-MSIXFixNotepadPlusPlus</code> &hellip;) all follow
+        the same shape &mdash; here is how to write your own.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Anatomy -->
+    <section class="section">
+      <h2>1. The anatomy of a fix</h2>
+      <p>Every fix is an advanced function named <code>Add-MSIXFix&lt;App&gt;</code> with a
+         consistent parameter block. It opens the package, does its work, then repacks &mdash;
+         all inside a <code>try/catch</code>.</p>
+      <pre><code><span class="c-cmd">function</span> Add-MSIXFixMyApp {
+    [<span class="c-cmd">CmdletBinding</span>()]
+    <span class="c-cmd">param</span>(
+        [<span class="c-cmd">Parameter</span>(Mandatory, ValueFromPipeline, Position=0)]
+        [System.IO.FileInfo] <span class="c-var">$MsixFile</span>,
+
+        [System.IO.DirectoryInfo] <span class="c-var">$MSIXFolder</span> = (<span class="c-var">$env:Temp</span> + <span class="c-str">'\MSIX_'</span> + [guid]::NewGuid()),
+        [System.IO.FileInfo] <span class="c-var">$OutputFilePath</span> = <span class="c-var">$null</span>,
+        [string] <span class="c-var">$Subject</span> = <span class="c-str">''</span>,
+        [switch] <span class="c-var">$Force</span>,
+        [switch] <span class="c-var">$KeepMSIXFolder</span>
+    )
+    <span class="c-cmd">process</span> {
+        <span class="c-cmd">if</span> (-<span class="c-cmd">not</span> <span class="c-var">$OutputFilePath</span>) { <span class="c-var">$OutputFilePath</span> = <span class="c-var">$MsixFile</span> }
+        <span class="c-cmd">try</span> {
+            <span class="c-cmd">Open-MSIXPackage</span> <span class="c-arg">-MsixFile</span> <span class="c-var">$MsixFile</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-Force</span>:<span class="c-var">$Force</span>
+            <span class="c-cmd">if</span> (<span class="c-var">$Subject</span>) { <span class="c-cmd">Set-MSIXPublisher</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-PublisherSubject</span> <span class="c-var">$Subject</span> }
+
+            <span class="c-cmt"># --- your building blocks go here (see step 2) ---</span>
+
+            <span class="c-cmd">Close-MSIXPackage</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-MSIXFile</span> <span class="c-var">$OutputFilePath</span> `
+                <span class="c-arg">-Force</span>:<span class="c-var">$Force</span> <span class="c-arg">-KeepMSIXFolder</span>:<span class="c-var">$KeepMSIXFolder</span>
+        }
+        <span class="c-cmd">catch</span> { <span class="c-cmd">Write-Error</span> <span class="c-str">"Error applying MyApp fix: $_"</span> }
+    }
+}</code></pre>
+    </section>
+
+    <!-- Building blocks -->
+    <section class="section section-alt">
+      <h2>2. Pick your building blocks</h2>
+      <p class="section-sub">Drop in only what the app needs. Each links to its reference entry.</p>
+      <div class="grid">
+        <article class="card"><h3>Clean up</h3><p>Strip captured installer leftovers and unsupported artifacts.</p><code><a href="cmdlets.html#invoke-msixcleanup">Invoke-MSIXCleanup</a></code></article>
+        <article class="card"><h3>Capabilities</h3><p>Declare what the app needs, e.g. <code>internetClient</code>.</p><code><a href="cmdlets.html#add-msixcapabilities">Add-MSIXCapabilities</a></code></article>
+        <article class="card"><h3>Find DLLs</h3><p>Add a loader search path and installed-location virtualization.</p><code><a href="cmdlets.html#add-msixloadersearchpathoverride">Add-MSIXloaderSearchPathOverride</a></code></article>
+        <article class="card"><h3>PSF launcher</h3><p>Ship the PSF binaries and wire every app through the launcher.</p><code><a href="cmdlets.html#add-msixpsfframeworkfiles">Add-MSIXPsfFrameworkFiles</a></code> &middot; <code><a href="cmdlets.html#add-msxixpsfshim">Add-MSXIXPSFShim</a></code></article>
+        <article class="card"><h3>Registry fixups</h3><p>Normalise HKCU/HKLM access; optional HKLM&rarr;HKCU redirection.</p><code><a href="cmdlets.html#add-msixpsfdefaultreglegacy">Add-MSIXPSFDefaultRegLegacy</a></code></article>
+        <article class="card"><h3>File redirection</h3><p>Tim&nbsp;Mangan MFR (ILV-aware) and dynamic library fixups.</p><code><a href="cmdlets.html#add-msixpsfmfrfixup">Add-MSIXPSFMFRFixup</a></code></article>
+        <article class="card"><h3>Shortcuts</h3><p>Add a working Start&nbsp;Menu / Desktop shortcut with a PNG icon.</p><code><a href="cmdlets.html#add-msixdesktop7shortcut">Add-MSIXDesktop7Shortcut</a></code></article>
+        <article class="card"><h3>Strip ballast</h3><p>Remove captured services and dependencies that block activation.</p><code><a href="cmdlets.html#remove-msixservices">Remove-MSIXServices</a></code> &middot; <code><a href="cmdlets.html#remove-msixdependencies">Remove-MSIXDependencies</a></code></article>
+      </div>
+    </section>
+
+    <!-- Worked example -->
+    <section class="section">
+      <h2>3. A worked example</h2>
+      <p>A typical PSF-based fix &mdash; modelled on <code>Add-MSIXFixWinRAR</code>:</p>
+      <pre><code>            <span class="c-cmt"># 1. clean captured leftovers</span>
+            <span class="c-cmd">Invoke-MSIXCleanup</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>
+
+            <span class="c-cmt"># 2. capabilities the app needs</span>
+            <span class="c-cmd">Add-MSIXCapabilities</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-Capabilities</span> <span class="c-str">'internetClient'</span>
+
+            <span class="c-cmt"># 3. let the loader find sibling DLLs</span>
+            <span class="c-cmd">Add-MSIXloaderSearchPathOverride</span> <span class="c-arg">-MSIXFolderPath</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-FolderPaths</span> <span class="c-str">'VFS\ProgramFilesX64\MyApp'</span>
+            <span class="c-cmd">Add-MSIXInstalledLocationVirtualization</span> <span class="c-arg">-MSIXFolderPath</span> <span class="c-var">$MSIXFolder</span>
+
+            <span class="c-cmt"># 4. wire every application through the PSF launcher</span>
+            <span class="c-cmd">Add-MSIXPsfFrameworkFiles</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>
+            <span class="c-cmd">foreach</span> (<span class="c-var">$app</span> <span class="c-cmd">in</span> (<span class="c-cmd">Get-MSIXApplications</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>)) {
+                <span class="c-cmd">Add-MSXIXPSFShim</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-MISXAppID</span> <span class="c-var">$app</span>.Id <span class="c-arg">-PSFArchitektur</span> x64
+            }
+
+            <span class="c-cmt"># 5. registry + file-redirection fixups</span>
+            <span class="c-cmd">Add-MSIXPSFDefaultRegLegacy</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>
+            <span class="c-cmd">Add-MSIXPSFMFRFixup</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-IlvAware</span> <span class="c-var">$true</span></code></pre>
+    </section>
+
+    <!-- Test -->
+    <section class="section section-alt">
+      <h2>4. Test &amp; diagnose</h2>
+      <p>PSF cmdlets need an active framework. Run the fix, sign the result, install and inspect:</p>
+      <pre><code><span class="c-cmd">Set-MSIXActivePSFFramework</span> <span class="c-arg">-Framework</span> TimManganPSF     <span class="c-cmt"># required for shims/fixups</span>
+
+<span class="c-cmd">Add-MSIXFixMyApp</span> <span class="c-arg">-MsixFile</span> <span class="c-str">'C:\Apps\MyApp.msix'</span> `
+    <span class="c-arg">-OutputFilePath</span> <span class="c-str">'C:\Apps\MyApp_fixed.msix'</span> <span class="c-arg">-Verbose</span>
+
+<span class="c-var">$cert</span> = <span class="c-cmd">New-MSIXSelfSigningCert</span> <span class="c-arg">-Subject</span> <span class="c-str">'CN=Test'</span> <span class="c-arg">-Password</span> <span class="c-str">'pw'</span>
+<span class="c-cmd">Set-MSIXSignature</span> <span class="c-arg">-MSIXFile</span> <span class="c-str">'C:\Apps\MyApp_fixed.msix'</span> <span class="c-arg">-PfxCert</span> <span class="c-var">$cert</span>
+
+<span class="c-cmt"># when something hangs or fails to launch:</span>
+<span class="c-cmd">Wait-MSIXTracing</span>     <span class="c-cmt"># ETW trace start/stop around a launch</span></code></pre>
+      <p class="muted">Tip: run with <code>-KeepMSIXFolder</code> to inspect the expanded package, and pair
+         the ETW trace with Process Monitor (filter <code>Result = NAME NOT FOUND / ACCESS DENIED</code>)
+         to find what the app is missing.</p>
+    </section>
+
+    <!-- Contribute -->
+    <section class="section">
+      <h2>5. Ship it &mdash; or contribute it back</h2>
+      <p>Save the function as <code>src/Public/Add-MSIXFixMyApp.ps1</code>; the module auto-exports
+         everything in <code>Public/</code>. Your <code>.SYNOPSIS</code> line automatically appears in the
+         <a href="cmdlets.html">cmdlet reference</a>. Got a fix for a common app?
+         <a href="https://github.com/AndreasNick/MSIXForcelets">Open a pull request</a> &mdash; the goal of
+         this project is a growing library of ready-made solutions.</p>
+      <p class="more"><a class="btn btn-primary" href="cmdlets.html">Browse the building blocks &rarr;</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a></span>
+      <span class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+        <a href="legal.html">Legal</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+  <script defer src="consent.js"></script>
+</body>
+</html>
