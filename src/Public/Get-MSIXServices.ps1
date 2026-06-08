@@ -1,39 +1,13 @@
 ﻿function Get-MSIXServices {
 <#
 .SYNOPSIS
-    Lists the Windows services declared in an expanded MSIX package's manifest.
-
-.DESCRIPTION
-    Scans AppxManifest.xml for desktop6:Extension entries of category
-    "windows.service" and returns one object per declared service. Each result
-    carries the hosting Application Id plus the service attributes (name,
-    startup type, start account, executable).
-
-    MSIX Packaging Tool conversions often capture unrelated services into a
-    package (e.g. Visual Studio installer services when repackaging SSMS).
-    Such localSystem services can break deployment or activation of the whole
-    package. Pipe the results into Remove-MSIXServices to strip them out.
-
+    Lists windows.service declarations in an MSIX manifest (one object per service,
+    incl. ApplicationId, ServiceName, StartAccount, HasComServer).
 .PARAMETER MSIXFolder
-    Path to the expanded MSIX package folder containing AppxManifest.xml.
-
+    Expanded MSIX package folder (contains AppxManifest.xml).
 .EXAMPLE
-    Get-MSIXServices -MSIXFolder "C:\MSIXTemp\SSMS22"
-
-.EXAMPLE
-    Get-MSIXServices -MSIXFolder $pkg | Format-Table ApplicationId, ServiceName, StartAccount
-
-.EXAMPLE
-    # Remove every captured service
     Get-MSIXServices -MSIXFolder $pkg | Remove-MSIXServices
-
-.OUTPUTS
-    PSCustomObject with: ApplicationId, ServiceName, StartupType, StartAccount,
-    Executable, HasComServer, MSIXFolderPath. The MSIXFolderPath and ServiceName
-    properties bind to Remove-MSIXServices via ValueFromPipelineByPropertyName.
-
 .NOTES
-    https://www.nick-it.de
     Andreas Nick, 2026
 #>
     [CmdletBinding()]
@@ -54,16 +28,14 @@
         $manifest.Load($manifestPath)
 
         $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
-        $null = $nsmgr.AddNamespace('default',  'http://schemas.microsoft.com/appx/manifest/foundation/windows10')
-        $null = $nsmgr.AddNamespace('desktop6', 'http://schemas.microsoft.com/appx/manifest/desktop/windows10/6')
-        $null = $nsmgr.AddNamespace('com2',     'http://schemas.microsoft.com/appx/manifest/com/windows10/2')
+        $AppXNamespaces.GetEnumerator() | ForEach-Object { $null = $nsmgr.AddNamespace($_.Key, $_.Value) }
 
-        $applications = $manifest.SelectNodes('//default:Package/default:Applications/default:Application', $nsmgr)
+        $applications = $manifest.SelectNodes('//ns:Package/ns:Applications/ns:Application', $nsmgr)
         foreach ($app in $applications) {
             $appId = $app.GetAttribute('Id')
 
             $serviceExtensions = $app.SelectNodes(
-                "default:Extensions/desktop6:Extension[@Category='windows.service']", $nsmgr)
+                "ns:Extensions/desktop6:Extension[@Category='windows.service']", $nsmgr)
             foreach ($ext in $serviceExtensions) {
                 $svc = $ext.SelectSingleNode('desktop6:Service', $nsmgr)
                 if ($null -eq $svc) {
@@ -73,7 +45,7 @@
 
                 # Detect an accompanying COM ServiceServer (matched by ServiceName)
                 $hasComServer = $null -ne $app.SelectSingleNode(
-                    "default:Extensions/com2:Extension/com2:ComServer/*[local-name()='ServiceServer']", $nsmgr)
+                    "ns:Extensions/com2:Extension/com2:ComServer/*[local-name()='ServiceServer']", $nsmgr)
 
                 Write-Verbose "Found service '$($svc.GetAttribute('Name'))' on Application '$appId'"
                 [PSCustomObject]@{

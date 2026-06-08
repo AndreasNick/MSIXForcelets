@@ -1,4 +1,4 @@
-Import-Module D:\Development\GithubProjekte\MSIXForcelets\src\MSIXForcelets.psm1 -Force -Verbose
+Import-Module  MSIXForcelets
 
 $msixSource = "$env:USERPROFILE\Desktop\GimpImVFS_3.2.2.0_x64.msix"
 

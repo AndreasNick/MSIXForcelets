@@ -42,6 +42,8 @@ $AppXNamespaces = [ordered]@{
     "mobile"  = "http://schemas.microsoft.com/appx/manifest/mobile/windows10"
     "iot"     = "http://schemas.microsoft.com/appx/manifest/iot/windows10"
     "com"     = "http://schemas.microsoft.com/appx/manifest/com/windows10"
+    "com2"    = "http://schemas.microsoft.com/appx/manifest/com/windows10/2"
+    "com3"    = "http://schemas.microsoft.com/appx/manifest/com/windows10/3"
     "desktop"  = "http://schemas.microsoft.com/appx/manifest/desktop/windows10"
     "desktop2" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/2"
     "desktop4" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
@@ -49,7 +51,18 @@ $AppXNamespaces = [ordered]@{
     "desktop6" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
     "desktop7" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/7"
     "desktop9" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/9"
+    "desktop10" = "http://schemas.microsoft.com/appx/manifest/desktop/windows10/10"
     "rescap"  = "http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+}
+
+# desktop7:Shortcut File/Icon location tokens -> package VFS subfolder.
+# Shared by Add-/Remove-/Repair-MSIXDesktop7Shortcut.
+$ShortcutLocationTokens = [ordered]@{
+    "[{Common Programs}]" = "VFS\Common Programs"   # all-users Start Menu\Programs (the standard)
+    "[{Common Desktop}]"  = "VFS\Common Desktop"    # all-users (Public) Desktop
+    "[{Programs}]"        = "VFS\Programs"           # per-user Start Menu\Programs
+    "[{Desktop}]"         = "VFS\Desktop"            # per-user Desktop
+    "[{Package}]"         = ""                       # package root (Icon/Target only)
 }
 
 
@@ -265,6 +278,11 @@ public static class Win32Apis {
         string lpSubKey,
         uint samDesired,
         uint Reserved);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int RegDeleteTree(
+        IntPtr hKey,
+        string lpSubKey);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int RegDeleteValue(

@@ -1,25 +1,22 @@
-function Remove-MSIXVirtualRegistryKey {
-    <#
+﻿function Remove-MSIXVirtualRegistryKey {
+<#
 .SYNOPSIS
-Removes a virtual registry key from an MSIX package.
-
-.DESCRIPTION
-The Remove-MSIXVirtualRegistryKey function is used to remove a virtual registry key from an MSIX package. This function can be used to clean up virtual registry keys that are no longer needed.
-
+    Removes a virtual registry key from an MSIX hive file (Registry.dat / User.dat).
+.PARAMETER HiveFilePath
+    Path to the hive file, e.g. "$pkg\Registry.dat".
 .PARAMETER KeyPath
-Specifies the path of the virtual registry key to be removed.
-
-.PARAMETER PackagePath
-Specifies the path of the MSIX package from which the virtual registry key should be removed.
-
+    Key path relative to the hive root, e.g.
+    'REGISTRY\MACHINE\SOFTWARE\Microsoft\.NETFramework'.
+.PARAMETER Recurse
+    Delete the key AND all its subkeys (RegDeleteTree). Without it only an empty
+    leaf key is removed (RegDeleteKeyEx).
 .EXAMPLE
-Remove-MSIXVirtualRegistryKey -HiveFilePath "$env:userprofile\Desktop\Registry.dat" -KeyPath "REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Verbose
-This example removes the virtual registry key "HKCU\Software\MyApp" from the MSIX package located at "C:\MyApp.msix".
-
+    Remove-MSIXVirtualRegistryKey -HiveFilePath "$pkg\Registry.dat" `
+        -KeyPath 'REGISTRY\MACHINE\SOFTWARE\Microsoft\.NETFramework' -Recurse
 .NOTES
-Only run this function with administrative privileges.
-https://www.nick-it.de
-Andreas Nick, 2024
+    RegLoadAppKey needs write access to the hive (may require elevation).
+    https://www.nick-it.de
+    Andreas Nick, 2024
 #>
     [CmdletBinding()]
     param (
@@ -27,25 +24,36 @@ Andreas Nick, 2024
         [string]$HiveFilePath,
 
         [Parameter(Mandatory = $true)]
-        [string]$KeyPath
+        [string]$KeyPath,
+
+        [switch]$Recurse
     )
 
     $hKey = [IntPtr]::Zero
     $result = [Win32Apis]::RegLoadAppKey($HiveFilePath, [ref]$hKey, 0xF003F, 0, 0)
     if ($result -ne 0) {
-        throw "Failed to load hive file with error code: $result"
+        throw "Failed to load hive '$HiveFilePath' (error $result; 5 = access denied, may need elevation)."
     }
 
     try {
-        $result = [Win32Apis]::RegDeleteKeyEx($hKey, $KeyPath, 0xF003F, 0)
-        if ($result -ne 0) {
-            throw "Failed to delete key with error code: $result"
+        if ($Recurse) {
+            $result = [Win32Apis]::RegDeleteTree($hKey, $KeyPath)
         }
         else {
-            Write-Host "Key '$KeyPath' deleted successfully."
+            $result = [Win32Apis]::RegDeleteKeyEx($hKey, $KeyPath, 0xF003F, 0)
+        }
+
+        if ($result -eq 2) {
+            Write-Verbose "Key '$KeyPath' not present - nothing to remove."
+        }
+        elseif ($result -ne 0) {
+            throw "Failed to delete key '$KeyPath' (error $result)."
+        }
+        else {
+            Write-Verbose "Removed virtual registry key '$KeyPath'."
         }
     }
     finally {
-        $resVal = [Win32Apis]::RegCloseKey($hKey)
+        $null = [Win32Apis]::RegCloseKey($hKey)
     }
 }

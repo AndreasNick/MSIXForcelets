@@ -12,5 +12,6 @@
 workspace.code-workspace
 CLAUDE.md
 Project.md
+/web
 .claude/
 

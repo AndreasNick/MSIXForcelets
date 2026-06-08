@@ -1,4 +1,4 @@
-Import-Module D:\Development\GithubProjekte\MSIXForcelets\src\MSIXForcelets.psm1 -Force -Verbose
+Import-Module  MSIXForcelets
 
 # Source MSIX — Adobe Acrobat Reader DC
 

@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-Import-Module D:\Development\GithubProjekte\MSIXForcelets\src\MSIXForcelets.psm1 -Force
+Import-Module MSIXForcelets 
 
 Set-MSIXActivePSFFramework -Framework 'TimManganPSF\2026-2-22_release'
 

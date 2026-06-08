@@ -1,61 +1,19 @@
 ﻿function Remove-MSIXServices {
 <#
 .SYNOPSIS
-    Removes Windows service declarations from an expanded MSIX package's manifest.
-
-.DESCRIPTION
-    Removes desktop6:Extension entries of category "windows.service" from
-    AppxManifest.xml. For each removed service it also strips a matching COM
-    ServiceServer extension (com2:Extension with a ServiceServer whose
-    ServiceName matches). When the hosting Application becomes an empty
-    service-host afterwards (no remaining extensions and AppListEntry="none"),
-    the Application element itself is removed too - unless -KeepHostApplication
-    is set.
-
-    Designed to clean up services that an MSIX Packaging Tool capture pulled in
-    by accident (e.g. Visual Studio installer / diagnostics services when
-    repackaging SSMS), which can break deployment or activation of the package.
-
-    Accepts pipeline input from Get-MSIXServices. The manifest is saved once per
-    folder after all pipeline objects are processed.
-
+    Removes windows.service declarations (+ matching COM ServiceServer and empty
+    service-host apps) from an MSIX manifest. Once no service remains, the
+    localSystemServices/packagedServices capabilities are dropped too
+    (keeps the install dialog from demanding admin) - unless -KeepServiceCapabilities.
 .PARAMETER MSIXFolderPath
-    Path to the expanded MSIX package folder containing AppxManifest.xml.
-    Accepts pipeline input by property name (supplied by Get-MSIXServices).
-
+    Expanded MSIX package folder. Pipeline by property name.
 .PARAMETER ServiceName
-    Name of a specific service to remove. Accepted from the pipeline. When
-    omitted, ALL windows.service declarations in the folder are removed.
-
+    Name of a specific service. Omit to remove all.
 .PARAMETER KeepHostApplication
-    Keep the hosting Application element even if it becomes an empty
-    service-host after the service is removed. By default such pure
-    service-host applications (AppListEntry="none", no other extensions) are
-    removed entirely.
-
+    Keep the hosting Application even if it becomes an empty service-host.
 .EXAMPLE
     Get-MSIXServices -MSIXFolder $pkg | Remove-MSIXServices
-
-    Removes every declared service (and empty service-host apps) from the package.
-
-.EXAMPLE
-    Get-MSIXServices -MSIXFolder $pkg |
-        Where-Object ServiceName -like 'VS*' |
-        Remove-MSIXServices
-
-    Removes only the Visual Studio services, keeps everything else.
-
-.EXAMPLE
-    Remove-MSIXServices -MSIXFolderPath $pkg -ServiceName 'VSStandardCollectorService150'
-
-    Removes a single named service directly.
-
 .NOTES
-    Service capabilities (rescap:localSystemServices / packagedServices) are
-    intentionally left in place; they are harmless when sideloading. Remove them
-    manually from <Capabilities> if you want a minimal manifest.
-
-    https://www.nick-it.de
     Andreas Nick, 2026
 #>
     [CmdletBinding(SupportsShouldProcess = $true)]
@@ -66,7 +24,11 @@
         [Parameter(ValueFromPipelineByPropertyName = $true, Position = 1)]
         [string] $ServiceName,
 
-        [switch] $KeepHostApplication
+        [switch] $KeepHostApplication,
+        # Keep the rescap service capabilities even when no service remains.
+        # By default they are removed once the last service is gone - otherwise
+        # the install dialog keeps showing "installs a service" + admin prompt.
+        [switch] $KeepServiceCapabilities
     )
 
     begin {
@@ -97,18 +59,15 @@
             $manifest.Load($manifestPath)
 
             $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
-            $null = $nsmgr.AddNamespace('default',  'http://schemas.microsoft.com/appx/manifest/foundation/windows10')
-            $null = $nsmgr.AddNamespace('uap',      'http://schemas.microsoft.com/appx/manifest/uap/windows10')
-            $null = $nsmgr.AddNamespace('desktop6', 'http://schemas.microsoft.com/appx/manifest/desktop/windows10/6')
-            $null = $nsmgr.AddNamespace('com2',     'http://schemas.microsoft.com/appx/manifest/com/windows10/2')
+            $AppXNamespaces.GetEnumerator() | ForEach-Object { $null = $nsmgr.AddNamespace($_.Key, $_.Value) }
 
             $targetNames = $pending[$folder]   # empty list = remove all
             $removedAny  = $false
 
-            $applications = @($manifest.SelectNodes('//default:Package/default:Applications/default:Application', $nsmgr))
+            $applications = @($manifest.SelectNodes('//ns:Package/ns:Applications/ns:Application', $nsmgr))
             foreach ($app in $applications) {
                 $appId          = $app.GetAttribute('Id')
-                $extensionsNode = $app.SelectSingleNode('default:Extensions', $nsmgr)
+                $extensionsNode = $app.SelectSingleNode('ns:Extensions', $nsmgr)
                 if ($null -eq $extensionsNode) { continue }
 
                 $svcExtensions = @($extensionsNode.SelectNodes("desktop6:Extension[@Category='windows.service']", $nsmgr))
@@ -151,6 +110,22 @@
                         if ($appListEntry -eq 'none') {
                             $null = $app.ParentNode.RemoveChild($app)
                             Write-Verbose "Removed empty service-host Application '$appId' (AppListEntry=none)."
+                        }
+                    }
+                }
+            }
+
+            # Once no windows.service remains, drop the now-pointless service
+            # capabilities - otherwise the install dialog still shows "installs a
+            # service" and demands admin rights.
+            if ($removedAny -and -not $KeepServiceCapabilities) {
+                $stillHasService = $manifest.SelectSingleNode("//desktop6:Extension[@Category='windows.service']", $nsmgr)
+                if ($null -eq $stillHasService) {
+                    foreach ($capName in 'localSystemServices', 'packagedServices') {
+                        $cap = $manifest.SelectSingleNode("//*[local-name()='Capability'][@Name='$capName']", $nsmgr)
+                        if ($null -ne $cap) {
+                            $null = $cap.ParentNode.RemoveChild($cap)
+                            Write-Verbose "Removed service capability '$capName'."
                         }
                     }
                 }

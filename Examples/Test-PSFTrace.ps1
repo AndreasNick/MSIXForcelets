@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 $ScriptRoot = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-Import-Module "$ScriptRoot\..\src\MSIXForcelets.psm1" -Force -Verbose
+Import-Module  MSIXForcelets
 
 # --- Configuration -----------------------------------------------------------
 

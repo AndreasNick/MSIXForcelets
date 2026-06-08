@@ -193,7 +193,7 @@
         # Tim Mangan-only feature guard
         if ($PSCmdlet.ParameterSetName -in @('HKLM2HKCU', 'JavaBlocker')) {
             if ($Script:PsfBasePath -notlike '*TimMangan*') {
-                Write-Error "$($PSCmdlet.ParameterSetName) requires Tim Mangan PSF. Run Set-MSIXActivePSFFramework -version TimManganPSF first."
+                Write-Error "$($PSCmdlet.ParameterSetName) requires Tim Mangan PSF. Run Set-MSIXActivePSFFramework -Framework TimManganPSF first."
                 return
             }
         }

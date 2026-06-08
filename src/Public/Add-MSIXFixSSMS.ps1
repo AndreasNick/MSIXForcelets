@@ -1,4 +1,5 @@
 # Fix for Microsoft SQL Server Management Studio (SSMS) MSIX package
+# Only working with ssms 19,20 not with 21,22!
 function Add-MSIXFixSSMS {
     [CmdletBinding()]
     param(

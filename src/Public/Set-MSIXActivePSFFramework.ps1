@@ -129,6 +129,17 @@ function Set-MSIXActivePSFFramework {
     # -Framework: find and activate the selected installation
     $selected = $discovered | Where-Object { $_.Name -eq $Framework } | Select-Object -First 1
 
+    # A family name (e.g. 'TimManganPSF' or 'MicrosoftPSF') has no launchers directly -
+    # resolve it to its newest non-debug release subfolder.
+    if ($null -eq $selected) {
+        $selected = $discovered |
+            Where-Object { $_.Name -like ($Framework + '\*') -and $_.Name -notlike '*debug*' } |
+            Sort-Object Name -Descending | Select-Object -First 1
+        if ($null -ne $selected) {
+            Write-Verbose "Resolved '$Framework' to latest release '$($selected.Name)'."
+        }
+    }
+
     if ($null -eq $selected) {
         $availableNames = $discovered | Select-Object -ExpandProperty Name
         Write-Error ("PSF '$Framework' not found. Available options:`n" +
@@ -137,10 +148,10 @@ function Set-MSIXActivePSFFramework {
         return
     }
 
-    $Script:PSFVersion  = $Framework
+    $Script:PSFVersion  = $selected.Name
     $Script:PsfBasePath = $selected.Path
 
-    Write-Host "Active PSF : $Framework" -ForegroundColor Green
+    Write-Host "Active PSF : $($selected.Name)" -ForegroundColor Green
     Write-Host "Path       : $($Script:PsfBasePath)" -ForegroundColor Green
 
     # Warn if expected structure is incomplete

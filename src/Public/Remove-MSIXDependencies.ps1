@@ -1,51 +1,15 @@
 ﻿function Remove-MSIXDependencies {
 <#
 .SYNOPSIS
-    Removes PackageDependency entries from an expanded MSIX package's manifest.
-
-.DESCRIPTION
-    Removes <PackageDependency> elements from the <Dependencies> section of
-    AppxManifest.xml. The mandatory <TargetDeviceFamily> entry is never touched.
-
-    Useful to strip framework dependencies that an MSIX Packaging Tool capture
-    added but that the app does not actually require (e.g. a
-    Microsoft.WindowsAppRuntime.* reference that prevents every app from
-    launching when that runtime is absent on the target).
-
-    Accepts pipeline input from Get-MSIXDependencies. The manifest is saved once
-    per folder after all pipeline objects are processed.
-
-    Caution: removing a dependency the app really needs will break it at
-    runtime. Verify against the app's requirements before stripping.
-
+    Removes PackageDependency entries from an MSIX manifest. TargetDeviceFamily
+    is never touched.
 .PARAMETER MSIXFolderPath
-    Path to the expanded MSIX package folder containing AppxManifest.xml.
-    Accepts pipeline input by property name (supplied by Get-MSIXDependencies).
-
+    Expanded MSIX package folder. Pipeline by property name.
 .PARAMETER Name
-    Name of a specific PackageDependency to remove. Accepted from the pipeline.
-    When omitted, ALL <PackageDependency> entries in the folder are removed
-    (TargetDeviceFamily always stays).
-
+    Name of a specific PackageDependency. Omit to remove all.
 .EXAMPLE
-    Get-MSIXDependencies -MSIXFolder $pkg |
-        Where-Object Name -like 'Microsoft.WindowsAppRuntime*' |
-        Remove-MSIXDependencies
-
-    Removes only the WindowsAppRuntime framework dependency.
-
-.EXAMPLE
-    Remove-MSIXDependencies -MSIXFolderPath $pkg -Name 'Microsoft.WindowsAppRuntime.1.4'
-
-    Removes a single named dependency directly.
-
-.EXAMPLE
-    Get-MSIXDependencies -MSIXFolder $pkg | Remove-MSIXDependencies -WhatIf
-
-    Shows what would be removed without modifying the manifest.
-
+    Get-MSIXDependencies -MSIXFolder $pkg | Where-Object Name -like '*WindowsAppRuntime*' | Remove-MSIXDependencies
 .NOTES
-    https://www.nick-it.de
     Andreas Nick, 2026
 #>
     [CmdletBinding(SupportsShouldProcess = $true)]
@@ -85,9 +49,9 @@
             $manifest.Load($manifestPath)
 
             $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
-            $null = $nsmgr.AddNamespace('default', 'http://schemas.microsoft.com/appx/manifest/foundation/windows10')
+            $AppXNamespaces.GetEnumerator() | ForEach-Object { $null = $nsmgr.AddNamespace($_.Key, $_.Value) }
 
-            $dependenciesNode = $manifest.SelectSingleNode('//default:Package/default:Dependencies', $nsmgr)
+            $dependenciesNode = $manifest.SelectSingleNode('//ns:Package/ns:Dependencies', $nsmgr)
             if ($null -eq $dependenciesNode) {
                 Write-Warning "No <Dependencies> section in '$folder' - nothing to do."
                 continue
@@ -96,7 +60,7 @@
             $targetNames = $pending[$folder]   # empty list = remove all PackageDependency entries
             $removedAny  = $false
 
-            foreach ($dep in @($dependenciesNode.SelectNodes('default:PackageDependency', $nsmgr))) {
+            foreach ($dep in @($dependenciesNode.SelectNodes('ns:PackageDependency', $nsmgr))) {
                 $depName = $dep.GetAttribute('Name')
 
                 if ($targetNames.Count -gt 0 -and $targetNames -notcontains $depName) {

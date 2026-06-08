@@ -62,7 +62,7 @@
         }
 
         if ($Script:PsfBasePath -notlike '*TimMangan*') {
-            Write-Error "MFRFixup requires Tim Mangan PSF. Run Set-MSIXActivePSFFramework -version TimManganPSF first."
+            Write-Error "MFRFixup requires Tim Mangan PSF. Run Set-MSIXActivePSFFramework -Framework TimManganPSF first."
             return
         }
 

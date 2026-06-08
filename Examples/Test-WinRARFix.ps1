@@ -1,4 +1,4 @@
-﻿Import-Module D:\Development\GithubProjekte\MSIXForcelets\src\MSIXForcelets.psm1 -Force
+﻿Import-Module  MSIXForcelets
 
 Set-MSIXActivePSFFramework -Framework 'TimManganPSF\2026-2-22_release'
 
@@ -21,3 +21,4 @@ Add-MSIXFixWinRARModernShell `
 # Sign the fixed package
 $Secpass = 'mypass' | ConvertTo-SecureString -Force -AsPlainText
 Set-MSIXSignature -PfxCert "$env:USERPROFILE\Desktop\NewSelfSigningCert.pfx" -CertPassword $Secpass -MSIXFile $msixOutput
+
