@@ -45,7 +45,12 @@
         <li>
           <h3>Fetch the tooling (one-time)</h3>
           <p>The published module stays lean &mdash; the Windows SDK packaging tools and the
-             Package Support Framework binaries are downloaded on demand:</p>
+             Package Support Framework binaries are downloaded on demand. Since v1.0.2 a single
+             umbrella cmdlet pulls everything in one go:</p>
+          <pre><code><span class="c-cmd">Install-MSIXForceletsAllRequirements</span>   <span class="c-cmt"># MSIX tooling + Tim Mangan PSF + Microsoft PSF</span></code></pre>
+          <p>Re-run with <code>-Force</code> to update existing components (or
+             <code>-Confirm:$false</code> for an entirely non-interactive run). The individual
+             updaters are still there if you want to pick one:</p>
           <pre><code><span class="c-cmd">Update-MSIXTooling</span>        <span class="c-cmt"># Windows SDK: makeappx, signtool, msixmgr</span>
 <span class="c-cmd">Update-MSIXTMPSF</span>          <span class="c-cmt"># Tim Mangan Package Support Framework</span>
 <span class="c-cmd">Update-MSIXMicrosoftPSF</span>   <span class="c-cmt"># Microsoft Package Support Framework</span></code></pre>

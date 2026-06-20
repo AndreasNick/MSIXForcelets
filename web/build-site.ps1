@@ -61,6 +61,7 @@ $categories = [ordered]@{
         'Start-MSIXTracing','Stop-MSIXTracing','Wait-MSIXTracing','Get-MSIXVirtualProcess',
         'Get-MSIXAppMachineType','Get-MSIXAppExeDetailInfo','Get-AppXManifestInfo','Invoke-MSIXCleanup','Find-MSIXFonts')
     'Setup, tooling &amp; configuration' = @(
+        'Install-MSIXForceletsAllRequirements',
         'Update-MSIXTooling','Update-MSIXMicrosoftPSF','Update-MSIXTMPSF','Set-MSIXCore',
         'Get-MSIXForceletsConfiguration','Set-MSIXForceletsConfiguration')
 }
