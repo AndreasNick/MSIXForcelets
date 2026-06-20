@@ -18,6 +18,10 @@
 #>
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText', '',
+        Justification = 'Lab helper: -Password is intentional plaintext input, converted to SecureString for Export-PfxCertificate.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', 'Password',
+        Justification = 'Lab helper: plaintext password is the intended interface for ad-hoc self-signing.')]
     param(
         [string] $Subject      = 'CN=CoolIT',
         [string] $Password     = 'mypass',

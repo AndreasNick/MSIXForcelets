@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.0'
+    ModuleVersion        = '1.0.2'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -93,6 +93,7 @@
         'Stop-MSIXTracing',
         'Test-MSIXManifest',
         'Test-MSIXSignature',
+        'Install-MSIXForceletsAllRequirements',
         'Update-MSIXMicrosoftPSF',
         'Update-MSIXTMPSF',
         'Update-MSIXTooling',
@@ -105,11 +106,26 @@
     PrivateData = @{
         PSData = @{
             Tags         = @('MSIX', 'AppX', 'PSF', 'PackageSupportFramework', 'Packaging',
-                             'WindowsApps', 'MSIXPackagingTool')
+                             'WindowsApps', 'MSIXPackagingTool', 'CodeSigning', 'Signing',
+                             'Manifest', 'AppAttach', 'AVD', 'AzureVirtualDesktop',
+                             'Repackaging', 'desktop7', 'AppV')
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
             ReleaseNotes = @'
+1.0.2 - Tags, Update-MSIXTMPSF format fix, umbrella Update cmdlet.
+
+- Update-MSIXTMPSF now handles BOTH Tim Mangan PSF release formats: the legacy single
+  ZipRelease*.zip wrapper AND the newer DebugPsf.zip + ReleasePsf.zip pair (introduced
+  in v2026.05.01). Without this fix the cmdlet silently fell back to the previous
+  release that still shipped the wrapper.
+- Expanded PSGallery tags for discoverability: CodeSigning, Signing, Manifest,
+  AppAttach, AVD, AzureVirtualDesktop, Repackaging, desktop7, AppV.
+- New umbrella cmdlet Install-MSIXForceletsAllRequirements: downloads/updates MSIX
+  Tooling (MSIX Core + SDK Packaging Tools), Tim Mangan's PSF AND the Microsoft PSF
+  in one call. Use -Skip* switches to opt out of individual parts; -Force re-downloads
+  existing components (= update path).
+
 1.0.0 - Initial PowerShell Gallery release.
 
 Highlights:

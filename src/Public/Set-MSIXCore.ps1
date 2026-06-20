@@ -7,7 +7,7 @@ function Set-MSIXCore {
     Locates msixmgr.exe inside the module's Data\MSIXCore\x64 folder and
     creates a script-scoped alias named 'msixmgr'. If the binary is not
     found a warning is written and the user is directed to run
-    Update-MSIXForcelets.
+    Install-MSIXForceletsAllRequirements.
 
 .EXAMPLE
     Set-MSIXCore

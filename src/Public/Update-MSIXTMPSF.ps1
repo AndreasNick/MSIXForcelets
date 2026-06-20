@@ -79,33 +79,43 @@ function Update-MSIXTMPSF {
         return
     }
 
+    # Two asset formats are accepted: the old wrapper (ZipRelease*.zip containing inner
+    # Debug+Release zips) or the newer pair (DebugPsf.zip + ReleasePsf.zip) introduced in
+    # 2025/2026. Picking the first release that carries at least one of them.
     $latestRelease = $null
-    $zipAsset      = $null
+    $wrapperAsset  = $null
+    $debugAsset    = $null
+    $releaseAsset  = $null
     foreach ($release in $releases) {
-        $asset = $release.assets |
-            Where-Object { $_.name -like "ZipRelease*.zip" } |
-            Select-Object -First 1
-        if ($null -ne $asset) {
+        $wrap = $release.assets | Where-Object { $_.name -like 'ZipRelease*.zip' } | Select-Object -First 1
+        $dbg  = $release.assets | Where-Object { $_.name -ieq 'DebugPsf.zip' }     | Select-Object -First 1
+        $rel  = $release.assets | Where-Object { $_.name -ieq 'ReleasePsf.zip' }   | Select-Object -First 1
+        if ($wrap -or $dbg -or $rel) {
             $latestRelease = $release
-            $zipAsset      = $asset
+            $wrapperAsset  = $wrap
+            $debugAsset    = $dbg
+            $releaseAsset  = $rel
             break
         }
     }
 
     if ($null -eq $latestRelease) {
-        Write-Warning "No Tim Mangan PSF release with a ZipRelease*.zip asset was found on GitHub."
+        Write-Warning "No Tim Mangan PSF release with a usable asset (ZipRelease*.zip or DebugPsf.zip/ReleasePsf.zip) was found on GitHub."
         return
     }
 
-    $assetName   = $zipAsset.name
-    $downloadUrl = $zipAsset.browser_download_url
+    # Display name for prompts / verbose output.
+    $assetName = if ($wrapperAsset) { $wrapperAsset.name } else {
+        @($debugAsset.name, $releaseAsset.name | Where-Object { $_ }) -join ' + '
+    }
 
-    # Extract date string from asset name, e.g. "ZipRelease.zip-v2026-2-22.zip" -> "2026-2-22"
-    if ($assetName -match '-v(\d{4}-\d{1,2}-\d{1,2})') {
+    # Date string: prefer the wrapper-asset date suffix (old format), else strip the
+    # leading v/V from the release tag (e.g. v2026.05.01 -> 2026.05.01).
+    if ($wrapperAsset -and $wrapperAsset.name -match '-v(\d{4}-\d{1,2}-\d{1,2})') {
         $dateStr = $Matches[1]
     }
     else {
-        $dateStr = $latestRelease.tag_name -replace '^[vV]', ''
+        $dateStr = $latestRelease.tag_name -replace '^[vV]\.?', ''
     }
 
     $debugPath   = Join-Path $timManganPsfPath "$($dateStr)_debug"
@@ -136,11 +146,26 @@ function Update-MSIXTMPSF {
     $tempExtract = Join-Path $env:TEMP ("TMPSFPSF_outer_$guid")
 
     try {
-        Write-Verbose "Downloading $downloadUrl ..."
-        Invoke-WebRequest -Uri $downloadUrl -OutFile $tempZip -UseBasicParsing
+        if ($wrapperAsset) {
+            Write-Verbose "Downloading $($wrapperAsset.browser_download_url) ..."
+            Invoke-WebRequest -Uri $wrapperAsset.browser_download_url -OutFile $tempZip -UseBasicParsing
 
-        Write-Verbose "Extracting outer ZIP..."
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($tempZip, $tempExtract)
+            Write-Verbose "Extracting outer ZIP..."
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($tempZip, $tempExtract)
+        }
+        else {
+            # New format: download Debug/Release zips directly into $tempExtract so the
+            # existing inner-zip discovery logic below finds them by name.
+            $null = New-Item -ItemType Directory -Path $tempExtract -Force
+            if ($debugAsset) {
+                Write-Verbose "Downloading $($debugAsset.browser_download_url) ..."
+                Invoke-WebRequest -Uri $debugAsset.browser_download_url -OutFile (Join-Path $tempExtract 'DebugPsf.zip') -UseBasicParsing
+            }
+            if ($releaseAsset) {
+                Write-Verbose "Downloading $($releaseAsset.browser_download_url) ..."
+                Invoke-WebRequest -Uri $releaseAsset.browser_download_url -OutFile (Join-Path $tempExtract 'ReleasePsf.zip') -UseBasicParsing
+            }
+        }
 
         # --- Locate the inner Debug / Release ZIPs ---
         $innerZips  = Get-ChildItem -Path $tempExtract -Filter "*.zip" -Recurse

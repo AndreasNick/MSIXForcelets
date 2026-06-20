@@ -91,7 +91,7 @@ function New-MSIXAppAttachImage {
     fixed-size images.
 
 .NOTES
-    Requires msixmgr.exe. Run Update-MSIXForcelets if it is missing.
+    Requires msixmgr.exe. Run Install-MSIXForceletsAllRequirements if it is missing.
     ExistingDisk mode requires elevation (Administrator) for Mount-DiskImage.
     msixmgr source: https://github.com/microsoft/msix-packaging
     Andreas Nick, 2024
@@ -142,7 +142,7 @@ function New-MSIXAppAttachImage {
     begin {
         $msixmgrExe = $Script:MSIXMgrPath
         if ([string]::IsNullOrEmpty($msixmgrExe) -or -not (Test-Path $msixmgrExe)) {
-            throw "msixmgr.exe not found. Run Update-MSIXForcelets to download MSIX Core."
+            throw "msixmgr.exe not found. Run Install-MSIXForceletsAllRequirements to download MSIX Core."
         }
 
         if ($PSCmdlet.ParameterSetName -eq 'OutputFolder' -and -not (Test-Path $OutputFolder)) {

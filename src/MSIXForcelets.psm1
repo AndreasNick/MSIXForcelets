@@ -1,4 +1,4 @@
-﻿# root path
+# root path
 $root = Split-Path -Parent -Path $MyInvocation.MyCommand.Path
 $Script:MSIXPackagingPath = "$PSScriptRoot\Libs\MSIXPackaging\WindowsSDK\11\10.0.22000.0\x64"
 $Script:MSIXPSFPath     = "$PSScriptRoot\MSIXPSF"
@@ -413,6 +413,15 @@ foreach ($_item in $_coreOut) {
     if ($_item -is [System.Management.Automation.WarningRecord]) {
         $_summary.Add([PSCustomObject]@{ Text = "  WARNING  : $($_item.Message)"; Color = 'Yellow' })
     }
+}
+
+# If anything above is missing, point the user at the umbrella update cmdlet that
+# downloads / refreshes all required binaries (PSF + Tooling) in a single call.
+if (($_summary | Where-Object { $_.Color -eq 'Yellow' }).Count -gt 0) {
+    $_summary.Add([PSCustomObject]@{
+        Text  = "  TIP      : Run Install-MSIXForceletsAllRequirements to install/update ALL required binaries in one call."
+        Color = 'Cyan'
+    })
 }
 
 # Print banner and summary at the very end so it is visible after verbose output
