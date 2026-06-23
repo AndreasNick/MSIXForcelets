@@ -1,11 +1,11 @@
 
-function Add-MSIXDisableVREGOrRegistryWrite {
+function Add-MSIXDisableWriteVirtualization {
     <#
     .SYNOPSIS
-    Disables  VFS and VREG in MSIX / APPX package
-    
+    Disables file-system and registry write virtualization in an MSIX / APPX package
+
     .DESCRIPTION
-    Disables  VFS and VREG in einem MSIX / APPX package.
+    Disables file-system and registry write virtualization in an MSIX / APPX package.
     >>> ATTENTION <<< - the package cannot be opened with the Packaging Tool afterwards. It does not 
     seem to know the namespace "desktop6" yet. An installation is only possible via the PoweerShell "Add-AppXPackage".
     
@@ -24,7 +24,7 @@ function Add-MSIXDisableVREGOrRegistryWrite {
     
     .EXAMPLE
     Add-MSIXCapabilities -MSIXFolder $Package  -Capabilities unvirtualizedResources 
-    Add-DisableVREGOrRegistryWrite -MSIXFolder $Package -DisableFileSystemWriteVirtualization -DisableRegistryWriteVirtualization
+    Add-MSIXDisableWriteVirtualization -MSIXFolder $Package -DisableFileSystemWriteVirtualization -DisableRegistryWriteVirtualization
     
     .NOTES
     The idea is from this blog

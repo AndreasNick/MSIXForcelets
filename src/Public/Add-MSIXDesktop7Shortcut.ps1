@@ -14,6 +14,11 @@
     Target folder token, e.g. '[{Programs}]' (default) or '[{Desktop}]'. Use a per-user
     location; system locations ('[{Common Programs}]', '[{Common Desktop}]') do not render
     the shortcut icon. Tab-completes.
+.PARAMETER SubFolder
+    Optional sub-folder under the location, e.g. 'Putty'. On the Desktop this creates a real
+    folder holding the shortcuts. NOTE: the Windows 11 Start menu does NOT show sub-folders
+    for packaged shortcuts - the .lnk is created physically but entries appear flat (one per
+    AUMID), so a Start-menu group is not displayed.
 .PARAMETER Arguments
     Optional command-line arguments.
 .PARAMETER Description
@@ -46,6 +51,7 @@
         })]
         [string] $Location = '[{Programs}]',
 
+        [string] $SubFolder   = '',
         [string] $Arguments   = '',
         [string] $Description = '',
         [string] $IconSource  = '',
@@ -163,8 +169,12 @@
 
     # --- 3. Write the physical .lnk into the package ---------------------------
     $vfsDir  = Join-Path $MSIXFolder.FullName $ShortcutLocationTokens[$Location]
+    if ($SubFolder) { $vfsDir = Join-Path $vfsDir $SubFolder }
     if (-not (Test-Path $vfsDir)) { $null = New-Item -ItemType Directory -Path $vfsDir -Force }
     $lnkPath = Join-Path $vfsDir ($Name + '.lnk')
+
+    # File token written to the manifest (location + optional sub-folder + file name).
+    $fileToken = if ($SubFolder) { $Location + '\' + $SubFolder + '\' + $Name + '.lnk' } else { $Location + '\' + $Name + '.lnk' }
 
     $wshShell = New-Object -ComObject WScript.Shell
     try {
@@ -198,7 +208,7 @@
     $ext = $manifest.CreateElement('desktop7:Extension', $desktop7Ns)
     $null = $ext.SetAttribute('Category', 'windows.shortcut')
     $sc  = $manifest.CreateElement('desktop7:Shortcut', $desktop7Ns)
-    $null = $sc.SetAttribute('File', ($Location + '\' + $Name + '.lnk'))
+    $null = $sc.SetAttribute('File', $fileToken)
     $null = $sc.SetAttribute('Icon', $iconRef)
     if ($Arguments)      { $null = $sc.SetAttribute('Arguments', $Arguments) }
     if ($Description)    { $null = $sc.SetAttribute('Description', $Description) }
@@ -212,7 +222,7 @@
     [PSCustomObject]@{
         ApplicationId  = $AppId
         Name           = $Name
-        File           = ($Location + '\' + $Name + '.lnk')
+        File           = $fileToken
         Icon           = $iconRef
         PinToStartMenu = [bool]$PinToStartMenu
         LnkPath        = $lnkPath

@@ -39,6 +39,7 @@ $AppXNamespaces = [ordered]@{
     "uap6"    = "http://schemas.microsoft.com/appx/manifest/uap/windows10/6"
     "uap7"    = "http://schemas.microsoft.com/appx/manifest/uap/windows10/7"
     "uap10"   = "http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+    "uap11"   = "http://schemas.microsoft.com/appx/manifest/uap/windows10/11"
     "mobile"  = "http://schemas.microsoft.com/appx/manifest/mobile/windows10"
     "iot"     = "http://schemas.microsoft.com/appx/manifest/iot/windows10"
     "com"     = "http://schemas.microsoft.com/appx/manifest/com/windows10"

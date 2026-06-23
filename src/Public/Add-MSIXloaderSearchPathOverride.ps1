@@ -11,6 +11,8 @@ Specifies the path to the folder containing the MSIX package.
 
 .PARAMETER FolderPaths
 Specifies an array of folder paths to be added as search paths in the LoaderSearchPathEntry element.
+The uap6 schema permits a maximum of 5 paths; for more, use the PSF DynamicLibraryFixup
+(Add-MSIXPSFDynamicLibraryFixup) instead.
 
 .EXAMPLE
 Add-MSIXloaderSearchPathOverride -MSIXFolderPath "C:\MyMSIXPackage" -FolderPaths "libs", "plugins"
@@ -37,6 +39,13 @@ https://www.nick-it.de
         [String[]] $FolderPaths,
         [Switch] $SaveManifestCopy
     )
+
+    # The uap6 LoaderSearchPathOverride schema allows at most 5 LoaderSearchPathEntry
+    # elements. More paths produce a manifest that fails package validation at build
+    # time, so reject the call early with a pointer to the unlimited PSF alternative.
+    if ($FolderPaths.Count -gt 5) {
+        throw "LoaderSearchPathOverride supports a maximum of 5 folder paths (uap6 schema limit); $($FolderPaths.Count) were supplied. Reduce the list, or use the PSF DynamicLibraryFixup (Add-MSIXPSFDynamicLibraryFixup), which has no such limit."
+    }
 
     if (Test-Path "$MSIXFolderPath\AppxManifest.xml") {
     

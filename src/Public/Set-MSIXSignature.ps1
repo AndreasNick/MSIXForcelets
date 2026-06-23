@@ -22,7 +22,10 @@ function Set-MSIXSignature {
     Specifies the thumbprint of the certificate to be used for signing the MSIX file. This parameter is mandatory when using the certificate thumbprint.
 
 .PARAMETER TimeStampServer
-    Specifies the timestamp server to be used for timestamping the signature. The default value is 'http://timestamp.entrust.net/TSS/RFC3161sha2TS'. Valid options are: 'http://timestamp.entrust.net/TSS/RFC3161sha2TS', 'http://time.certum.pl', 'http://timestamp.comodoca.com?td=sha256', 'http://timestamp.apple.com/ts01', 'http://zeitstempel.dfn.de'.
+    Specifies the timestamp server to be used for timestamping the signature. The default value is 'http://timestamp.entrust.net/TSS/RFC3161sha2TS'. Valid options are: 'http://timestamp.entrust.net/TSS/RFC3161sha2TS', 'http://time.certum.pl', 'http://timestamp.comodoca.com?td=sha256', 'http://timestamp.apple.com/ts01', 'http://zeitstempel.dfn.de'. Ignored when -NoTimestamp is used.
+
+.PARAMETER NoTimestamp
+    Signs without an RFC3161 timestamp. Mutually exclusive with -TimeStampServer. Note: an untimestamped signature becomes invalid once the signing certificate expires.
 
 .PARAMETER Force
     Forces the signature to be set even if the MSIX file already has a signature.
@@ -64,7 +67,8 @@ function Set-MSIXSignature {
 
         [ValidateSet('http://timestamp.entrust.net/TSS/RFC3161sha2TS', 'http://time.certum.pl', 'http://timestamp.comodoca.com?td=sha256', 'http://timestamp.apple.com/ts01', 'http://zeitstempel.dfn.de')]
         $TimeStampServer = 'http://timestamp.entrust.net/TSS/RFC3161sha2TS',
-        
+
+        [switch] $NoTimestamp,
         [switch] $force,
         [switch] $Certumfix
     )
@@ -73,7 +77,10 @@ function Set-MSIXSignature {
             Write-Error "MSIX file not found: $($MSIXFile.FullName)"
             return
         }
-        $addParams = ""
+        if ($NoTimestamp -and $PSBoundParameters.ContainsKey('TimeStampServer')) {
+            Write-Error "Specify either -TimeStampServer or -NoTimestamp, not both."
+            return $false
+        }
         if ($force) {
             if (Test-MSIXSignature -MSIXFile $MSIXFile) {
                 signtool remove $MSIXFile.FullName
@@ -83,22 +90,41 @@ function Set-MSIXSignature {
             'PFX' {
                 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($CertPassword)
                 $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-                signtool sign /v /td SHA256 /fd SHA256 /a /f $PfxCert /tr $TimeStampServer /p $UnsecurePassword $MSIXFile.Fullname 
+                if ($NoTimestamp) {
+                    signtool sign /v /td SHA256 /fd SHA256 /a /f $PfxCert /p $UnsecurePassword $MSIXFile.Fullname
+                }
+                else {
+                    signtool sign /v /td SHA256 /fd SHA256 /a /f $PfxCert /tr $TimeStampServer /p $UnsecurePassword $MSIXFile.Fullname
+                }
             }
             'Thumbprint' {
                 if ($Certumfix) {
                     # Temporary workaround for Certum smartcard PIN-dialog ordering issue (2026-02-09).
-                    signtool sign /v /tr $TimeStampServer /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
+                    if ($NoTimestamp) {
+                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint $MSIXFile.Fullname
+                    }
+                    else {
+                        signtool sign /v /tr $TimeStampServer /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
+                    }
                 }
                 else {
                     # Standard hardware token / certificate-store signing by thumbprint.
-                    signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
+                    if ($NoTimestamp) {
+                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint $MSIXFile.Fullname
+                    }
+                    else {
+                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
+                    }
                 }
             }
         }
-        
-        if ($lastexitcode -ne 0) {
-            Write-Error "ERROR: MSIX Cannot sign package $($MSIXFile)"
+
+        if ($LASTEXITCODE -ne 0) {
+            $tsHint = ''
+            if (-not $NoTimestamp) {
+                $tsHint = " If the timestamp server '$TimeStampServer' could not be reached, retry later or sign with -NoTimestamp."
+            }
+            Write-Error "Signing failed: signtool returned exit code $LASTEXITCODE. Package '$($MSIXFile.Name)' was NOT signed.$tsHint"
             return $false
         }
         else {

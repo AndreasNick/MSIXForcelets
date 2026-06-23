@@ -42,8 +42,20 @@ https://www.nick-it.de
     )
      
     process {
-        if (-not (Test-Path $MsixFile )) {
-            Write-Warning "the  file $($MsixFile.FullName) not exist"
+        # [System.IO.FileInfo]/[DirectoryInfo] resolve relative paths against the process
+        # working directory ([Environment]::CurrentDirectory), not PowerShell's $PWD. Re-resolve
+        # the input against $PWD so a relative path behaves as typed at the prompt; otherwise
+        # MakeAppx receives a path rooted at the wrong directory and fails with 0x80070002.
+        $resolvedMsix = Resolve-Path -LiteralPath $MsixFile.ToString() -ErrorAction SilentlyContinue
+        if (-not $resolvedMsix) {
+            Write-Error "MSIX file not found: $($MsixFile)"
+            return $null
+        }
+        $MsixFile = [System.IO.FileInfo] $resolvedMsix.ProviderPath
+
+        # Make a relative output folder absolute against $PWD for the same reason.
+        if (-not [System.IO.Path]::IsPathRooted($MSIXFolder.ToString())) {
+            $MSIXFolder = [System.IO.DirectoryInfo] (Join-Path $PWD.ProviderPath $MSIXFolder.ToString())
         }
 
         if ((Test-Path $MSIXFolder) -and $ClearOutputFolder) {

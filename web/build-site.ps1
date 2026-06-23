@@ -49,7 +49,7 @@ $categories = [ordered]@{
         'Add-MSIXDesktop7Shortcut','Get-MSIXDesktop7Shortcut','Remove-MSIXDesktop7Shortcut','Repair-MSIXDesktop7Shortcut',
         'Convert-MSIXClassicContextMenuToVerbs','Remove-MSIXClassicShellExtension','Import-MSIXSparseShellExtension')
     'Capabilities, virtualization &amp; registry' = @(
-        'Add-MSIXCapabilities','Add-MSIXFlexibleVirtualization','Add-MSIXDisableVREGOrRegistryWrite',
+        'Add-MSIXCapabilities','Add-MSIXFlexibleVirtualization','Add-MSIXDisableWriteVirtualization',
         'Add-MSIXInstalledLocationVirtualization','Add-MSIXloaderSearchPathOverride','Add-MSIXRegAccessFix',
         'Remove-MSIXPackageIntegrity','Add-MSIXFirewallRule','Add-MSIXSharedContainer','Add-MSIXSharedFonts')
     'Assets &amp; visual elements' = @(

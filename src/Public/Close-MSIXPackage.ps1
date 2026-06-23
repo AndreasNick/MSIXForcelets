@@ -27,6 +27,10 @@ function Close-MSIXPackage {
     function relies on MakeAppx -o; use -Force when MakeAppx fails because
     the output file is locked or already present.
 
+.PARAMETER PrettyPrint
+    Re-formats AppxManifest.xml with indentation and line breaks before packing,
+    so the manifest inside the package stays human-readable.
+
 .EXAMPLE
     Close-MSIXPackage -MSIXFolder "C:\Temp\MSIXTemp" -MSIXFile "C:\Temp\MyApp.msix"
 
@@ -55,7 +59,8 @@ function Close-MSIXPackage {
             Position = 1)]
         [System.IO.FileInfo] $MSIXFile,
         [Switch] $KeepMSIXFolder,
-        [Switch] $Force
+        [Switch] $Force,
+        [Switch] $PrettyPrint
     )
 
     process {
@@ -94,6 +99,24 @@ function Close-MSIXPackage {
             }
 
             $manifestPath = Join-Path $MSIXFolder.FullName 'AppxManifest.xml'
+
+            # Re-serialize the manifest with indentation so the packed copy is readable.
+            if ($PrettyPrint -and (Test-Path $manifestPath)) {
+                $fmtDoc = New-Object System.Xml.XmlDocument
+                $fmtDoc.PreserveWhitespace = $false
+                $fmtDoc.Load($manifestPath)
+
+                $settings = New-Object System.Xml.XmlWriterSettings
+                $settings.Indent = $true
+                $settings.IndentChars = '  '
+                $settings.NewLineChars = "`r`n"
+                $settings.Encoding = New-Object System.Text.UTF8Encoding($false)
+
+                $writer = [System.Xml.XmlWriter]::Create($manifestPath, $settings)
+                try { $fmtDoc.Save($writer) } finally { $writer.Dispose() }
+                Write-Verbose "Pretty-printed AppxManifest.xml"
+            }
+
             if (Test-Path $manifestPath) {
                 $valid = Test-MSIXManifest -ManifestPath $manifestPath -Verbose:($VerbosePreference -eq 'Continue')
                 if (-not $valid) {
