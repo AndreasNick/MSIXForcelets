@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.2'
+    ModuleVersion        = '1.0.3'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -119,6 +119,37 @@
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
             ReleaseNotes = @'
+1.0.3 - File type associations, application editing, icon repair, packaging refinements.
+
+New cmdlets:
+- Add/Get/Set/Remove-MSIXFileTypeAssociation: manage windows.fileTypeAssociation (FTA)
+  entries (extensions, verbs, logo) per application.
+- Set-MSIXApplication: edit Application entries - rename Id (-NewId), change the launcher
+  (-Executable), set working directory and default parameters (uap11:CurrentDirectoryPath /
+  uap11:Parameters) and toggle autostart (windows.startupTask) via -Autostart.
+- Set-MSIXApplicationIcon: regenerate transparent icon assets (incl. unplated target sizes)
+  and wire them into an Application's VisualElements in one call - fixes boxed/plated
+  Start-menu and taskbar icons.
+
+Improvements:
+- New-MSIXAssetFrom -IncludeUnplatedTargetSizes: emits Square44x44Logo.targetsize-*_altform-unplated
+  so Windows shows the icon unplated on the taskbar / Start app list.
+- Close-MSIXPackage: -PrettyPrint (readable AppxManifest.xml) and -RegenerateResource
+  (rebuild resources.pri via makepri after asset changes).
+- Add-MSIXFlexibleVirtualization reworked into Disable / Directory / Registry parameter sets;
+  selective HKCU-key and AppData-folder exclusions via -RegistryKey and -KnownFolder/-Folder
+  (no arrays, no %ENV% strings).
+- Add-MSIXDesktop7Shortcut -SubFolder; Get-/Remove-MSIXDesktop7Shortcut now also handle
+  package-level shortcuts.
+- Set-MSIXSignature -NoTimestamp plus a clearer signing-failure message.
+- Add-MSIXloaderSearchPathOverride enforces the 5-path schema limit.
+- Open-MSIXPackage resolves a relative -MsixFile against the current location.
+- Get-MSIXApplications also returns UAP11 working directory/parameters and autostart state.
+
+Breaking change:
+- Add-MSIXDisableVREGOrRegistryWrite renamed to Add-MSIXDisableWriteVirtualization (clearer
+  name; covers file-system AND registry write virtualization).
+
 1.0.2 - Tags, Update-MSIXTMPSF format fix, umbrella Update cmdlet.
 
 - Update-MSIXTMPSF now handles BOTH Tim Mangan PSF release formats: the legacy single

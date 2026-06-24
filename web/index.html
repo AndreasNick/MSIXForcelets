@@ -29,7 +29,7 @@
     "name": "MSIXForcelets",
     "description": "PowerShell framework to open, repack, sign and fix MSIX packages with ready-made application fixes.",
     "codeRepository": "https://github.com/AndreasNick/MSIXForcelets",
-    "softwareVersion": "1.0.2",
+    "softwareVersion": "1.0.3",
     "programmingLanguage": "PowerShell",
     "operatingSystem": "Windows",
     "author": { "@type": "Person", "name": "Andreas Nick", "url": "https://www.nick-it.de" }
@@ -50,7 +50,7 @@
     </nav>
 
     <div class="hero-content">
-      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.2</a></p>
+      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.3</a></p>
       <h1>Automate your <span class="accent">MSIX</span> &amp; PSF fixes</h1>
       <p class="lead">
         MSIXForcelets started out to automate Package Support Framework and MSIX fixes &mdash; and to
@@ -88,26 +88,31 @@
         <article class="card"><h3>Shortcuts &amp; shell</h3><p>desktop7 shortcuts, context-menu handlers and shell-extension fixes.</p></article>
         <article class="card"><h3>Registry, capabilities &amp; App&nbsp;Attach</h3><p>Virtual-registry edits, capabilities, write-virtualization and VHD/CIM images.</p></article>
       </div>
-      <p class="more"><a class="btn btn-ghost" href="cmdlets.html">Browse all 84 cmdlets &rarr;</a></p>
+      <p class="more"><a class="btn btn-ghost" href="cmdlets.html">Browse all 90+ cmdlets &rarr;</a></p>
     </section>
 
     <section id="whats-new" class="section">
-      <h2>What&rsquo;s new <span class="version-tag">v1.0.2</span></h2>
+      <h2>What&rsquo;s new <span class="version-tag">v1.0.3</span></h2>
       <ul class="changelog">
         <li>
-          <strong><a href="cmdlets.html#install-msixforceletsallrequirements">Install-MSIXForceletsAllRequirements</a></strong>
-          &mdash; one call downloads or updates the MSIX tooling, Tim&nbsp;Mangan&rsquo;s PSF and the
-          Microsoft PSF. <code>-Force</code> (or <code>-Confirm:$false</code>) for non-interactive runs;
-          <code>-Skip*</code> switches to opt out of individual parts.
+          <strong><a href="cmdlets.html#add-msixfiletypeassociation">File type associations</a></strong>
+          &mdash; Add/Get/Set/Remove-MSIXFileTypeAssociation manage <code>windows.fileTypeAssociation</code>
+          entries (extensions, verbs, logo) per application.
         </li>
         <li>
-          <strong>Update-MSIXTMPSF</strong> now handles the new Tim&nbsp;Mangan PSF release layout
-          (<code>DebugPsf.zip</code> + <code>ReleasePsf.zip</code>) introduced in v2026.05.01.
-          Without this fix the cmdlet silently fell back to the previous wrapper-style release.
+          <strong><a href="cmdlets.html#set-msixapplication">Set-MSIXApplication</a></strong>
+          &mdash; rename the Id, repoint the launcher, set the working directory/parameters
+          (<code>uap11</code>) and toggle autostart (<code>windows.startupTask</code>) via <code>-Autostart</code>.
         </li>
         <li>
-          <strong>Expanded PSGallery tags</strong> for discoverability: <em>CodeSigning, Signing,
-          Manifest, AppAttach, AVD, AzureVirtualDesktop, Repackaging, desktop7, AppV</em>.
+          <strong><a href="cmdlets.html#set-msixapplicationicon">Set-MSIXApplicationIcon</a></strong>
+          &mdash; regenerates transparent icons incl. unplated target sizes and wires them in,
+          fixing boxed/plated Start-menu and taskbar icons.
+        </li>
+        <li>
+          <strong>Packaging refinements</strong> &mdash; Close-MSIXPackage <code>-PrettyPrint</code> /
+          <code>-RegenerateResource</code> (makepri), reworked flexible virtualization, desktop7
+          sub-folders, and Set-MSIXSignature <code>-NoTimestamp</code>.
         </li>
       </ul>
       <p class="more">

@@ -43,17 +43,18 @@ $categories = [ordered]@{
         'Add-MSIXPSFEnvVarFixup','Add-MSIXPSFFtaCom','Add-MSIXPSFTracing','Add-MSIXPSFMonitor',
         'Add-MSIXPSFPowerShellScript','Remove-MSIXPsfFiles','Remove-MSIXPSFMonitorFiles')
     'Applications, services &amp; dependencies' = @(
-        'Add-MSIXApplication','Get-MSIXApplications','Remove-MSIXApplications','New-MSIXApplicationVariant',
+        'Add-MSIXApplication','Get-MSIXApplications','Set-MSIXApplication','Remove-MSIXApplications','New-MSIXApplicationVariant',
         'Add-MSIXAppExecutionAlias','Get-MSIXServices','Remove-MSIXServices','Get-MSIXDependencies','Remove-MSIXDependencies')
     'Shortcuts, shell &amp; context menus' = @(
         'Add-MSIXDesktop7Shortcut','Get-MSIXDesktop7Shortcut','Remove-MSIXDesktop7Shortcut','Repair-MSIXDesktop7Shortcut',
+        'Add-MSIXFileTypeAssociation','Get-MSIXFileTypeAssociation','Set-MSIXFileTypeAssociation','Remove-MSIXFileTypeAssociation',
         'Convert-MSIXClassicContextMenuToVerbs','Remove-MSIXClassicShellExtension','Import-MSIXSparseShellExtension')
     'Capabilities, virtualization &amp; registry' = @(
         'Add-MSIXCapabilities','Add-MSIXFlexibleVirtualization','Add-MSIXDisableWriteVirtualization',
         'Add-MSIXInstalledLocationVirtualization','Add-MSIXloaderSearchPathOverride','Add-MSIXRegAccessFix',
         'Remove-MSIXPackageIntegrity','Add-MSIXFirewallRule','Add-MSIXSharedContainer','Add-MSIXSharedFonts')
     'Assets &amp; visual elements' = @(
-        'New-MSIXAssetFrom','Set-MSIXApplicationVisualElements')
+        'New-MSIXAssetFrom','Set-MSIXApplicationVisualElements','Set-MSIXApplicationIcon')
     'App Attach &amp; deployment' = @(
         'New-MSIXAppAttachImage','New-MSIXDynamicAppAttachDisk','Invoke-MSIXCreateImage',
         'New-MSIXAppInstallerConfiguration','New-MSIXPortalPage')
