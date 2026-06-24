@@ -64,6 +64,8 @@ $ShortcutLocationTokens = [ordered]@{
     "[{Programs}]"        = "VFS\Programs"           # per-user Start Menu\Programs
     "[{Desktop}]"         = "VFS\Desktop"            # per-user Desktop
     "[{Package}]"         = ""                       # package root (Icon/Target only)
+    # NOTE: [{Startup}] / [{Common Startup}] are NOT valid desktop7:Shortcut tokens - they
+    # break deployment with 0x800700A1 (ERROR_BAD_PATHNAME). Autostart = windows.startupTask.
 }
 
 

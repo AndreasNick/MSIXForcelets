@@ -60,10 +60,17 @@
             $targets    = $pending[$folder]   # empty = all
             $removedAny = $false
 
+            # desktop7:Shortcut may live under each Application's Extensions AND directly under the
+            # package-level Extensions - collect both so package-level shortcuts are removed too.
+            $extNodes = @()
             foreach ($app in @($manifest.SelectNodes('//ns:Package/ns:Applications/ns:Application', $nsmgr))) {
-                $extNode = $app.SelectSingleNode('ns:Extensions', $nsmgr)
-                if ($null -eq $extNode) { continue }
+                $e = $app.SelectSingleNode('ns:Extensions', $nsmgr)
+                if ($null -ne $e) { $extNodes += $e }
+            }
+            $pkgExt = $manifest.SelectSingleNode('/ns:Package/ns:Extensions', $nsmgr)
+            if ($null -ne $pkgExt) { $extNodes += $pkgExt }
 
+            foreach ($extNode in $extNodes) {
                 foreach ($ext in @($extNode.SelectNodes("desktop7:Extension[@Category='windows.shortcut']", $nsmgr))) {
                     $sc       = $ext.SelectSingleNode('desktop7:Shortcut', $nsmgr)
                     $fileTok  = if ($null -ne $sc) { $sc.GetAttribute('File') } else { '' }
@@ -93,9 +100,9 @@
                     }
                 }
 
-                # Drop an empty <Extensions> node
+                # Drop an empty <Extensions> node (works for Application and Package level).
                 if ($null -ne $extNode -and $extNode.SelectNodes('*').Count -eq 0) {
-                    $null = $app.RemoveChild($extNode)
+                    $null = $extNode.ParentNode.RemoveChild($extNode)
                 }
             }
 

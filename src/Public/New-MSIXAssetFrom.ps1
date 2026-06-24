@@ -31,6 +31,12 @@
 .PARAMETER IconIndex
     Icon index inside the PE file (only meaningful for .exe / .dll). Default 0.
 
+.PARAMETER IncludeUnplatedTargetSizes
+    Also writes <AssetId>-Square44x44Logo.targetsize-{16,24,32,48,256}_altform-unplated.png
+    (transparent). Windows uses these UNPLATED for the taskbar and the Start "All apps" list;
+    without them it plates the logo on BackgroundColor and the icon looks boxed. Rebuild
+    resources.pri afterwards (Close-MSIXPackage -RegenerateResource) so they are indexed.
+
 .EXAMPLE
     $a = New-MSIXAssetFrom -MSIXFolder $pkg -SourcePath "$env:windir\System32\WindowsPowerShell\v1.0\powershell.exe"
     Add-MSIXApplication -MSIXFolder $pkg -Executable 'NITTracer.ps1' -AssetId $a.AssetId
@@ -54,7 +60,11 @@
 
         # Also overwrites Assets\StoreLogo.png so the package-level Logo
         # (shown by AppInstaller) matches the generated icon.
-        [switch] $SetAsPackageLogo
+        [switch] $SetAsPackageLogo,
+
+        # Also emit the transparent unplated target-size variants of Square44x44Logo
+        # (taskbar / Start app list). Rebuild resources.pri afterwards.
+        [switch] $IncludeUnplatedTargetSizes
     )
 
     process {
@@ -183,6 +193,37 @@
                 $canvas.Dispose()
                 $written.Add($outPath) | Out-Null
                 Write-Verbose "Wrote $outPath ($w x $h)"
+            }
+
+            # Unplated target-size variants of Square44x44Logo (transparent). Windows uses
+            # these without a plate for the taskbar and the Start "All apps" list.
+            if ($IncludeUnplatedTargetSizes) {
+                foreach ($ts in 16, 24, 32, 48, 256) {
+                    $outPath = Join-Path $assetsDir ("$AssetId-Square44x44Logo.targetsize-$ts" + '_altform-unplated.png')
+                    $canvas = New-Object System.Drawing.Bitmap($ts, $ts, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+                    $g = [System.Drawing.Graphics]::FromImage($canvas)
+                    try {
+                        $g.Clear([System.Drawing.Color]::Transparent)
+                        $g.InterpolationMode  = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+                        $g.SmoothingMode      = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+                        $g.PixelOffsetMode    = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+                        $g.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+
+                        $ratio = [Math]::Min([double]$ts / $sourceBitmap.Width, [double]$ts / $sourceBitmap.Height)
+                        $rw = [int]([Math]::Round($sourceBitmap.Width  * $ratio))
+                        $rh = [int]([Math]::Round($sourceBitmap.Height * $ratio))
+                        $rx = [int](($ts - $rw) / 2)
+                        $ry = [int](($ts - $rh) / 2)
+                        $g.DrawImage($sourceBitmap, $rx, $ry, $rw, $rh)
+                    }
+                    finally {
+                        $g.Dispose()
+                    }
+                    $canvas.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
+                    $canvas.Dispose()
+                    $written.Add($outPath) | Out-Null
+                    Write-Verbose "Wrote $outPath (unplated target size $ts)"
+                }
             }
         }
         catch {

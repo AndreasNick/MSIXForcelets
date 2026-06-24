@@ -60,6 +60,11 @@
 
     # Placement target must be a known location with a real VFS folder
     # ('[{Package}]' resolves to the root and is not a valid shortcut location).
+    # NOTE: the Startup folder is NOT supported. Tested 2026-06: a desktop7:Shortcut with
+    # File="[{Startup}]\..." (or [{Common Startup}]) breaks deployment with 0x800700A1
+    # (ERROR_BAD_PATHNAME) - the windows.shortcut extension fails to register. Only
+    # Common Programs / Programs / Desktop are valid. For autostart use the windows.startupTask
+    # extension instead (Set-MSIXApplication -Autostart).
     if (-not $ShortcutLocationTokens.Contains($Location) -or [string]::IsNullOrEmpty($ShortcutLocationTokens[$Location])) {
         $valid = ($ShortcutLocationTokens.GetEnumerator() | Where-Object { $_.Value } | ForEach-Object { $_.Key }) -join ', '
         Write-Error "Invalid Location token '$Location'. Use one of: $valid"

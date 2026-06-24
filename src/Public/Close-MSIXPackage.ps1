@@ -31,6 +31,10 @@ function Close-MSIXPackage {
     Re-formats AppxManifest.xml with indentation and line breaks before packing,
     so the manifest inside the package stays human-readable.
 
+.PARAMETER RegenerateResource
+    Rebuilds resources.pri with makepri before packing. Use after changing assets so Windows
+    resolves the icons correctly (fixes plated/boxed Start-menu icons caused by a stale index).
+
 .EXAMPLE
     Close-MSIXPackage -MSIXFolder "C:\Temp\MSIXTemp" -MSIXFile "C:\Temp\MyApp.msix"
 
@@ -60,7 +64,8 @@ function Close-MSIXPackage {
         [System.IO.FileInfo] $MSIXFile,
         [Switch] $KeepMSIXFolder,
         [Switch] $Force,
-        [Switch] $PrettyPrint
+        [Switch] $PrettyPrint,
+        [Switch] $RegenerateResource
     )
 
     process {
@@ -121,6 +126,44 @@ function Close-MSIXPackage {
                 $valid = Test-MSIXManifest -ManifestPath $manifestPath -Verbose:($VerbosePreference -eq 'Continue')
                 if (-not $valid) {
                     Write-Warning "AppxManifest.xml has schema validation errors (see warnings above). Packing may fail."
+                }
+            }
+
+            # Rebuild resources.pri so Windows resolves the (possibly changed) assets correctly.
+            if ($RegenerateResource) {
+                $makepri = Join-Path $Script:MSIXPackagingPath 'makepri.exe'
+                if (-not (Test-Path $makepri)) {
+                    Write-Warning "makepri.exe not found at '$makepri'. Run Update-MSIXTooling. Skipping resource index regeneration."
+                }
+                elseif (-not (Test-Path $manifestPath)) {
+                    Write-Warning "AppxManifest.xml not found - skipping resource index regeneration."
+                }
+                else {
+                    $priConfig = Join-Path $env:TEMP ('priconfig_' + [System.Guid]::NewGuid().ToString('N') + '.xml')
+                    $priFile   = Join-Path $MSIXFolder.FullName 'resources.pri'
+                    try {
+                        # Remove the stale index first so makepri writes a clean one.
+                        if (Test-Path $priFile) { Remove-Item $priFile -Force }
+
+                        if ($VerbosePreference -eq 'Continue') {
+                            & $makepri createconfig /cf $priConfig /dq 'en-US' /o | Out-Default
+                            & $makepri new /pr $MSIXFolder.FullName /cf $priConfig /mn $manifestPath /of $priFile /o | Out-Default
+                        }
+                        else {
+                            & $makepri createconfig /cf $priConfig /dq 'en-US' /o | Out-Null
+                            & $makepri new /pr $MSIXFolder.FullName /cf $priConfig /mn $manifestPath /of $priFile /o | Out-Null
+                        }
+
+                        if ($LASTEXITCODE -ne 0) {
+                            Write-Warning "makepri returned exit code $LASTEXITCODE - resources.pri may be incomplete."
+                        }
+                        else {
+                            Write-Verbose "Regenerated resources.pri via makepri."
+                        }
+                    }
+                    finally {
+                        if (Test-Path $priConfig) { Remove-Item $priConfig -Force -ErrorAction SilentlyContinue }
+                    }
                 }
             }
 

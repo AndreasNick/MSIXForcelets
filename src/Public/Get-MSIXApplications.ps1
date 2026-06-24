@@ -21,7 +21,8 @@ function Get-MSIXApplications {
         Set-MSIXApplicationVisualElements -AssetId 'MyApp'
 
 .OUTPUTS
-    PSCustomObject with properties: Id, Executable, EntryPoint, MSIXFolderPath.
+    PSCustomObject with properties: Id, Executable, EntryPoint, MSIXFolderPath,
+    UAP11WorkingDirectory, UAP11Parameters, Autostart, AutostartTaskId, AutostartDisplayName.
     The MSIXFolderPath property is named so it binds to the MSIXFolderPath
     parameter of downstream cmdlets via ValueFromPipelineByPropertyName.
 
@@ -44,17 +45,32 @@ function Get-MSIXApplications {
             return
         }
 
-        $appxManifest = New-Object xml
+        $appxManifest = New-Object System.Xml.XmlDocument
         $appxManifest.Load($manifestPath)
 
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($appxManifest.NameTable)
+        $AppXNamespaces.GetEnumerator() | ForEach-Object { $null = $nsmgr.AddNamespace($_.Key, $_.Value) }
+        $uap11Uri = $AppXNamespaces['uap11']
+
         $result = @()
-        foreach ($app in $appxManifest.Package.Applications.Application) {
-            Write-Verbose "Found application $($app.Id)"
+        foreach ($app in $appxManifest.SelectNodes('//ns:Package/ns:Applications/ns:Application', $nsmgr)) {
+            Write-Verbose "Found application $($app.GetAttribute('Id'))"
+
+            $wd  = $app.GetAttribute('CurrentDirectoryPath', $uap11Uri)
+            $par = $app.GetAttribute('Parameters', $uap11Uri)
+
+            $startNode = $app.SelectSingleNode("ns:Extensions/desktop:Extension[@Category='windows.startupTask']/desktop:StartupTask", $nsmgr)
+
             $result += [PSCustomObject]@{
-                Id             = $app.Id
-                Executable     = $app.Executable
-                EntryPoint     = $app.EntryPoint
-                MSIXFolderPath = $MSIXFolder.FullName
+                Id                   = $app.GetAttribute('Id')
+                Executable           = $app.GetAttribute('Executable')
+                EntryPoint           = $app.GetAttribute('EntryPoint')
+                MSIXFolderPath       = $MSIXFolder.FullName
+                UAP11WorkingDirectory = if ($wd)  { $wd }  else { $null }
+                UAP11Parameters       = if ($par) { $par } else { $null }
+                Autostart            = ($null -ne $startNode -and $startNode.GetAttribute('Enabled') -eq 'true')
+                AutostartTaskId      = if ($null -ne $startNode) { $startNode.GetAttribute('TaskId') } else { $null }
+                AutostartDisplayName = if ($null -ne $startNode) { $startNode.GetAttribute('DisplayName') } else { $null }
             }
         }
         return $result
