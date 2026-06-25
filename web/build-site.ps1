@@ -11,7 +11,9 @@
 .PARAMETER RepoBase
     GitHub repository base URL.
 .PARAMETER Ref
-    Git ref the source links point at (branch or tag, e.g. 'v1.0.0').
+    Git ref the source links point at (branch or tag, e.g. 'v1.0.0'). Verified against the
+    remote: if the ref is not found on GitHub (e.g. a tag that was not pushed), the script
+    warns and falls back to 'master' so the generated source links never 404.
 .PARAMETER OutFile
     Output HTML path. Defaults to cmdlets.html next to this script.
 .NOTES
@@ -23,6 +25,31 @@ param(
     [string] $Ref      = 'master',
     [string] $OutFile  = (Join-Path $PSScriptRoot 'cmdlets.html')
 )
+
+# Make sure the chosen ref actually exists on the remote, otherwise the generated source links
+# would 404 (classic case: a version tag that was generated against but never pushed). When the
+# ref cannot be confirmed on the remote, fall back to 'master', which always resolves.
+if ($Ref -ne 'master') {
+    $verified  = $false
+    $reachable = $true
+    try {
+        $remoteHit = git ls-remote $RepoBase "refs/tags/$Ref" "refs/heads/$Ref" 2>$null
+        if ($LASTEXITCODE -ne 0) { $reachable = $false }
+        elseif (-not [string]::IsNullOrWhiteSpace($remoteHit)) { $verified = $true }
+    }
+    catch { $reachable = $false }
+
+    if ($verified) {
+        Write-Verbose "Ref '$Ref' verified on $RepoBase."
+    }
+    elseif (-not $reachable) {
+        Write-Warning "Could not verify ref '$Ref' on $RepoBase (git/network). Using it as given - check the source links if the ref is not pushed."
+    }
+    else {
+        Write-Warning "Ref '$Ref' not found on $RepoBase - source links would 404. Falling back to 'master'. Push the tag first (git push origin $Ref) for version-pinned links."
+        $Ref = 'master'
+    }
+}
 
 $moduleRoot = Split-Path $PSScriptRoot -Parent
 Import-Module (Join-Path $moduleRoot 'src\MSIXForcelets.psm1') -Force *> $null
