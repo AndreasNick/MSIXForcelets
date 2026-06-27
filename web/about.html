@@ -88,9 +88,11 @@
       <p>
         MSIXForcelets stands on the shoulders of the
         <a href="https://github.com/microsoft/MSIX-PackageSupportFramework">Package Support Framework</a>.
-        Special thanks to <strong>Tim&nbsp;Mangan</strong> for his outstanding work on the PSF and in particular
-        for his two fixups &mdash; <strong>MFRFixup</strong> (modern file redirection) and
-        <strong>RegLegacyFixups</strong> &mdash; which MSIXForcelets wires up directly. His
+        Special thanks to <strong>Tim&nbsp;Mangan</strong> for his outstanding work on the PSF &mdash; in
+        particular the <strong>MFRFixup</strong> (modern file redirection) and the new
+        <strong>FtaCOM</strong> fixup, plus his extension to <strong>RegLegacyFixups</strong> (which also
+        ships with the Microsoft PSF) that adds writing to <code>HKLM</code>. MSIXForcelets wires these up
+        directly. His
         <a href="https://github.com/TimMangan/MSIX-PackageSupportFramework">MSIX-PackageSupportFramework fork</a>
         is downloaded and managed by <a href="cmdlets.html#update-msixtmpsf">Update-MSIXTMPSF</a>.
       </p>

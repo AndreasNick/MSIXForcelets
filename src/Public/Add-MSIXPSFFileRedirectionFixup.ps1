@@ -124,12 +124,12 @@
                 #$appNode.ParentNode.SelectNodes('fixups').AppendChild($fixup)  | Out-Null
                 $dll = $conxml.CreateElement("dll")
                 $dll.InnerText = 'FileRedirectionFixup.dll'
-                $fixup.AppendChild($dll)
+                $fixup.AppendChild($dll) | Out-Null
                 $Config = $conxml.CreateElement("config")
-                $fixup.AppendChild($config)
+                $fixup.AppendChild($config) | Out-Null
 
                 $rp = $conxml.CreateElement("redirectedPaths")
-                $Config.AppendChild($rp)
+                $Config.AppendChild($rp) | Out-Null
                 $appNode.ParentNode.SelectNodes('fixups').AppendChild( $fixup)  | Out-Null
             }
 

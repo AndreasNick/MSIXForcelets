@@ -423,7 +423,7 @@ foreach ($_item in $_coreOut) {
 # downloads / refreshes all required binaries (PSF + Tooling) in a single call.
 if (($_summary | Where-Object { $_.Color -eq 'Yellow' }).Count -gt 0) {
     $_summary.Add([PSCustomObject]@{
-        Text  = "  TIP      : Run Install-MSIXForceletsAllRequirements to install/update ALL required binaries in one call."
+        Text  = "  TIP      : Run Install-MSIXForceletsAllRequirements -Force to install/update ALL required binaries in one call (no prompts)."
         Color = 'Cyan'
     })
 }
