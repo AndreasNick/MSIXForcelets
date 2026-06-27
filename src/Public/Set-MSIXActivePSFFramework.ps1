@@ -22,6 +22,8 @@ function Set-MSIXActivePSFFramework {
     .PARAMETER Framework
     Relative path under the MSIXPSF folder identifying the PSF to activate.
     Examples: "MicrosoftPSF", "TimManganPSF", "TimManganPSF\2026-2-22_release"
+    Note: tab-completion of these values works in the console, not in the VSCode editor
+    (known PSES limitation, vscode-powershell#2162).
 
     .PARAMETER List
     Lists all discovered PSF installations with their full paths. Does not change
@@ -51,24 +53,28 @@ function Set-MSIXActivePSFFramework {
             $psfRoot = & $module { $Script:MSIXPSFPath }
             if (-not (Test-Path $psfRoot)) { return }
 
-            $options = @()
+            $options = [System.Collections.Generic.List[string]]::new()
             foreach ($dir in (Get-ChildItem $psfRoot -Directory -ErrorAction SilentlyContinue)) {
-                $hasLauncher = (Test-Path (Join-Path $dir.FullName 'PsfLauncher64.exe')) -or
-                               (Test-Path (Join-Path $dir.FullName 'PsfLauncher32.exe'))
-                if ($hasLauncher) {
-                    $options += $dir.Name
-                }
-                # One level deeper (e.g. TimManganPSF\2026-2-22_release)
+                $dirHasLauncher = (Test-Path (Join-Path $dir.FullName 'PsfLauncher64.exe')) -or
+                                  (Test-Path (Join-Path $dir.FullName 'PsfLauncher32.exe'))
+                $hasValidSub = $false
+                # Specific builds one level deeper (e.g. TimManganPSF\2026.05.01_release)
                 foreach ($sub in (Get-ChildItem $dir.FullName -Directory -ErrorAction SilentlyContinue)) {
                     $subHas = (Test-Path (Join-Path $sub.FullName 'PsfLauncher64.exe')) -or
                               (Test-Path (Join-Path $sub.FullName 'PsfLauncher32.exe'))
                     if ($subHas) {
-                        $options += "$($dir.Name)\$($sub.Name)"
+                        $options.Add("$($dir.Name)\$($sub.Name)")
+                        $hasValidSub = $true
                     }
+                }
+                # Also offer the family name (resolves to the latest release) when usable
+                if ($dirHasLauncher -or $hasValidSub) {
+                    $options.Add($dir.Name)
                 }
             }
             # Quote options that contain a backslash so PowerShell handles them correctly
             $options |
+                Sort-Object -Unique |
                 Where-Object { $_ -like "$word*" } |
                 ForEach-Object { if ($_ -match '\\') { "'$_'" } else { $_ } }
         })]

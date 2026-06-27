@@ -21,13 +21,15 @@ function Convert-MSIXPSFXML2JSON {
         $xslt.Transform($xml, $output);
 
         # Normalize: XSLT outputs path values (e.g. VFS\FONTS) and regex patterns (.*\.)
-        # with unescaped backslashes — invalid JSON. Fix lone backslashes without touching
-        # already-valid \\ pairs. Alternation ensures \\ is consumed as a unit before the
-        # engine can split it and misidentify the second \ as the start of a new escape.
+        # with unescaped backslashes — invalid JSON. Double every lone backslash; the first
+        # alternative keeps an already-valid \\ pair intact (consumed as a unit). The following
+        # char must NOT be excluded for the JSON-escape letters (b f n r t u): a Windows path
+        # like 'Mozilla Firefox\firefox.exe' contains \f, which is a literal backslash here, not
+        # a form-feed escape — so it must be doubled too. Only an existing \\ pair is preserved.
         $rawJson = [System.IO.File]::ReadAllText($output, [System.Text.Encoding]::UTF8)
         $rawJson = [System.Text.RegularExpressions.Regex]::Replace(
             $rawJson,
-            '(\\\\)|\\([^"\\\/bfnrtu])',
+            '(\\\\)|\\([^\\])',
             [System.Text.RegularExpressions.MatchEvaluator]{
                 param($m)
                 if ($m.Groups[1].Success) { return $m.Value }

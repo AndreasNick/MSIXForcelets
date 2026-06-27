@@ -32,6 +32,15 @@ function New-MSIXApplicationVariant {
     Accepted values: 'default', 'none'.
     Use 'none' to hide the variant from the Start menu (typical for argument-only variants).
 
+.PARAMETER DisplayName
+    Optional. Sets the DisplayName on the cloned uap:VisualElements (the Start-menu name).
+    The variant reuses the source app's existing logo assets - no new assets are generated.
+
+.PARAMETER WithoutExtensions
+    Optional switch. Removes the cloned <Extensions> (file type associations, protocols,
+    shortcuts, aliases) from the variant. Use this for a pure launcher variant so it does not
+    duplicate / conflict with the source app's registrations.
+
 .EXAMPLE
     # Create a hidden WinRAR variant for silent operation, then wire it through PSF
     New-MSIXApplicationVariant -MSIXFolder "C:\MSIXTemp\WinRAR" `
@@ -65,7 +74,12 @@ function New-MSIXApplicationVariant {
         [String] $Executable = '',
 
         [ValidateSet('default', 'none')]
-        [String] $AppListEntry = ''
+        [String] $AppListEntry = '',
+
+        [String] $DisplayName = '',
+
+        [Alias('NoExtensions')]
+        [switch] $WithoutExtensions
     )
 
     $manifestPath = Join-Path $MSIXFolder 'AppxManifest.xml'
@@ -109,6 +123,26 @@ function New-MSIXApplicationVariant {
         }
         else {
             Write-Warning "uap:VisualElements not found on cloned Application '$NewAppId' — AppListEntry not set."
+        }
+    }
+
+    if ($DisplayName -ne '') {
+        $veNode = $clone.SelectSingleNode('uap:VisualElements', $nsmgr)
+        if ($null -ne $veNode) {
+            $null = $veNode.SetAttribute('DisplayName', $DisplayName)
+        }
+        else {
+            Write-Warning "uap:VisualElements not found on cloned Application '$NewAppId' — DisplayName not set."
+        }
+    }
+
+    if ($WithoutExtensions) {
+        # A launcher variant should not re-register the source app's FTAs / protocols / shortcuts -
+        # that would duplicate them and conflict with the source app. Drop the cloned Extensions.
+        $extNodes = @($clone.SelectNodes("*[local-name()='Extensions']"))
+        foreach ($x in $extNodes) { $null = $clone.RemoveChild($x) }
+        if ($extNodes.Count -gt 0) {
+            Write-Verbose "Removed $($extNodes.Count) Extensions node(s) from variant '$NewAppId'."
         }
     }
 

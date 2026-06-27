@@ -50,8 +50,8 @@
                 <xsl:if test="monitor/asadmin">
                     , "asadmin": <xsl:value-of select="monitor/asadmin"/>
                 </xsl:if>
-                <xsl:if test="wait">
-                    ,"wait": "<xsl:value-of select="monitor/wait"/>"
+                <xsl:if test="monitor/wait">
+                    ,"wait": <xsl:value-of select="monitor/wait"/>
                 </xsl:if>
             }
             </xsl:if>
@@ -281,6 +281,10 @@
 											, "isExclusion": <xsl:value-of select="pathConfig/isExclusion"/>
 											</xsl:if>
 
+											<xsl:if test="pathConfig/isReadOnly">
+											, "isReadOnly": <xsl:value-of select="pathConfig/isReadOnly"/>
+											</xsl:if>
+
 											<xsl:if test="pathConfig/redirectTargetBase">
 											, "redirectTargetBase": "<xsl:value-of select="pathConfig/redirectTargetBase"/>"
 											</xsl:if> <!-- -->
@@ -307,7 +311,7 @@
                                             , "isExclusion": <xsl:value-of select="pathConfig/isExclusion"/>
                                             </xsl:if>
                                             <xsl:if test="pathConfig/isReadOnly">
-                                            , "isReadOnly": "<xsl:value-of select="pathConfig/isReadOnly"/>"
+                                            , "isReadOnly": <xsl:value-of select="pathConfig/isReadOnly"/>
                                             </xsl:if>
                                             <xsl:if test="pathConfig/redirectTargetBase">
                                             , "redirectTargetBase": "<xsl:value-of select="pathConfig/redirectTargetBase"/>"
@@ -343,7 +347,7 @@
 											</xsl:if>
 											
 											<xsl:if test="isReadOnly">
-											, "isReadOnly": "<xsl:value-of select="isReadOnly"/>"
+											, "isReadOnly": <xsl:value-of select="isReadOnly"/>
 											</xsl:if> 
 											
 											<xsl:if test="redirectTargetBase">

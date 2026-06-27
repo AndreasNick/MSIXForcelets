@@ -14,7 +14,8 @@ $Script:MSIXForceletsConfig = [ordered]@{
     PSFProcessEntryPowershell  = $true   # adds "^[Pp]ower[Ss]hell.*" entry
     # PSF general defaults
     PSFDefaultArchitecture        = 'Auto'  # Auto | x64 | x86
-    PSFTimManganDebugLevel        = 2       # 0-5, written only when Tim Mangan PSF is active
+    PSFDebugLevel                 = 2       # debugLevel in config.json (forks that support it)
+    PSFEnableReportError          = $false  # enableReportError in config.json; $true shows PSF error dialogs (debugging)
     # Download behaviour
     CopyVCRuntime                 = $true   # copy VC++ Runtime DLLs from local Windows
     # Package handling

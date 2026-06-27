@@ -83,10 +83,12 @@ function Set-MSIXSignature {
         }
         if ($force) {
             if (Test-MSIXSignature -MSIXFile $MSIXFile) {
-                signtool remove $MSIXFile.FullName
+                $null = signtool remove $MSIXFile.FullName
             }
         }
-        switch ($PSCmdlet.ParameterSetName) {
+        # Capture signtool's (verbose) stdout so it does not leak into this function's return
+        # value - the caller should only get the [bool] result.
+        $signOut = switch ($PSCmdlet.ParameterSetName) {
             'PFX' {
                 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($CertPassword)
                 $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
@@ -124,10 +126,12 @@ function Set-MSIXSignature {
             if (-not $NoTimestamp) {
                 $tsHint = " If the timestamp server '$TimeStampServer' could not be reached, retry later or sign with -NoTimestamp."
             }
-            Write-Error "Signing failed: signtool returned exit code $LASTEXITCODE. Package '$($MSIXFile.Name)' was NOT signed.$tsHint"
+            $detail = if ($signOut) { [Environment]::NewLine + ($signOut -join [Environment]::NewLine) } else { '' }
+            Write-Error "Signing failed: signtool returned exit code $LASTEXITCODE. Package '$($MSIXFile.Name)' was NOT signed.$tsHint$detail"
             return $false
         }
         else {
+            if ($signOut) { Write-Verbose ($signOut -join [Environment]::NewLine) }
             return $true
         }
     }

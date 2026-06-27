@@ -109,22 +109,22 @@ function Add-MSIXPSFTracing {
                 $fixup = $conxml.CreateElement("fixup")
                 $dll = $conxml.CreateElement("dll")
                 $dll.InnerText = 'TraceFixup.dll'
-                $fixup.AppendChild($dll)
+                $fixup.AppendChild($dll) | Out-Null
 
                 $Config = $conxml.CreateElement("config")
-                $fixup.AppendChild($config)
-          
+                $fixup.AppendChild($Config) | Out-Null
+
                 $rp = $conxml.CreateElement("traceMethod")
                 $rp.InnerText = $TraceMethod
-                $Config.AppendChild($rp)
-                
+                $Config.AppendChild($rp) | Out-Null
+
                 $tls = $conxml.CreateElement("traceLevels")
                 $trl = $conxml.CreateElement("traceLevel")
                 $trl.SetAttribute("level", 'default')
                 $trl.InnerText = $TraceLevel
-                $tls.AppendChild($trl)
-                $Config.AppendChild($tls)
-                $appNode.ParentNode.SelectNodes('fixups').AppendChild($fixup)  | Out-Null
+                $tls.AppendChild($trl) | Out-Null
+                $Config.AppendChild($tls) | Out-Null
+                $appNode.ParentNode.SelectSingleNode('fixups').AppendChild($fixup)  | Out-Null
             }
             else {
                 #The node exists

@@ -12,7 +12,9 @@ The path to the folder containing the MSIX package.
 The ID of the MSIX application to add the PSF Monitor configuration for.
 
 .PARAMETER Executable
-The path to the executable to be monitored by the PSF Monitor.
+The monitor program PsfLauncher starts before the app. Resolved relative to the package root.
+Defaults to 'VFS\SystemX64\PsfMonitor.exe' - the PsfMonitor shipped by
+Add-MSIXPsfFrameworkFiles -IncludePSFMonitor. Override only for a different monitor or location.
 
 .PARAMETER Arguments
 Optional. Additional arguments to be passed to the monitored executable.
@@ -28,10 +30,12 @@ Optional switch. Specifies whether the PSF Monitor should wait for the monitored
 - The function modifies the config.json.xml file within the MSIX package.
 - Need Capability AdministratorCapability
 
->>> ATTANTION <<<
->>> "c:/Windows/System32/PSFMonitor.exe" not work anymore. Need Admin rights and run as admin is not enough
->>> The CMD is started outside the virtual bubble. Therefore I cannot start a PSF monitor here either
->>> without "AsAdmin" a CMD.exe does not work. Because rights and deeded Files are missing.
+>>> NOTE <<<
+>>> Reference the monitor by a package-root-relative path (e.g. the default
+>>> 'VFS\SystemX64\PsfMonitor.exe'). PsfLauncher resolves it against the package install root,
+>>> so it points at the real physical file - which an elevated (asadmin) monitor can reach even
+>>> though it runs outside the virtual bubble. An absolute 'C:\Windows\System32\...' path does
+>>> NOT work, because that location only exists virtualized inside the bubble.
 >>>>>>>>-<<<<<<<<
 
 Author: Andreas Nick
@@ -60,9 +64,8 @@ function Add-MSIXPSFMonitor {
             Position = 1)] 
         [Alias('Id')] 
         [String] $MISXAppID,
-        [Parameter(Mandatory = $true)]
-        [ArgumentCompleter( { 'c:/windows/system32/PsfMonitorx64.exe', 'c:/windows/SysWOW64/PsfMonitorx86.exe', 'DebugView.exe', 'c:/Windows/System32/cmd.exe' })]
-        $Executable, #"PsfMonitorX64.exe", "c:/windows/system32/cmd.exe", "DebugView.exe"...
+        [ArgumentCompleter( { 'VFS\SystemX64\PsfMonitor.exe', 'VFS\SystemX64\PsfMonitorx64.exe', 'VFS\SystemX86\PsfMonitorx86.exe', 'DebugView.exe' })]
+        [string] $Executable = 'VFS\SystemX64\PsfMonitor.exe',
         $Arguments = '', #"/g", "/c dir c:\\ /s"
         [switch] $Asadmin,
         [switch] $Monitorwait
@@ -101,7 +104,7 @@ function Add-MSIXPSFMonitor {
             # Check if a monitor with the same executable already exists
             Write-Verbose "Checking if monitor executable '$Executable' is already configured for this application."
             
-            if ($appNode.SelectSingleNode("//application/monitor")) {
+            if ($appNode.ParentNode.SelectSingleNode("monitor")) {
                 Write-Warning "A Monitor entry is already configured for this application - skipping for '$Executable'."
                 return $null
             }
@@ -127,9 +130,34 @@ function Add-MSIXPSFMonitor {
             }
             if ($Monitorwait) {
                 $m.AppendChild($conxml.CreateElement("wait")) | Out-Null
-                $m.asadmin = 'wait'
+                $m.wait = 'true'
             }
             $appNode.ParentNode.AppendChild($m) | Out-Null
+
+            # Exclude PsfMonitor itself from fixup injection. Without this the catch-all '.*'
+            # process rule also matches PsfMonitor, PSF injects into the monitor, and it can
+            # relaunch repeatedly. Add a no-fixup process entry BEFORE the catch-all '.*'
+            # (PSF matches processes in order, first match wins) - just like the existing
+            # PsfLauncher / PsfFtaCom / PowerShell exclusions.
+            $processes = $conxml.SelectSingleNode('//processes')
+            if ($processes) {
+                $monitorExcl = $processes.SelectSingleNode("process[executable='.*[Pp]sf[Mm]onitor.*']")
+                if (-not $monitorExcl) {
+                    $excl = $conxml.CreateElement('process')
+                    $exclExe = $conxml.CreateElement('executable')
+                    $exclExe.InnerText = '.*[Pp]sf[Mm]onitor.*'
+                    $excl.AppendChild($exclExe) | Out-Null
+                    $catchAll = $processes.SelectSingleNode("process[executable='.*']")
+                    if ($catchAll) {
+                        $processes.InsertBefore($excl, $catchAll) | Out-Null
+                    }
+                    else {
+                        $processes.AppendChild($excl) | Out-Null
+                    }
+                    Write-Verbose "Added PsfMonitor process exclusion before the catch-all '.*' rule."
+                }
+            }
+
             $conxml.PreserveWhiteSpace = $false
             $conxml.Save((Join-Path $MSIXFolder -ChildPath "config.json.xml"))
         }

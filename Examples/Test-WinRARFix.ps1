@@ -1,7 +1,5 @@
 ﻿Import-Module  MSIXForcelets
 
-Set-MSIXActivePSFFramework -Framework 'TimManganPSF\2026-2-22_release'
-
 $msixSource = "$env:USERPROFILE\Desktop\WinRar_notStart_7.20.1.0_x64.msix"
 
 # Fixed package written to Desktop

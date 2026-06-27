@@ -23,9 +23,9 @@ function Get-MSIXForceletsConfiguration {
         Default PE architecture used by Add-MSXIXPSFShim when -PSFArchitektur is
         not specified. Values: Auto | x64 | x86.
 
-    PSFTimManganDebugLevel       (2)
-        debugLevel value written into config.json when Tim Mangan PSF is active.
-        Supported range: 0-5.
+    PSFDebugLevel                (2)
+        debugLevel value written into config.json (forks that support it).
+        Supported range: 0-20.
 
     CopyVCRuntime                ($true)
         Copy VC++ Runtime DLLs from the local Windows installation when

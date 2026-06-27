@@ -20,7 +20,8 @@ function Add-MSIXPsfFrameworkFiles {
     This is the default behaviour when no individual fixup switches are specified.
 
 .PARAMETER IncludePSFMonitor
-    Copies the PSF Monitor binaries into VFS\SystemX64 and VFS\SystemX86.
+    Copies the PSF Monitor binaries into VFS\SystemX64 and VFS\SystemX86. Reference the monitor
+    in the config by its package-root-relative path (e.g. 'VFS\SystemX64\PsfMonitor.exe').
     Not included by default.
 
 .OUTPUTS
@@ -199,14 +200,14 @@ Andreas Nick, 2024
         
 
             if ($IncludePSFMonitor) {
-                Write-Verbose "Copy 32Bit Monitor Files" 
-                #Copy-Item "$PsfBasePath\PSFMonitor*" -Destination "$MSIXFolder\"  -Force | Out-Null
-
-                #Copy All Systemfiles
+                # Copies PsfMonitor + its dependency DLLs into VFS\SystemX64 / VFS\SystemX86.
+                # Reference the monitor in the config by its package-root-relative path, e.g.
+                # 'VFS\SystemX64\PsfMonitor.exe' (PsfLauncher resolves it from the package root).
+                Write-Verbose "Copy PsfMonitor files"
                 if ($UseArch -contains "64") {
                     Copy-Item "$PsfBasePath\amd64\*" -Destination "$MSIXFolder\VFS\SystemX64"  -Force | Out-Null
                 }
-                
+
                 if ($UseArch -contains "32") {
                     Copy-Item "$PsfBasePath\win32\*" -Destination "$MSIXFolder\VFS\SystemX86"  -Force | Out-Null
                 }

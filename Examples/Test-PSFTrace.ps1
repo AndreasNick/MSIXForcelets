@@ -28,7 +28,6 @@ break
 
 # --- Apply PSF (TraceFixup + Monitor) ----------------------------------------
 
-Set-MSIXActivePSFFramework -Framework 'TimManganPSF\2026-2-22_release'
 Add-MSIXPsfFrameworkFiles  -MSIXFolder $Package -PSFArchitektur 64And32Bit `
                             -TraceFixup -IncludePSFMonitor -Verbose
 

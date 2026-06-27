@@ -6,7 +6,10 @@
 .PARAMETER MSIXFolderPath
     Expanded MSIX package folder. Pipeline by property name.
 .PARAMETER Name
-    Name of a specific PackageDependency. Omit to remove all.
+    Name of the PackageDependency to remove; supports wildcards
+    (e.g. 'Microsoft.WindowsAppRuntime*'). Omit to remove all.
+.EXAMPLE
+    Remove-MSIXDependencies -MSIXFolder $pkg -Name 'Microsoft.WindowsAppRuntime*'
 .EXAMPLE
     Get-MSIXDependencies -MSIXFolder $pkg | Where-Object Name -like '*WindowsAppRuntime*' | Remove-MSIXDependencies
 .NOTES
@@ -15,9 +18,11 @@
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, Position = 0)]
+        [Alias('MSIXFolder')]
         [System.IO.DirectoryInfo] $MSIXFolderPath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true, Position = 1)]
+        [Alias('DependencyPackageName')]
         [string] $Name
     )
 
@@ -63,8 +68,14 @@
             foreach ($dep in @($dependenciesNode.SelectNodes('ns:PackageDependency', $nsmgr))) {
                 $depName = $dep.GetAttribute('Name')
 
-                if ($targetNames.Count -gt 0 -and $targetNames -notcontains $depName) {
-                    continue
+                if ($targetNames.Count -gt 0) {
+                    # Match by wildcard so '-Name Microsoft.WindowsAppRuntime*' works; a literal
+                    # name without wildcards still matches exactly.
+                    $isTarget = $false
+                    foreach ($pattern in $targetNames) {
+                        if ($depName -like $pattern) { $isTarget = $true; break }
+                    }
+                    if (-not $isTarget) { continue }
                 }
 
                 if (-not $PSCmdlet.ShouldProcess($folder, "Remove PackageDependency '$depName'")) {

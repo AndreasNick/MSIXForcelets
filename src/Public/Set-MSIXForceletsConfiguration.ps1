@@ -26,9 +26,13 @@ function Set-MSIXForceletsConfiguration {
     Default architecture for Add-MSXIXPSFShim when -PSFArchitektur is omitted.
     Valid values: Auto, x64, x86. Default: Auto.
 
-.PARAMETER PSFTimManganDebugLevel
-    debugLevel value written into config.json when Tim Mangan PSF is active.
-    Range 0-5. Default: 2.
+.PARAMETER PSFDebugLevel
+    debugLevel written into config.json (applies to PSF forks that support it). Pick a named level
+    ('0=Disable' ... '20=Debug supermax'); only the leading number is written. Default: 2.
+
+.PARAMETER PSFEnableReportError
+    enableReportError in config.json. $false (default) suppresses PSF's error dialogs; $true shows
+    them - useful for debugging. Written on the next Add-MSXIXPSFShim.
 
 .PARAMETER CopyVCRuntime
     When $true (default), Update-MSIXMicrosoftPSF and Update-MSIXTMPSF
@@ -42,7 +46,7 @@ function Set-MSIXForceletsConfiguration {
     Set-MSIXForceletsConfiguration -PSFProcessEntryFtaCom $false
 
 .EXAMPLE
-    Set-MSIXForceletsConfiguration -PSFDefaultArchitecture x64 -PSFTimManganDebugLevel 0
+    Set-MSIXForceletsConfiguration -PSFDefaultArchitecture x64 -PSFDebugLevel '0=Disable'
 
 .EXAMPLE
     Set-MSIXForceletsConfiguration -KeepTempFolder $true
@@ -60,8 +64,14 @@ function Set-MSIXForceletsConfiguration {
         [ValidateSet('Auto', 'x64', 'x86')]
         [String] $PSFDefaultArchitecture,
 
-        [ValidateRange(0, 5)]
-        [System.Nullable[int]] $PSFTimManganDebugLevel,
+        [ValidateSet(
+            '0=Disable', '1=Exceptions only', '2=Start/Launch (default)',
+            '3=Debug basic', '4=Debug intermediate', '9=Debug maximum',
+            '20=Debug supermax (PSF internal)'
+        )]
+        [string] $PSFDebugLevel,
+
+        [System.Nullable[bool]] $PSFEnableReportError,
 
         [System.Nullable[bool]] $CopyVCRuntime,
         [System.Nullable[bool]] $KeepTempFolder
@@ -79,8 +89,12 @@ function Set-MSIXForceletsConfiguration {
     if ($PSBoundParameters.ContainsKey('PSFDefaultArchitecture')) {
         $Script:MSIXForceletsConfig.PSFDefaultArchitecture = $PSFDefaultArchitecture
     }
-    if ($PSBoundParameters.ContainsKey('PSFTimManganDebugLevel')) {
-        $Script:MSIXForceletsConfig.PSFTimManganDebugLevel = $PSFTimManganDebugLevel
+    if ($PSBoundParameters.ContainsKey('PSFDebugLevel')) {
+        # Store the numeric debugLevel, parsed from the 'N=Label' choice.
+        $Script:MSIXForceletsConfig.PSFDebugLevel = [int]($PSFDebugLevel -split '=')[0]
+    }
+    if ($PSBoundParameters.ContainsKey('PSFEnableReportError')) {
+        $Script:MSIXForceletsConfig.PSFEnableReportError = $PSFEnableReportError
     }
     if ($PSBoundParameters.ContainsKey('CopyVCRuntime')) {
         $Script:MSIXForceletsConfig.CopyVCRuntime = $CopyVCRuntime

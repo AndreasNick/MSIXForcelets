@@ -23,7 +23,7 @@ function Add-MSXIXPSFShim {
       5. When the active PSF framework is from Tim Mangan
          (Set-MSIXActivePSFFramework points to a TimManganPSF path), the
          enableReportError and debugLevel properties are added to the top-level
-         configuration element (debugLevel from PSFTimManganDebugLevel config).
+         configuration element (debugLevel from PSFDebugLevel config).
 
     The processes section (exclusion entries + catch-all) is managed by fixup
     functions such as Add-MSIXPSFFileRedirectionFixup and Add-MSIXPSFTracing.
@@ -212,12 +212,14 @@ function Add-MSXIXPSFShim {
             $configRoot = $conxml.SelectSingleNode('/configuration')
             $appsEl     = $conxml.SelectSingleNode('/configuration/applications')
 
+            # enableReportError from config (PSFEnableReportError); always updated so
+            # Set-MSIXForceletsConfiguration takes effect on rebuild. $true shows PSF error dialogs.
             $erNode = $conxml.SelectSingleNode('/configuration/enableReportError')
             if ($null -eq $erNode) {
-                $erEl = $conxml.CreateElement('enableReportError')
-                $erEl.InnerText = 'false'
-                $configRoot.InsertBefore($erEl, $appsEl) | Out-Null
+                $erNode = $conxml.CreateElement('enableReportError')
+                $configRoot.InsertBefore($erNode, $appsEl) | Out-Null
             }
+            $erNode.InnerText = if ($Script:MSIXForceletsConfig.PSFEnableReportError) { 'true' } else { 'false' }
 
             # Always update debugLevel so Set-MSIXForceletsConfiguration takes effect on rebuild
             $dlNode = $conxml.SelectSingleNode('/configuration/debugLevel')
@@ -225,9 +227,9 @@ function Add-MSXIXPSFShim {
                 $dlNode = $conxml.CreateElement('debugLevel')
                 $configRoot.InsertBefore($dlNode, $appsEl) | Out-Null
             }
-            $dlNode.InnerText = $Script:MSIXForceletsConfig.PSFTimManganDebugLevel.ToString()
+            $dlNode.InnerText = $Script:MSIXForceletsConfig.PSFDebugLevel.ToString()
 
-            Write-Verbose "Tim Mangan: enableReportError=false, debugLevel=$($Script:MSIXForceletsConfig.PSFTimManganDebugLevel)"
+            Write-Verbose "Tim Mangan extras: enableReportError=$($erNode.InnerText), debugLevel=$($Script:MSIXForceletsConfig.PSFDebugLevel)"
         }
 
         # --- Add application entry to config.json.xml if not yet present ---

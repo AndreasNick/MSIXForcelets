@@ -1,7 +1,5 @@
 #Requires -Version 5.1
-Import-Module MSIXForcelets 
-
-Set-MSIXActivePSFFramework -Framework 'TimManganPSF\2026-2-22_release'
+Import-Module MSIXForcelets
 
 # --- Configuration -----------------------------------------------------------
 

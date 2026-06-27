@@ -129,7 +129,10 @@
             }
         }
 
-        $uniquePfns = @($pfnList | Sort-Object -Unique)
+        # Keep the -Package order: in a shared package container the order is the priority
+        # (first = highest). Select-Object -Unique de-duplicates while preserving that order;
+        # Sort-Object -Unique would re-sort alphabetically and silently break the priority.
+        $uniquePfns = @($pfnList | Select-Object -Unique)
 
         if ($uniquePfns.Count -lt 2) {
             Write-Error "A shared package container needs at least 2 distinct PackageFamilyNames. Got $($uniquePfns.Count) after pattern resolution and de-duplication."
