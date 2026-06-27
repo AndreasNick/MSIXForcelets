@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.3'
+    ModuleVersion        = '1.0.4'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -119,6 +119,26 @@
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
             ReleaseNotes = @'
+1.0.4 - PSF reliability fixes, application-variant and configuration improvements.
+
+Fixes:
+- config.json generation now emits isReadOnly and the monitor "wait" flag as JSON booleans
+  (were quoted strings), fixing a PsfRuntime FixupEntryPoint 0x23e that could stop a fixed
+  app from starting.
+- Windows paths whose segments resemble escape sequences (e.g. \firefox.exe, \b, \t) are now
+  escaped correctly when converting config.json.xml to config.json, fixing corrupted paths.
+
+Improvements:
+- New-MSIXApplicationVariant: -DisplayName sets the cloned app's Start-menu name; -NoExtensions
+  clones a pure launcher variant without FTA/protocol extensions. Clones reuse the source's
+  icon assets (no regeneration).
+- Set-MSIXForceletsConfiguration: -PSFDebugLevel takes named levels ('0=Disable' ... '20=Debug
+  supermax') instead of raw numbers; new -PSFEnableReportError toggles the PSF error dialogs.
+- Set-MSIXActivePSFFramework: argument completion for -Framework (families + downloaded builds).
+- Add-MSIXPSFMonitor: -Executable optional (defaults to the in-package PsfMonitor path) and a
+  monitor process exclusion is added automatically so the monitor is not re-injected into itself.
+- Remove-MSIXDependencies: -Name accepts wildcards (e.g. Microsoft.WindowsAppRuntime*).
+
 1.0.3 - File type associations, application editing, icon repair, packaging refinements.
 
 New cmdlets:

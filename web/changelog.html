@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changelog — MSIXForcelets</title>
+  <meta name="description" content="Complete MSIXForcelets changelog since v1.0 — every release of the PowerShell MSIX packaging framework, from the initial PowerShell Gallery release through the latest version.">
+  <meta name="keywords" content="MSIXForcelets, changelog, release notes, version history, MSIX, PowerShell, Package Support Framework, PSF">
+  <meta name="author" content="Andreas Nick">
+  <link rel="canonical" href="https://msixforcelets.nick-it.de/changelog.html">
+  <meta name="theme-color" content="#0d1117">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Changelog — MSIXForcelets">
+  <meta property="og:description" content="Complete release history of MSIXForcelets since v1.0.">
+  <meta property="og:url" content="https://msixforcelets.nick-it.de/changelog.html">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero hero-slim">
+    <nav class="nav">
+      <a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
+      <div class="nav-links">
+        <a href="quickstart.html">Quickstart</a>
+        <a href="build-your-own-fix.html">Build a fix</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="about.html">About</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+      </div>
+    </nav>
+    <div class="hero-content">
+      <p class="eyebrow">Changelog</p>
+      <h1>Release history since v1.0</h1>
+      <p class="lead">Every MSIXForcelets release, newest first. Install or update from the
+        <a href="https://www.powershellgallery.com/packages/MSIXForcelets">PowerShell Gallery</a>.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <h2>v1.0.4 <span class="version-tag">latest</span></h2>
+      <p class="muted">PSF reliability fixes, application-variant and configuration improvements.</p>
+      <ul class="changelog">
+        <li>
+          <strong>PSF config reliability fixes</strong> &mdash; <code>isReadOnly</code> and the monitor
+          <code>wait</code> flag are now written into <code>config.json</code> as JSON booleans (previously
+          quoted strings), which fixed a <code>FixupEntryPoint 0x23e</code> that could stop a fixed app from
+          starting. Windows paths whose segments look like escape sequences (e.g. <code>\firefox.exe</code>,
+          <code>\b</code>, <code>\t</code>) are now escaped correctly when generating <code>config.json</code>,
+          fixing corrupted executable paths.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#new-msixapplicationvariant">New-MSIXApplicationVariant</a></strong>
+          &mdash; <code>-DisplayName</code> sets the cloned application&rsquo;s Start-menu name, and
+          <code>-NoExtensions</code> clones a pure launcher variant without the FTA/protocol extensions.
+          Clones reuse the source application&rsquo;s icon assets &mdash; no regeneration required.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#set-msixforceletsconfiguration">Set-MSIXForceletsConfiguration</a></strong>
+          &mdash; <code>-PSFDebugLevel</code> now takes named levels (<code>'0=Disable'</code> &hellip;
+          <code>'20=Debug supermax'</code>) instead of raw numbers, and the new
+          <code>-PSFEnableReportError</code> toggles the PSF error dialogs for debugging.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#set-msixactivepsfframework">Set-MSIXActivePSFFramework</a></strong>
+          &mdash; tab-completion for <code>-Framework</code> offers the installed families and the
+          downloaded release builds.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#add-msixpsfmonitor">Add-MSIXPSFMonitor</a></strong>
+          &mdash; <code>-Executable</code> is now optional (defaults to the in-package PsfMonitor path)
+          and a monitor process exclusion is added automatically so the monitor is not re-injected into itself.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#remove-msixdependencies">Remove-MSIXDependencies</a></strong>
+          &mdash; <code>-Name</code> now accepts wildcards, e.g. <code>Microsoft.WindowsAppRuntime*</code>.
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.3</h2>
+      <p class="muted">File type associations, application editing, icon repair, packaging refinements.</p>
+      <ul class="changelog">
+        <li>
+          <strong><a href="cmdlets.html#add-msixfiletypeassociation">File type associations</a></strong>
+          &mdash; Add/Get/Set/Remove-MSIXFileTypeAssociation manage <code>windows.fileTypeAssociation</code>
+          entries (extensions, verbs, logo) per application.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#set-msixapplication">Set-MSIXApplication</a></strong>
+          &mdash; rename the Id (<code>-NewId</code>), repoint the launcher (<code>-Executable</code>), set the
+          working directory and default parameters (<code>uap11</code>) and toggle autostart
+          (<code>windows.startupTask</code>) via <code>-Autostart</code>.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#set-msixapplicationicon">Set-MSIXApplicationIcon</a></strong>
+          &mdash; regenerates transparent icon assets (incl. unplated target sizes) and wires them into an
+          application&rsquo;s VisualElements in one call &mdash; fixing boxed/plated Start-menu and taskbar icons.
+        </li>
+        <li>
+          <strong>Packaging refinements</strong> &mdash; New-MSIXAssetFrom
+          <code>-IncludeUnplatedTargetSizes</code>; Close-MSIXPackage <code>-PrettyPrint</code> /
+          <code>-RegenerateResource</code> (makepri); reworked flexible virtualization (Disable / Directory /
+          Registry sets with selective HKCU-key and AppData-folder exclusions); Add-MSIXDesktop7Shortcut
+          <code>-SubFolder</code> plus package-level shortcut handling; Set-MSIXSignature
+          <code>-NoTimestamp</code>; Open-MSIXPackage resolves relative <code>-MsixFile</code> paths;
+          Get-MSIXApplications also returns uap11 working directory/parameters and autostart state.
+        </li>
+        <li>
+          <strong>Breaking change</strong> &mdash; Add-MSIXDisableVREGOrRegistryWrite renamed to
+          <a href="cmdlets.html#add-msixdisablewritevirtualization">Add-MSIXDisableWriteVirtualization</a>
+          (clearer name; covers file-system <em>and</em> registry write virtualization).
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.2</h2>
+      <p class="muted">Tags, Update-MSIXTMPSF format fix, umbrella update cmdlet.</p>
+      <ul class="changelog">
+        <li>
+          <strong><a href="cmdlets.html#update-msixtmpsf">Update-MSIXTMPSF</a></strong>
+          &mdash; now handles both Tim Mangan PSF release formats: the legacy single
+          <code>ZipRelease*.zip</code> wrapper and the newer <code>DebugPsf.zip</code> +
+          <code>ReleasePsf.zip</code> pair (introduced in v2026.05.01). Without this fix the cmdlet
+          silently fell back to the previous release that still shipped the wrapper.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#install-msixforceletsallrequirements">Install-MSIXForceletsAllRequirements</a></strong>
+          &mdash; new umbrella cmdlet that downloads/updates the MSIX tooling (MSIX Core + SDK Packaging
+          Tools), Tim Mangan&rsquo;s PSF and the Microsoft PSF in one call. Use <code>-Skip*</code> switches to
+          opt out of individual parts; <code>-Force</code> re-downloads existing components.
+        </li>
+        <li>
+          <strong>Discoverability</strong> &mdash; expanded PowerShell Gallery tags: CodeSigning, Signing,
+          Manifest, AppAttach, AVD, AzureVirtualDesktop, Repackaging, desktop7, AppV.
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.0</h2>
+      <p class="muted">Initial PowerShell Gallery release.</p>
+      <ul class="changelog">
+        <li>
+          <strong>Full MSIX/AppX edit workflow</strong> &mdash; Open-MSIXPackage / Close-MSIXPackage,
+          Set-MSIXPublisher, Set-MSIXSignature, Set-MSIXPackageVersion, Test-MSIXSignature.
+        </li>
+        <li>
+          <strong>Package Support Framework integration</strong> &mdash; Add-MSIXPsfFrameworkFiles,
+          Add-MSXIXPSFShim, MFRFixup, RegLegacyFixups, FileRedirectionFixup, DynamicLibraryFixup,
+          EnvVarFixup, PSF PowerShell scripts, FTA/COM and monitor/tracing helpers.
+        </li>
+        <li>
+          <strong>desktop7:Shortcut management</strong> &mdash; Add/Get/Remove/Repair-MSIXDesktop7Shortcut
+          with per-user-location defaults and custom icon support.
+        </li>
+        <li>
+          <strong>Ready-made application fixes</strong> &mdash; Acrobat Reader DC, GIMP, LibreOffice,
+          Notepad++, SSMS, WinRAR (incl. modern shell) and more.
+        </li>
+        <li>
+          <strong>Assets, variants &amp; App Attach</strong> &mdash; New-MSIXAssetFrom,
+          New-MSIXApplicationVariant, capabilities, services, dependencies, App Attach
+          (New-MSIXAppAttachImage, New-MSIXDynamicAppAttachDisk) and self-signing certificates.
+        </li>
+        <li>
+          <strong>Tooling helpers</strong> &mdash; Update-MSIXTooling, Update-MSIXTMPSF,
+          Update-MSIXMicrosoftPSF. Large binaries (MSIX SDK, PSF redistributables) are downloaded on
+          demand and are not shipped in the package.
+        </li>
+      </ul>
+      <p class="more">
+        <a class="btn btn-ghost" href="https://github.com/AndreasNick/MSIXForcelets/releases">Full release history on GitHub &rarr;</a>
+        <a class="btn btn-ghost" href="https://www.powershellgallery.com/packages/MSIXForcelets">PowerShell Gallery &rarr;</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a> &bull; PowerShell 5.1 &amp; 7</span>
+      <span class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="cmdlets.html">Cmdlets</a>
+        <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
+        <a href="legal.html">Legal</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </span>
+    </div>
+  </footer>
+  <script defer src="consent.js"></script>
+</body>
+</html>

@@ -29,7 +29,7 @@
     "name": "MSIXForcelets",
     "description": "PowerShell framework to open, repack, sign and fix MSIX packages with ready-made application fixes.",
     "codeRepository": "https://github.com/AndreasNick/MSIXForcelets",
-    "softwareVersion": "1.0.3",
+    "softwareVersion": "1.0.4",
     "programmingLanguage": "PowerShell",
     "operatingSystem": "Windows",
     "author": { "@type": "Person", "name": "Andreas Nick", "url": "https://www.nick-it.de" }
@@ -50,7 +50,7 @@
     </nav>
 
     <div class="hero-content">
-      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.3</a></p>
+      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.4</a></p>
       <h1>Automate your <span class="accent">MSIX</span> &amp; PSF fixes</h1>
       <p class="lead">
         MSIXForcelets started out to automate Package Support Framework and MSIX fixes &mdash; and to
@@ -92,31 +92,35 @@
     </section>
 
     <section id="whats-new" class="section">
-      <h2>What&rsquo;s new <span class="version-tag">v1.0.3</span></h2>
+      <h2>What&rsquo;s new <span class="version-tag">v1.0.4</span></h2>
       <ul class="changelog">
         <li>
-          <strong><a href="cmdlets.html#add-msixfiletypeassociation">File type associations</a></strong>
-          &mdash; Add/Get/Set/Remove-MSIXFileTypeAssociation manage <code>windows.fileTypeAssociation</code>
-          entries (extensions, verbs, logo) per application.
+          <strong>PSF config reliability fixes</strong> &mdash; <code>isReadOnly</code> and the monitor
+          <code>wait</code> flag are now written as JSON booleans (fixing a <code>FixupEntryPoint 0x23e</code>
+          that could stop a fixed app from starting), and Windows paths that look like escape sequences
+          (e.g. <code>\firefox.exe</code>) are escaped correctly in <code>config.json</code>.
         </li>
         <li>
-          <strong><a href="cmdlets.html#set-msixapplication">Set-MSIXApplication</a></strong>
-          &mdash; rename the Id, repoint the launcher, set the working directory/parameters
-          (<code>uap11</code>) and toggle autostart (<code>windows.startupTask</code>) via <code>-Autostart</code>.
+          <strong><a href="cmdlets.html#new-msixapplicationvariant">New-MSIXApplicationVariant</a></strong>
+          &mdash; <code>-DisplayName</code> for the cloned app and <code>-NoExtensions</code> for a pure
+          launcher variant (no FTA/protocol extensions); clones reuse the source icon assets.
         </li>
         <li>
-          <strong><a href="cmdlets.html#set-msixapplicationicon">Set-MSIXApplicationIcon</a></strong>
-          &mdash; regenerates transparent icons incl. unplated target sizes and wires them in,
-          fixing boxed/plated Start-menu and taskbar icons.
+          <strong><a href="cmdlets.html#set-msixforceletsconfiguration">Set-MSIXForceletsConfiguration</a></strong>
+          &mdash; <code>-PSFDebugLevel</code> takes named levels (<code>'0=Disable'</code> &hellip;
+          <code>'20=Debug supermax'</code>) and the new <code>-PSFEnableReportError</code> toggles PSF error dialogs.
         </li>
         <li>
-          <strong>Packaging refinements</strong> &mdash; Close-MSIXPackage <code>-PrettyPrint</code> /
-          <code>-RegenerateResource</code> (makepri), reworked flexible virtualization, desktop7
-          sub-folders, and Set-MSIXSignature <code>-NoTimestamp</code>.
+          <strong>Cmdlet refinements</strong> &mdash; tab-completion for
+          <a href="cmdlets.html#set-msixactivepsfframework">Set-MSIXActivePSFFramework</a> <code>-Framework</code>;
+          optional <code>-Executable</code> + self-exclusion for
+          <a href="cmdlets.html#add-msixpsfmonitor">Add-MSIXPSFMonitor</a>; wildcard <code>-Name</code> for
+          <a href="cmdlets.html#remove-msixdependencies">Remove-MSIXDependencies</a>.
         </li>
       </ul>
       <p class="more">
-        <a class="btn btn-ghost" href="https://github.com/AndreasNick/MSIXForcelets/releases">Full release history on GitHub &rarr;</a>
+        <a class="btn btn-primary" href="changelog.html">Full changelog since v1.0 &rarr;</a>
+        <a class="btn btn-ghost" href="https://github.com/AndreasNick/MSIXForcelets/releases">Releases on GitHub &rarr;</a>
         <a class="btn btn-ghost" href="https://www.powershellgallery.com/packages/MSIXForcelets">PowerShell Gallery &rarr;</a>
       </p>
     </section>
@@ -127,6 +131,7 @@
       <span>&copy; 2026 Andreas Nick &mdash; <a href="https://www.nick-it.de">nick-it.de</a> &bull; PowerShell 5.1 &amp; 7</span>
       <span class="footer-links">
         <a href="cmdlets.html">Cmdlets</a>
+        <a href="changelog.html">Changelog</a>
         <a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a>
         <a href="https://www.powershellgallery.com/packages/MSIXForcelets">Gallery</a>
         <a href="legal.html">Legal</a>
