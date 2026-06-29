@@ -1,5 +1,5 @@
 ﻿
-function Add-MSXIXPSFShim {
+function Add-MSIXPSFShim {
 <#
 .SYNOPSIS
     Wires an MSIX application entry through the PSF launcher.
@@ -32,7 +32,7 @@ function Add-MSXIXPSFShim {
 .PARAMETER MSIXFolder
     Path to the expanded MSIX package folder (must contain AppxManifest.xml).
 
-.PARAMETER MISXAppID
+.PARAMETER MSIXAppID
     Application/@Id value as it appears in AppxManifest.xml.
 
 .PARAMETER WorkingDirectory
@@ -55,10 +55,10 @@ function Add-MSXIXPSFShim {
     Tim Mangan PSF only. Always written to config.json when Tim Mangan PSF is active (default: $false).
 
 .EXAMPLE
-    Add-MSXIXPSFShim -MSIXFolder "C:\MSIXTemp\WinRAR" -MISXAppID "WinRAR"
+    Add-MSIXPSFShim -MSIXFolder "C:\MSIXTemp\WinRAR" -MSIXAppID "WinRAR"
 
 .EXAMPLE
-    Add-MSXIXPSFShim -MSIXFolder "C:\MSIXTemp\App" -MISXAppID "App" `
+    Add-MSIXPSFShim -MSIXFolder "C:\MSIXTemp\App" -MSIXAppID "App" `
         -PSFArchitektur x64 -WorkingDirectory "VFS\ProgramFilesX64\App" `
         -Arguments "--mode compat" -Verbose
 
@@ -84,8 +84,8 @@ function Add-MSXIXPSFShim {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 1)]
-        [Alias('Id')]
-        [String] $MISXAppID,
+        [Alias('Id', 'MISXAppID')]
+        [String] $MSIXAppID,
 
         [String] $WorkingDirectory = '',
 
@@ -107,8 +107,8 @@ function Add-MSXIXPSFShim {
     )
 
     process {
-        if ([string]::IsNullOrWhiteSpace($MISXAppID)) {
-            Write-Error "-MISXAppID must not be empty or whitespace."
+        if ([string]::IsNullOrWhiteSpace($MSIXAppID)) {
+            Write-Error "-MSIXAppID must not be empty or whitespace."
             return
         }
 
@@ -124,17 +124,17 @@ function Add-MSXIXPSFShim {
             return
         }
 
-        Write-Verbose "Adding PSF shim for application: $MISXAppID"
+        Write-Verbose "Adding PSF shim for application: $MSIXAppID"
 
         # --- Load AppxManifest and locate the application node ---
         $manifest = New-Object xml
         $manifest.Load($manifestPath)
         $ns = New-Object System.Xml.XmlNamespaceManager $manifest.NameTable
         $ns.AddNamespace('ns', 'http://schemas.microsoft.com/appx/manifest/foundation/windows10')
-        $appNode = $manifest.SelectSingleNode("//ns:Application[@Id='$MISXAppID']", $ns)
+        $appNode = $manifest.SelectSingleNode("//ns:Application[@Id='$MSIXAppID']", $ns)
 
         if ($null -eq $appNode) {
-            Write-Warning "Application '$MISXAppID' not found in AppxManifest.xml."
+            Write-Warning "Application '$MSIXAppID' not found in AppxManifest.xml."
             return
         }
 
@@ -164,20 +164,20 @@ function Add-MSXIXPSFShim {
         $sourceLauncher = if ($resolvedArch -eq 'x64') { 'PsfLauncher64.exe' } else { 'PsfLauncher32.exe' }
 
         # --- Find or assign a renamed launcher for this AppId ---
-        $existingLauncher = Get-ChildItem -Path $MSIXFolder.FullName -Filter "$($MISXAppID)_PsfLauncher?.exe" -ErrorAction SilentlyContinue |
+        $existingLauncher = Get-ChildItem -Path $MSIXFolder.FullName -Filter "$($MSIXAppID)_PsfLauncher?.exe" -ErrorAction SilentlyContinue |
             Select-Object -First 1
 
         if ($null -ne $existingLauncher) {
             $launcherName    = $existingLauncher.Name
             $launcherLetter  = $existingLauncher.BaseName[-1]
-            $newAppId        = $MISXAppID + 'PsfLauncher' + $launcherLetter
+            $newAppId        = $MSIXAppID + 'PsfLauncher' + $launcherLetter
             Write-Verbose "Reusing existing launcher: $launcherName"
         }
         else {
             $allRenamed   = @(Get-ChildItem -Path $MSIXFolder.FullName -Filter '*_PsfLauncher?.exe' -ErrorAction SilentlyContinue)
             $nextLetter   = [char]([int][char]'A' + $allRenamed.Count)
-            $launcherName = "$($MISXAppID)_PsfLauncher$($nextLetter).exe"
-            $newAppId     = $MISXAppID + 'PsfLauncher' + $nextLetter
+            $launcherName = "$($MSIXAppID)_PsfLauncher$($nextLetter).exe"
+            $newAppId     = $MSIXAppID + 'PsfLauncher' + $nextLetter
 
             $srcPath = Join-Path $MSIXFolder.FullName $sourceLauncher
             if (Test-Path $srcPath) {

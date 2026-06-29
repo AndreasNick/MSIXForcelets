@@ -12,7 +12,7 @@ function Add-MSIXFirewallRule {
 .PARAMETER MSIXFolder
     The path to the expanded MSIX package.
 
-.PARAMETER MISXAppID
+.PARAMETER MSIXAppID
     The AppID of the application to which the rule should be added.
 
 .PARAMETER Executable
@@ -31,15 +31,15 @@ function Add-MSIXFirewallRule {
     Optional firewall profile. Defaults to 'all'.
 
 .EXAMPLE
-    Add-MSIXFirewallRule -MSIXFolder "C:\MyApp" -MISXAppID "App" -Executable "app.exe" -Direction in -IPProtocol TCP -Port 4810
+    Add-MSIXFirewallRule -MSIXFolder "C:\MyApp" -MSIXAppID "App" -Executable "app.exe" -Direction in -IPProtocol TCP -Port 4810
 #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
         [System.IO.DirectoryInfo]$MSIXFolder,
         [Parameter(Mandatory=$true, Position=1)]
-        [Alias('Id')]
-        [string]$MISXAppID,
+        [Alias('Id', 'MISXAppID')]
+        [string]$MSIXAppID,
         [Parameter(Mandatory=$true, Position=2)]
         [string]$Executable,
         [Parameter(Mandatory=$true)]
@@ -66,7 +66,7 @@ function Add-MSIXFirewallRule {
         $AppXNamespaces.GetEnumerator() | ForEach-Object { $nsmgr.AddNamespace($_.key, $_.value) }
         $nsmgr.AddNamespace('desktop2', $AppXNamespaces['desktop2'])
 
-        $appNode = $manifest.SelectSingleNode("//ns:Package/ns:Applications/ns:Application[@Id='" + $MISXAppID + "']", $nsmgr)
+        $appNode = $manifest.SelectSingleNode("//ns:Package/ns:Applications/ns:Application[@Id='" + $MSIXAppID + "']", $nsmgr)
         if (-not $appNode) {
             Write-Verbose '[ERROR] Application does not exist - skipping adding FirewallRule'
             return
@@ -77,11 +77,11 @@ function Add-MSIXFirewallRule {
             $appNode.AppendChild($ext) | Out-Null
         }
 
-        $extensionNode = $manifest.SelectSingleNode("//ns:Application[@Id='" + $MISXAppID + "']/ns:Extensions/desktop2:Extension[@Category='windows.firewallRules']", $nsmgr)
+        $extensionNode = $manifest.SelectSingleNode("//ns:Application[@Id='" + $MSIXAppID + "']/ns:Extensions/desktop2:Extension[@Category='windows.firewallRules']", $nsmgr)
         if (-not $extensionNode) {
             $extensionNode = $manifest.CreateElement('desktop2:Extension', $AppXNamespaces['desktop2'])
             $extensionNode.SetAttribute('Category','windows.firewallRules')
-            $manifest.SelectSingleNode("//ns:Application[@Id='" + $MISXAppID + "']/ns:Extensions", $nsmgr).AppendChild($extensionNode) | Out-Null
+            $manifest.SelectSingleNode("//ns:Application[@Id='" + $MSIXAppID + "']/ns:Extensions", $nsmgr).AppendChild($extensionNode) | Out-Null
         }
 
         $existingRule = $manifest.SelectSingleNode("//desktop2:Extension[@Category='windows.firewallRules']/desktop2:FirewallRules[@Executable='" + $Executable + "']", $nsmgr)

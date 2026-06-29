@@ -65,7 +65,7 @@ $categories = [ordered]@{
         'Add-MSIXFixNotepadPlusPlus','Add-MSIXFixSSMS','Add-MSIXFixWinRAR','Add-MSIXFixWinRARModernShell')
     'Package Support Framework (PSF)' = @(
         'Set-MSIXActivePSFFramework','Get-MSIXPSFFrameworkPath','Add-MSIXPsfFrameworkFiles',
-        'Add-MSXIXPSFShim','Add-MSIXPSFMFRFixup','Add-MSIXPSFRegLegacyFixup','Add-MSIXPSFDefaultRegLegacy',
+        'Add-MSIXPSFShim','Add-MSIXPSFMFRFixup','Add-MSIXPSFRegLegacyFixup','Add-MSIXPSFDefaultRegLegacy',
         'Add-MSIXPSFDefaultFRF','Add-MSIXPSFFileRedirectionFixup','Add-MSIXPSFDynamicLibraryFixup',
         'Add-MSIXPSFEnvVarFixup','Add-MSIXPSFFtaCom','Add-MSIXPSFTracing','Add-MSIXPSFMonitor',
         'Add-MSIXPSFPowerShellScript','Remove-MSIXPsfFiles','Remove-MSIXPSFMonitorFiles')

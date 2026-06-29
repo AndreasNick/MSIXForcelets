@@ -259,7 +259,7 @@ function Add-MSIXFixWinRARModernShell {
                 $shimmedIds = @{}
                 foreach ($app in $apps) {
                     Write-Verbose "Adding PSF shim for application: $($app.Id)"
-                    $newId = Add-MSXIXPSFShim -MSIXFolder $MSIXFolder -MISXAppID $app.Id -PSFArchitektur x64
+                    $newId = Add-MSIXPSFShim -MSIXFolder $MSIXFolder -MSIXAppID $app.Id -PSFArchitektur x64
                     $shimmedIds[$app.Id] = $newId
                 }
 
@@ -267,7 +267,7 @@ function Add-MSIXFixWinRARModernShell {
                 if ($null -ne $winrarApp) {
                     $winrarNewId = $shimmedIds[$winrarApp.Id]
                     Add-MSIXAppExecutionAlias -MSIXFolder $MSIXFolder `
-                        -MISXAppID $winrarNewId `
+                        -MSIXAppID $winrarNewId `
                         -CommandlineAlias 'WinRAR.exe' `
                         -Executable 'VFS\ProgramFilesX64\WinRAR\WinRAR.exe'
 

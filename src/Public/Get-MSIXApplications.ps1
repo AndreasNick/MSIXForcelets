@@ -7,7 +7,7 @@ function Get-MSIXApplications {
     Reads AppxManifest.xml from the specified expanded MSIX package folder and
     returns one object per Application entry, exposing Id, Executable, EntryPoint
     and the source folder. Designed to feed Set-MSIXApplicationVisualElements,
-    Add-MSXIXPSFShim and similar cmdlets via the pipeline.
+    Add-MSIXPSFShim and similar cmdlets via the pipeline.
 
 .PARAMETER MSIXFolder
     Path to the expanded MSIX package folder containing AppxManifest.xml.

@@ -8,7 +8,7 @@ Import-Module 'D:\Development\GithubProjekte\MSIXForcelets\src\MSIXForcelets.psd
 $CertPath           = "$env:USERPROFILE\Desktop\NewSelfSigningCert.pfx"
 $CertPassword       = 'mypass' | ConvertTo-SecureString -Force -AsPlainText
 $MSIXSource         = "$env:USERPROFILE\Desktop\MSIXPsfTestApp_1.0.1.0_x64__0cfjrh7p5ggd2.msix"
-$MSIXOutputFilename = "$env:USERPROFILE\Desktop\MSIXPsfTestApp_1.0.1.0_x64__0cfjrh7p5ggd2_PSF_FRF.msix"
+$MSIXOutputFilename = "$env:USERPROFILE\Desktop\MSIXPsfTestApp_1.0.1.0_x64__0cfjrh7p5ggd2_PSF_REG.msix"
 $WorkingDirectory   = ''   # optional literal path, e.g. 'VFS\ProgramFilesX64\MyApp'
 
 # --- Unpack ------------------------------------------------------------------
@@ -29,10 +29,11 @@ $app = Get-MSIXApplications -MSIXFolder $Package | Select-Object -First 1
 Add-MSIXPsfFrameworkFiles -MSIXFolder $Package -PSFArchitektur Both -TraceFixup -FRFixup -MFFixup #-IncludePSFMonitor -Verbose
 
 Set-MSIXForceletsConfiguration -PSFDebugLevel '3=Debug basic'
-Add-MSXIXPSFShim -MSIXFolder $Package -PSFArchitektur x64 -MISXAppID $app.Id -WorkingDirectory $WorkingDirectory -Verbose -Debug 
+Add-MSIXPSFShim -MSIXFolder $Package -PSFArchitektur x64 -MSIXAppID $app.Id -WorkingDirectory $WorkingDirectory -Verbose -Debug 
 
-#Not needed!
-MSIXForcelets\Add-MSIXPSFDefaultFRF -MSIXFolder $Package -Executable '.*' -PackageRelativeBase 'VFS\ProgramFilesX64\MSIXPsfTestApp' -Verbose
+
+# Add-MSIXPSFDefaultFRF -MSIXFolder $Package -Executable '.*' -PackageRelativeBase 'VFS\ProgramFilesX64\MSIXPsfTestApp' -Verbose
+Add-MSIXPSFDefaultRegLegacy -MSIXFolder $Package -Executable '.*' -AllowRedirectHKLMWrites
 
 # MFRFixup - modern replacement for FileRedirectionFixup. Its presence detours the file APIs, so
 # the fixup logs every file call to OutputDebugString at debugLevel >= 3 (DebugView). Don't combine
@@ -43,7 +44,7 @@ MSIXForcelets\Add-MSIXPSFDefaultFRF -MSIXFolder $Package -Executable '.*' -Packa
 #Add-MSIXPSFTracing    -MSIXFolder $Package -Executable '.*' -TraceMethod eventlog -TraceLevel allFailures -Verbose
 
 # $appId = (Get-MSIXApplications -MSIXFolder $Package | Select-Object -First 1).Id
-# Add-MSIXPSFMonitor   -MSIXFolder $Package -MISXAppID $appId -Asadmin -Verbose
+# Add-MSIXPSFMonitor   -MSIXFolder $Package -MSIXAppID $appId -Asadmin -Verbose
 # Add-MSIXCapabilities -MSIXFolder $Package -Capabilities 'runFullTrust', 'allowElevation' -Verbose
 
 $Package | Close-MSIXPackage -MSIXFile $MSIXOutputFilename  -Verbose

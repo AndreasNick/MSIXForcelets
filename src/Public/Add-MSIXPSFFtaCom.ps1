@@ -23,7 +23,7 @@ function Add-MSIXPSFFtaCom {
       4. Updates all uap3:Verb Parameters in the moved Extensions to prepend the
          real application executable path. PsfFtaCom requires the full package-relative
          path as the first verb argument (e.g. "VFS\ProgramFilesX64\App\App.exe" "%1").
-         The original executable is read from config.json.xml when Add-MSXIXPSFShim
+         The original executable is read from config.json.xml when Add-MSIXPSFShim
          has already run; otherwise it is taken from the source Application attribute.
       5. Creates or updates config.json.xml with hasShellVerbs=true for this entry.
 
@@ -160,7 +160,7 @@ function Add-MSIXPSFFtaCom {
             Write-Verbose "Auto-detected source Application: $SourceAppId"
         }
 
-        # Strip the PsfLauncher<Letter> suffix added by Add-MSXIXPSFShim so the FtaCom
+        # Strip the PsfLauncher<Letter> suffix added by Add-MSIXPSFShim so the FtaCom
         # Application Id and exe name are always derived from the original base name,
         # not from the launcher-specific Id (e.g. "WINRAR" not "WINRARPsfLauncherA").
         $baseId = $SourceAppId -replace 'PsfLauncher[A-Za-z]$', ''
@@ -188,7 +188,7 @@ function Add-MSIXPSFFtaCom {
         }
 
         # Determine the real executable path for verb parameter updates.
-        # config.json.xml (written by Add-MSXIXPSFShim) holds the original path even when
+        # config.json.xml (written by Add-MSIXPSFShim) holds the original path even when
         # the manifest Executable attribute already points to PsfLauncher.
         $realExe = $null
         $configXmlPath = Join-Path $MSIXFolder 'config.json.xml'
@@ -197,7 +197,7 @@ function Add-MSIXPSFFtaCom {
             $conxmlCheck.Load($configXmlPath)
             $exeNode = $conxmlCheck.SelectSingleNode("//application[id='$SourceAppId']/executable")
             if ($null -ne $exeNode) {
-                # InnerText contains JSON-escaped double backslashes (written by Add-MSXIXPSFShim).
+                # InnerText contains JSON-escaped double backslashes (written by Add-MSIXPSFShim).
                 # Normalise back to single backslash before using in XML manifest attributes.
                 $realExe = $exeNode.InnerText -replace '\\\\', '\'
             }

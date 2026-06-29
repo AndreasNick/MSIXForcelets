@@ -11,11 +11,11 @@ The Remove-MSIXApplications function removes an MSIX application from the specif
 .PARAMETER MSIXFolder
 Specifies the expanded MSIX folder where the AppxManifest.xml file is located. This parameter is mandatory.
 
-.PARAMETER MISXAppID
+.PARAMETER MSIXAppID
 Specifies the ID of the MSIX application to be removed. This parameter is mandatory.
 
 .EXAMPLE
-Remove-MSIXApplications -MSIXFolder "C:\MSIXFolder" -MISXAppID "MyAppID"
+Remove-MSIXApplications -MSIXFolder "C:\MSIXFolder" -MSIXAppID "MyAppID"
 
 This example removes the MSIX application with the ID "MyAppID" from the "C:\MSIXFolder" folder.
 
@@ -38,8 +38,8 @@ None.
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 1)] 
-        [Alias('Id')] 
-        [String] $MISXAppID
+        [Alias('Id', 'MISXAppID')] 
+        [String] $MSIXAppID
     )
 
     begin {
@@ -52,13 +52,13 @@ None.
         }
         else {
 
-            Write-Verbose "[INFORMATION] Remove MSIX Application $MISXAppID"
+            Write-Verbose "[INFORMATION] Remove MSIX Application $MSIXAppID"
             $AppxManigest = New-Object xml
             $AppxManigest.Load((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
         
             $ns = New-Object System.Xml.XmlNamespaceManager $AppxManigest.NameTable 
             $ns.AddNamespace("ns", 'http://schemas.microsoft.com/appx/manifest/foundation/windows10')
-            $node = $AppxManigest.SelectSingleNode($("//ns:Application[@Id=" + "'" + $MISXAppID + "']"), $ns)
+            $node = $AppxManigest.SelectSingleNode($("//ns:Application[@Id=" + "'" + $MSIXAppID + "']"), $ns)
             if ($node) {
                 $node.ParentNode.RemoveChild($node) | out-null
 
@@ -67,7 +67,7 @@ None.
                 $AppxManigest.Save((Join-Path $MSIXFolder -ChildPath "AppxManifest.xml"))
             }
             else {
-                Write-Verbose "[INFORMATION] MSIX Application $MISXAppID not found"
+                Write-Verbose "[INFORMATION] MSIX Application $MSIXAppID not found"
             }
         }
 

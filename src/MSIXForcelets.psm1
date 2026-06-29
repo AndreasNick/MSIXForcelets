@@ -339,7 +339,10 @@ Get-ChildItem "$($root)/Public/*.ps1" | Resolve-Path | ForEach-Object { . $_ }
 # get functions from memory and compare to existing to find new functions added
 $funcs = Get-ChildItem Function: | Where-Object { $sysfuncs -notcontains $_ }
 
-Export-ModuleMember -Function ($funcs.Name)
+# Backward-compatibility alias for the former (misspelled) function name Add-MSXIXPSFShim.
+Set-Alias -Name 'Add-MSXIXPSFShim' -Value 'Add-MSIXPSFShim'
+
+Export-ModuleMember -Function ($funcs.Name) -Alias 'Add-MSXIXPSFShim'
 
 $VerbosePreference = $_savedVerbose
 

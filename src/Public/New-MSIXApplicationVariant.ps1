@@ -11,7 +11,7 @@ function New-MSIXApplicationVariant {
 
     Use this to create a second launcher variant for the same executable that
     requires different command-line arguments. After cloning, call
-    Add-MSXIXPSFShim on the new Id to wire it through a dedicated PSF launcher
+    Add-MSIXPSFShim on the new Id to wire it through a dedicated PSF launcher
     with the desired -Arguments value.
 
 .PARAMETER MSIXFolder
@@ -46,8 +46,8 @@ function New-MSIXApplicationVariant {
     New-MSIXApplicationVariant -MSIXFolder "C:\MSIXTemp\WinRAR" `
         -SourceAppId "WinRAR" -NewAppId "WinRAR_Silent" -AppListEntry none
 
-    Add-MSXIXPSFShim -MSIXFolder "C:\MSIXTemp\WinRAR" `
-        -MISXAppID "WinRAR_Silent" -Arguments "-s" -PSFArchitektur x64
+    Add-MSIXPSFShim -MSIXFolder "C:\MSIXTemp\WinRAR" `
+        -MSIXAppID "WinRAR_Silent" -Arguments "-s" -PSFArchitektur x64
 
 .OUTPUTS
     System.String

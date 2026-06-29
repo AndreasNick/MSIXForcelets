@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.4'
+    ModuleVersion        = '1.0.5'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -47,7 +47,7 @@
         'Add-MSIXRegAccessFix',
         'Add-MSIXSharedContainer',
         'Add-MSIXSharedFonts',
-        'Add-MSXIXPSFShim',
+        'Add-MSIXPSFShim',
         'Backup-MSIXManifest',
         'Close-MSIXPackage',
         'Convert-MSIXClassicContextMenuToVerbs',
@@ -107,7 +107,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
-    AliasesToExport   = @()
+    AliasesToExport   = @('Add-MSXIXPSFShim')
 
     PrivateData = @{
         PSData = @{
@@ -118,7 +118,7 @@
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
-            ReleaseNotes = 'v1.0.4 - PSF reliability fixes (config.json booleans, backslash path escaping) plus application-variant and configuration improvements. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
+            ReleaseNotes = 'v1.0.5 - PSF reliability fixes (config.json booleans, backslash path escaping) plus application-variant and configuration improvements. Renamed misspelled Add-MSXIXPSFShim -> Add-MSIXPSFShim and -MISXAppID -> -MSIXAppID (old names kept as aliases). Full changelog: https://msixforcelets.nick-it.de/changelog.html'
         }
     }
 }

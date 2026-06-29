@@ -11,7 +11,7 @@ function Add-MSIXAppExecutionAlias {
 .PARAMETER MSIXFolder
     Path to the expanded MSIX package folder (must contain AppxManifest.xml).
 
-.PARAMETER MISXAppID
+.PARAMETER MSIXAppID
     Application/@Id value as it appears in AppxManifest.xml.
 
 .PARAMETER CommandlineAlias
@@ -25,10 +25,10 @@ function Add-MSIXAppExecutionAlias {
     attribute already points to a PSF launcher.
 
 .EXAMPLE
-    Add-MSIXAppExecutionAlias -MSIXFolder "C:\MyApp" -MISXAppID "MyAppID" -CommandlineAlias "myapp.exe"
+    Add-MSIXAppExecutionAlias -MSIXFolder "C:\MyApp" -MSIXAppID "MyAppID" -CommandlineAlias "myapp.exe"
 
 .EXAMPLE
-    Add-MSIXAppExecutionAlias -MSIXFolder "C:\MSIXTemp\WinRAR" -MISXAppID "WinRAR" `
+    Add-MSIXAppExecutionAlias -MSIXFolder "C:\MSIXTemp\WinRAR" -MSIXAppID "WinRAR" `
         -CommandlineAlias "WinRAR.exe" `
         -Executable "VFS\ProgramFilesX64\WinRAR\WinRAR.exe"
 
@@ -46,8 +46,8 @@ function Add-MSIXAppExecutionAlias {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 1)]
-        [Alias('Id')]
-        [String] $MISXAppID,
+        [Alias('Id', 'MISXAppID')]
+        [String] $MSIXAppID,
 
         [Parameter(Mandatory = $true)]
         [String] $CommandlineAlias,
@@ -70,9 +70,9 @@ function Add-MSIXAppExecutionAlias {
         $manifest.Load($manifestPath)
 
         $appNode = $manifest.SelectSingleNode(
-            "//ns:Package/ns:Applications/ns:Application[@Id='$MISXAppID']", $nsmgr)
+            "//ns:Package/ns:Applications/ns:Application[@Id='$MSIXAppID']", $nsmgr)
         if ($null -eq $appNode) {
-            Write-Error "Application '$MISXAppID' not found in AppxManifest.xml."
+            Write-Error "Application '$MSIXAppID' not found in AppxManifest.xml."
             return
         }
 
@@ -90,13 +90,13 @@ function Add-MSIXAppExecutionAlias {
         $existingAlias = $extensionsNode.SelectSingleNode(
             ".//uap5check:Extension[@Category='windows.appExecutionAlias']", $nsmgr)
         if ($null -ne $existingAlias) {
-            Write-Verbose "Execution alias already present for '$MISXAppID' - skipped."
+            Write-Verbose "Execution alias already present for '$MSIXAppID' - skipped."
             return
         }
 
         Add-MSIXManifestNamespace -Manifest $manifest -Prefixes 'uap5'
 
-        Write-Verbose "Adding execution alias '$CommandlineAlias' to Application '$MISXAppID'."
+        Write-Verbose "Adding execution alias '$CommandlineAlias' to Application '$MSIXAppID'."
 
         # Structure per MSIX schema: uap5:Extension / uap5:AppExecutionAlias / uap5:ExecutionAlias
         $extensionNode = $manifest.CreateElement('uap5', 'Extension', $nsUap5)

@@ -43,7 +43,7 @@ foreach ($app in $apps) {
 
     $exe = Join-Path -Path $Package -ChildPath $app.Executable
     $arch = if ((Get-MSIXAppExeArchitectureType $exe) -eq 'I386') { '32Bit' } else { '64Bit' }
-    Add-MSXIXPSFShim -MSIXFolder $Package -PSFArchitektur $arch -MISXAppID $app.Id `
+    Add-MSIXPSFShim -MSIXFolder $Package -PSFArchitektur $arch -MSIXAppID $app.Id `
                      -WorkingDirectory $WorkingDirectory -Verbose
 }
 

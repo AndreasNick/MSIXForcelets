@@ -1,7 +1,7 @@
 ﻿function Add-MSIXPSFDynamicLibraryFixup {
 <#
 .SYNOPSIS
-    Adds a DynamicLibraryFixup configuration entry for all package DLLs to config.json.xml.
+    Adds DynamicLibraryFixup entries to config.json.xml — all package DLLs (scan), or a single explicit DLL via -DllFile.
 
 .DESCRIPTION
     Scans the expanded MSIX package for application DLLs and registers them in
@@ -31,6 +31,11 @@
     Regex pattern for the process entry in config.json.xml.
     Default: ".*" (catch-all for all processes).
 
+.PARAMETER DllFile
+    Single-DLL mode. One or more package-relative DLL paths to register
+    explicitly instead of scanning the whole package — useful when only one
+    DLL is missing, e.g. 'VFS\ProgramFilesX64\App\Missing.dll'.
+
 .PARAMETER ExcludeNames
     Additional DLL filenames (with .dll extension) to exclude from the scan,
     e.g. @('MyHelper.dll').
@@ -52,21 +57,31 @@
         -DefaultArchitecture x64 `
         -Verbose
 
+.EXAMPLE
+    # Only one DLL is missing — add just that one, no full scan.
+    Add-MSIXPSFDynamicLibraryFixup -MSIXFolder "C:\MSIXTemp\App" `
+        -DllFile 'VFS\ProgramFilesX64\App\Missing.dll'
+
 .NOTES
     Requires Tim Mangan PSF DynamicLibraryFixup.dll to be present in the package.
     Run Add-MSIXPsfFrameworkFiles before this function.
     https://www.nick-it.de
     Andreas Nick, 2026
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Scan')]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
         [System.IO.DirectoryInfo] $MSIXFolder,
 
         [String] $Executable = '.*',
 
+        [Parameter(ParameterSetName = 'Single', Mandatory = $true)]
+        [String[]] $DllFile,
+
+        [Parameter(ParameterSetName = 'Scan')]
         [String[]] $ExcludeNames = @(),
 
+        [Parameter(ParameterSetName = 'Scan')]
         [String[]] $ExcludeFolders = @('VFS\SystemX64', 'VFS\SystemX86'),
 
         [ValidateSet('x64', 'x86')]
@@ -81,7 +96,7 @@
 
         $configXmlPath = Join-Path $MSIXFolder.FullName 'config.json.xml'
         if (-not (Test-Path $configXmlPath)) {
-            Write-Error "config.json.xml not found in '$($MSIXFolder.FullName)'. Run Add-MSXIXPSFShim or another fixup function first."
+            Write-Error "config.json.xml not found in '$($MSIXFolder.FullName)'. Run Add-MSIXPSFShim or another fixup function first."
             return
         }
 
@@ -105,14 +120,42 @@
 
         $msixRoot = $MSIXFolder.FullName.TrimEnd('\')
 
-        # Build absolute excluded folder prefixes for fast comparison
-        $excludedPrefixes = $ExcludeFolders | ForEach-Object {
-            (Join-Path $msixRoot $_).TrimEnd('\') + '\'
-        }
-
-        $allDlls = Get-ChildItem -Path $msixRoot -Filter '*.dll' -Recurse -File
-
         $pathEntries = New-Object System.Collections.ArrayList
+
+        if ($PSCmdlet.ParameterSetName -eq 'Single') {
+            # Single-DLL mode: one entry per -DllFile, no package scan.
+            foreach ($df in $DllFile) {
+                $rel = $df.Replace('\\', '\').TrimStart('\')
+                $fileName = [System.IO.Path]::GetFileName($rel)
+                $baseName = [System.IO.Path]::GetFileNameWithoutExtension($fileName)
+
+                if (-not (Test-Path (Join-Path $msixRoot $rel))) {
+                    Write-Warning "DLL not found in package: $rel (entry is written anyway)."
+                }
+
+                $relPathDoubleSlash = $rel.Replace('\', '\\')
+
+                $arch = $DefaultArchitecture
+                if ($baseName -match '32') { $arch = 'x86' }
+                elseif ($baseName -match '64') { $arch = 'x64' }
+                elseif ($rel -match '\\ProgramFilesX86\\') { $arch = 'x86' }
+                elseif ($rel -match '\\ProgramFilesX64\\') { $arch = 'x64' }
+
+                $null = $pathEntries.Add([PSCustomObject]@{
+                    Name     = $fileName
+                    FilePath = $relPathDoubleSlash
+                    Arch     = $arch
+                })
+                Write-Verbose "Single DLL ($arch): $fileName -> $rel"
+            }
+        }
+        else {
+            # Scan mode: register every application DLL in the package.
+            $excludedPrefixes = $ExcludeFolders | ForEach-Object {
+                (Join-Path $msixRoot $_).TrimEnd('\') + '\'
+            }
+
+            $allDlls = Get-ChildItem -Path $msixRoot -Filter '*.dll' -Recurse -File
 
         foreach ($dll in $allDlls) {
             $fullPath  = $dll.FullName
@@ -184,6 +227,7 @@
                 Arch     = $arch
             })
             Write-Verbose "Found DLL ($arch): $fileName -> $relPath"
+        }
         }
 
         if ($pathEntries.Count -eq 0) {

@@ -20,7 +20,7 @@ function Get-MSIXForceletsConfiguration {
         Add "^[Pp]ower[Ss]hell.*" named process entry for PowerShell wrapper scripts.
 
     PSFDefaultArchitecture       ('Auto')
-        Default PE architecture used by Add-MSXIXPSFShim when -PSFArchitektur is
+        Default PE architecture used by Add-MSIXPSFShim when -PSFArchitektur is
         not specified. Values: Auto | x64 | x86.
 
     PSFDebugLevel                (2)

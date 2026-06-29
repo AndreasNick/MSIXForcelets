@@ -8,7 +8,7 @@ The Add-MSIXPSFMonitor function adds a PSF Monitor configuration to the MSIX con
 .PARAMETER MSIXFolder
 The path to the folder containing the MSIX package.
 
-.PARAMETER MISXAppID
+.PARAMETER MSIXAppID
 The ID of the MSIX application to add the PSF Monitor configuration for.
 
 .PARAMETER Executable
@@ -44,7 +44,7 @@ https://www.nick-it.de
 
 
 .EXAMPLE
-Add-MSIXPSFMonitor -MSIXFolder "C:\MyMSIXPackage" -MISXAppID "MyApp" -Executable "C:\Windows\System32\cmd.exe" -Asadmin -Verbose
+Add-MSIXPSFMonitor -MSIXFolder "C:\MyMSIXPackage" -MSIXAppID "MyApp" -Executable "C:\Windows\System32\cmd.exe" -Asadmin -Verbose
 Adds a PSF Monitor configuration to the MSIX config.json.xml file for the "MyApp" MSIX application. The PSF Monitor will monitor the "cmd.exe" executable and run it with administrator privileges.
 Get-MSIXApplications -MSIXFolder $Package | Add-MSIXPSFMonitor -MSIXFolder $Package -Executable "c:/Windows/System32/cmd.exe" -Asadmin -Verbose
 Add-MSIXCapabilities -MSIXFolder $Package -Capabilities "runFullTrust", "allowElevation" -Verbose
@@ -62,8 +62,8 @@ function Add-MSIXPSFMonitor {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 1)] 
-        [Alias('Id')] 
-        [String] $MISXAppID,
+        [Alias('Id', 'MISXAppID')] 
+        [String] $MSIXAppID,
         [ArgumentCompleter( { 'VFS\SystemX64\PsfMonitor.exe', 'VFS\SystemX64\PsfMonitorx64.exe', 'VFS\SystemX86\PsfMonitorx86.exe', 'DebugView.exe' })]
         [string] $Executable = 'VFS\SystemX64\PsfMonitor.exe',
         $Arguments = '', #"/g", "/c dir c:\\ /s"
@@ -77,8 +77,8 @@ function Add-MSIXPSFMonitor {
             return
         }
 
-        if ([string]::IsNullOrWhiteSpace($MISXAppID)) {
-            Write-Error "-MISXAppID must not be empty or whitespace."
+        if ([string]::IsNullOrWhiteSpace($MSIXAppID)) {
+            Write-Error "-MSIXAppID must not be empty or whitespace."
             return
         }
 
@@ -88,13 +88,13 @@ function Add-MSIXPSFMonitor {
         }
 
         if (-not (Test-Path (Join-Path $MSIXFolder -ChildPath "config.json.xml") )) {
-            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSXIXPSFShim first."
+            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSIXPSFShim first."
             return
         }
         else {
             $conxml = New-Object xml
             $conxml.Load((Join-Path $MSIXFolder -ChildPath "config.json.xml"))
-            $appNode = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']")
+            $appNode = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']")
 
             if ($null -eq $appNode) {
                 throw "ERROR The application not exist in MSIX config.json.xml - skip"

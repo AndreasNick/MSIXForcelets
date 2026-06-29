@@ -111,7 +111,7 @@ function Add-MSIXFixNotepadPlusPlus {
             else {
                 foreach ($app in $apps) {
                     Write-Verbose "Adding PSF shim for application: $($app.Id)"
-                    $null = Add-MSXIXPSFShim -MSIXFolder $MSIXFolder -MISXAppID $app.Id
+                    $null = Add-MSIXPSFShim -MSIXFolder $MSIXFolder -MSIXAppID $app.Id
                 }
             }
 

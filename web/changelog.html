@@ -38,7 +38,7 @@
 
   <main>
     <section class="section">
-      <h2>v1.0.4 <span class="version-tag">latest</span></h2>
+      <h2>v1.0.5 <span class="version-tag">latest</span></h2>
       <p class="muted">PSF reliability fixes, application-variant and configuration improvements.</p>
       <ul class="changelog">
         <li>
@@ -74,6 +74,23 @@
         <li>
           <strong><a href="cmdlets.html#remove-msixdependencies">Remove-MSIXDependencies</a></strong>
           &mdash; <code>-Name</code> now accepts wildcards, e.g. <code>Microsoft.WindowsAppRuntime*</code>.
+        </li>
+        <li>
+          <strong>Typo fix &mdash; <a href="cmdlets.html#add-msixpsfshim">Add-MSIXPSFShim</a></strong>
+          &mdash; the misspelled cmdlet <code>Add-MSXIXPSFShim</code> was renamed to
+          <code>Add-MSIXPSFShim</code>, and its parameter <code>-MISXAppID</code> (also used by several other
+          cmdlets) to <code>-MSIXAppID</code>. The old names are kept as aliases, so existing scripts keep working.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#add-msixpsfdefaultreglegacy">Add-MSIXPSFDefaultRegLegacy</a></strong>
+          &mdash; with <code>-AllowRedirectHKLMWrites</code> the conflicting HKLM read-only rules
+          (<code>Full2R</code>/<code>RW2R</code>) are now omitted; they would otherwise downgrade the HKLM
+          open to read-only and defeat the <code>HKLM2HKCU</code> redirect.
+        </li>
+        <li>
+          <strong>Console-output hygiene</strong> &mdash; suppressed stray pipeline output from
+          <code>Add-MSIXPSFDefaultFRF</code>, <code>Add-MSIXPSFFileRedirectionFixup</code> and
+          <code>Add-MSIXDisableWriteVirtualization</code> (internal XML nodes were leaking to the console).
         </li>
       </ul>
     </section>
@@ -149,7 +166,7 @@
         </li>
         <li>
           <strong>Package Support Framework integration</strong> &mdash; Add-MSIXPsfFrameworkFiles,
-          Add-MSXIXPSFShim, MFRFixup, RegLegacyFixups, FileRedirectionFixup, DynamicLibraryFixup,
+          Add-MSIXPSFShim, MFRFixup, RegLegacyFixups, FileRedirectionFixup, DynamicLibraryFixup,
           EnvVarFixup, PSF PowerShell scripts, FTA/COM and monitor/tracing helpers.
         </li>
         <li>

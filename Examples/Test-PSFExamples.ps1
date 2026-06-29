@@ -48,7 +48,7 @@ $putty = Get-MSIXApplications -MSIXFolder $Package |
     Where-Object { $_.Executable -like '*putty.exe' } | Select-Object -First 1
 foreach ($app in (Get-MSIXApplications -MSIXFolder $Package)) {
     if ($app.Id -ne $putty.Id) {
-        Remove-MSIXApplications -MSIXFolder $Package -MISXAppID $app.Id -Verbose
+        Remove-MSIXApplications -MSIXFolder $Package -MSIXAppID $app.Id -Verbose
     }
 }
 
@@ -69,7 +69,7 @@ break
 # The shim renames the AppId and repoints Executable to PsfLauncher; afterwards PuTTY
 # is the only (now shimmed) application in the package.
 
-Add-MSXIXPSFShim -MSIXFolder $Package -PSFArchitektur Auto -MISXAppID $putty.Id `
+Add-MSIXPSFShim -MSIXFolder $Package -PSFArchitektur Auto -MSIXAppID $putty.Id `
     -WorkingDirectory $WorkingDirectory -Arguments $Arguments -Verbose
 
 break
@@ -89,7 +89,7 @@ break
 # the start. Only PuTTY remains, so the single (now shimmed) app gets the monitor entry.
 
 $puttyApp = Get-MSIXApplications -MSIXFolder $Package | Select-Object -First 1
-Add-MSIXPSFMonitor -MSIXFolder $Package -MISXAppID $puttyApp.Id `
+Add-MSIXPSFMonitor -MSIXFolder $Package -MSIXAppID $puttyApp.Id `
     -Executable 'PsfMonitorx64.exe' -Asadmin -Verbose
 
 # The elevated monitor needs these capabilities.

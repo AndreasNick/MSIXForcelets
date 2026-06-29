@@ -10,8 +10,8 @@ function Add-MSIXPSFPowerShellScript {
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Position = 1)] 
-        [Alias('Id')] 
-        [String] $MISXAppID,
+        [Alias('Id', 'MISXAppID')] 
+        [String] $MSIXAppID,
         [Parameter(Mandatory = $true, ParameterSetName = 'StartScript')]
         [switch] $StartScript,
         [Parameter(Mandatory = $true, ParameterSetName = 'EndScript')]
@@ -38,8 +38,8 @@ function Add-MSIXPSFPowerShellScript {
             return
         }
 
-        if ([string]::IsNullOrWhiteSpace($MISXAppID)) {
-            Write-Error "-MISXAppID must not be empty or whitespace."
+        if ([string]::IsNullOrWhiteSpace($MSIXAppID)) {
+            Write-Error "-MSIXAppID must not be empty or whitespace."
             return
         }
 
@@ -52,13 +52,13 @@ function Add-MSIXPSFPowerShellScript {
         }
 
         if (-not (Test-Path (Join-Path $MSIXFolder -ChildPath "config.json.xml") )) {
-            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSXIXPSFShim first."
+            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSIXPSFShim first."
             return
         }
         else {
             $conxml = New-Object xml
             $conxml.Load((Join-Path $MSIXFolder -ChildPath "config.json.xml"))
-            $appNode = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']")
+            $appNode = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']")
             
 
             if ($null -eq $appNode) {
@@ -88,7 +88,7 @@ function Add-MSIXPSFPowerShellScript {
                 $m = $null
 
                 if ($ScriptExecutionMode -ne "") {
-                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']/../scriptExecutionMode")
+                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']/../scriptExecutionMode")
                     if ($em) {
                         $em.InnerText = $ScriptExecutionMode
                     }
@@ -101,7 +101,7 @@ function Add-MSIXPSFPowerShellScript {
                     }
                 }
                 if ($StopOnScriptError.IsPresent) {
-                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']/../stopOnScriptError")
+                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']/../stopOnScriptError")
                     if ($em) {
                         $em.InnerText = $StopOnScriptError.ToString().ToLower()
                     }
@@ -112,16 +112,16 @@ function Add-MSIXPSFPowerShellScript {
                     }
                 }
                 else {
-                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']/../stopOnScriptError")
+                    $em = $conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']/../stopOnScriptError")
                     if ($em) {
-                        Write-Verbose "[INFORMATION] Remove stopOnScriptError node for $MISXAppID"
+                        Write-Verbose "[INFORMATION] Remove stopOnScriptError node for $MSIXAppID"
                         $em.ParentNode.RemoveChild($em)
                     }
                 }
 
                 if ($StartScript.IsPresent) {
-                    if ($conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']/../startScript")) {
-                        Write-Warning "[WARNING] A start script for $MISXAppID already exist. Please remove it first"
+                    if ($conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']/../startScript")) {
+                        Write-Warning "[WARNING] A start script for $MSIXAppID already exist. Please remove it first"
                     }
                     else {
                         $m = $conxml.CreateElement("startScript") 
@@ -129,8 +129,8 @@ function Add-MSIXPSFPowerShellScript {
                 }
 
                 if ($EndScript.IsPresent) {
-                    if ($conxml.SelectSingleNode('//application/id[text()' + "='" + $MISXAppID + "']/../endScript")) {
-                        Write-Warning "[WARNING] A end script for $MISXAppID already exist. Please remove it first"
+                    if ($conxml.SelectSingleNode('//application/id[text()' + "='" + $MSIXAppID + "']/../endScript")) {
+                        Write-Warning "[WARNING] A end script for $MSIXAppID already exist. Please remove it first"
                     }
                     else {
                         $m = $conxml.CreateElement("endScript") 

@@ -201,7 +201,7 @@ function Add-MSIXFixWinRAR {
             Add-MSIXPsfFrameworkFiles -MSIXFolder $MSIXFolder
 
             # Redirect every regular application entry through PsfLauncher64.
-            # Add-MSXIXPSFShim renames the Application Id and returns the new Id.
+            # Add-MSIXPSFShim renames the Application Id and returns the new Id.
             $apps = Get-MSIXApplications -MSIXFolder $MSIXFolder
             if ($null -eq $apps -or $apps.Count -eq 0) {
                 Write-Warning "No application entries found in AppxManifest.xml."
@@ -210,7 +210,7 @@ function Add-MSIXFixWinRAR {
                 $shimmedIds = @{}
                 foreach ($app in $apps) {
                     Write-Verbose "Adding PSF shim for application: $($app.Id)"
-                    $newId = Add-MSXIXPSFShim -MSIXFolder $MSIXFolder -MISXAppID $app.Id -PSFArchitektur x64
+                    $newId = Add-MSIXPSFShim -MSIXFolder $MSIXFolder -MSIXAppID $app.Id -PSFArchitektur x64
                     $shimmedIds[$app.Id] = $newId
                 }
             }
@@ -220,7 +220,7 @@ function Add-MSIXFixWinRAR {
             if ($null -ne $winrarApp) {
                 $winrarNewId = $shimmedIds[$winrarApp.Id]
                 Add-MSIXAppExecutionAlias -MSIXFolder $MSIXFolder `
-                    -MISXAppID $winrarNewId `
+                    -MSIXAppID $winrarNewId `
                     -CommandlineAlias 'WinRAR.exe' `
                     -Executable 'VFS\ProgramFilesX64\WinRAR\WinRAR.exe'
             }

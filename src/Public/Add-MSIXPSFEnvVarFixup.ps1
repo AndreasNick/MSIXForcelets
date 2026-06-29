@@ -74,7 +74,7 @@ function Add-MSIXPSFEnvVarFixup {
 
         $configXmlPath = Join-Path $MSIXFolder 'config.json.xml'
         if (-not (Test-Path $configXmlPath)) {
-            Write-Warning "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSXIXPSFShim first."
+            Write-Warning "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSIXPSFShim first."
             return
         }
 

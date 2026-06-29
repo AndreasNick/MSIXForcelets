@@ -74,7 +74,7 @@ function Add-MSIXPSFTracing {
         }
 
         if (-not (Test-Path (Join-Path $MSIXFolder -ChildPath "config.json.xml") )) {
-            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSXIXPSFShim first."
+            Write-Error "config.json.xml not found in: $($MSIXFolder.FullName). Run Add-MSIXPSFShim first."
             return
         }
         else {

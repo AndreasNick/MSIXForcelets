@@ -23,7 +23,7 @@ function Set-MSIXForceletsConfiguration {
     PowerShell wrapper scripts.
 
 .PARAMETER PSFDefaultArchitecture
-    Default architecture for Add-MSXIXPSFShim when -PSFArchitektur is omitted.
+    Default architecture for Add-MSIXPSFShim when -PSFArchitektur is omitted.
     Valid values: Auto, x64, x86. Default: Auto.
 
 .PARAMETER PSFDebugLevel
@@ -32,7 +32,7 @@ function Set-MSIXForceletsConfiguration {
 
 .PARAMETER PSFEnableReportError
     enableReportError in config.json. $false (default) suppresses PSF's error dialogs; $true shows
-    them - useful for debugging. Written on the next Add-MSXIXPSFShim.
+    them - useful for debugging. Written on the next Add-MSIXPSFShim.
 
 .PARAMETER CopyVCRuntime
     When $true (default), Update-MSIXMicrosoftPSF and Update-MSIXTMPSF

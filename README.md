@@ -135,7 +135,7 @@ $pkg = Open-MSIXPackage -MsixFile "C:\Packages\MyApp.msix" -Force
 Add-MSIXPsfFrameworkFiles -MSIXFolder $pkg
 
 Get-MSIXApplications -MSIXFolder $pkg |
-    ForEach-Object { Add-MSXIXPSFShim -MSIXFolder $pkg -MISXAppID $_.Id -PSFArchitektur x64 }
+    ForEach-Object { Add-MSIXPSFShim -MSIXFolder $pkg -MSIXAppID $_.Id -PSFArchitektur x64 }
 
 Close-MSIXPackage -MSIXFolder $pkg -MSIXFile "C:\Packages\MyApp_PSF.msix"
 ```

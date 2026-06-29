@@ -68,7 +68,7 @@ function Add-MSIXDisableWriteVirtualization {
                     if ($null -eq $manifest.SelectSingleNode("//ns:Package/ns:Properties/desktop6:FileSystemWriteVirtualization", $nsmgr)) {
                         $disFSW = $manifest.CreateElement("desktop6:FileSystemWriteVirtualization", $Script:AppXNamespaces['desktop6'])
                         $disFSW.InnerText = "disabled"
-                        $properties.AppendChild($disFSW)
+                        $properties.AppendChild($disFSW) | Out-Null
                     }
                     else {
                         Write-Verbose "[INFORMATION] desktop6:FileSystemWriteVirtualization already exist"
@@ -78,7 +78,7 @@ function Add-MSIXDisableWriteVirtualization {
                     if ($null -eq $manifest.SelectSingleNode("//ns:Package/ns:Properties/desktop6:RegistryWriteVirtualization", $nsmgr)) {
                         $disvreg = $manifest.CreateElement("desktop6:RegistryWriteVirtualization", $Script:AppXNamespaces['desktop6'])
                         $disvreg.InnerText = "disabled"
-                        $properties.AppendChild($disvreg)
+                        $properties.AppendChild($disvreg) | Out-Null
                     }
                     else {
                         Write-Verbose "[INFORMATION] desktop6:RegistryWriteVirtualization already exist"

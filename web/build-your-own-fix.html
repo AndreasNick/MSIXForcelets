@@ -100,7 +100,7 @@
         <article class="card"><h3>Clean up</h3><p>Strip captured installer leftovers and unsupported artifacts.</p><code><a href="cmdlets.html#invoke-msixcleanup">Invoke-MSIXCleanup</a></code></article>
         <article class="card"><h3>Capabilities</h3><p>Declare what the app needs, e.g. <code>internetClient</code>.</p><code><a href="cmdlets.html#add-msixcapabilities">Add-MSIXCapabilities</a></code></article>
         <article class="card"><h3>Find DLLs</h3><p>Add a loader search path and installed-location virtualization.</p><code><a href="cmdlets.html#add-msixloadersearchpathoverride">Add-MSIXloaderSearchPathOverride</a></code></article>
-        <article class="card"><h3>PSF launcher</h3><p>Ship the PSF binaries and wire every app through the launcher.</p><code><a href="cmdlets.html#add-msixpsfframeworkfiles">Add-MSIXPsfFrameworkFiles</a></code> &middot; <code><a href="cmdlets.html#add-msxixpsfshim">Add-MSXIXPSFShim</a></code></article>
+        <article class="card"><h3>PSF launcher</h3><p>Ship the PSF binaries and wire every app through the launcher.</p><code><a href="cmdlets.html#add-msixpsfframeworkfiles">Add-MSIXPsfFrameworkFiles</a></code> &middot; <code><a href="cmdlets.html#add-msixpsfshim">Add-MSIXPSFShim</a></code></article>
         <article class="card"><h3>Registry fixups</h3><p>Normalise HKCU/HKLM access; optional HKLM&rarr;HKCU redirection.</p><code><a href="cmdlets.html#add-msixpsfdefaultreglegacy">Add-MSIXPSFDefaultRegLegacy</a></code></article>
         <article class="card"><h3>File redirection</h3><p>Tim&nbsp;Mangan MFR (ILV-aware) and dynamic library fixups.</p><code><a href="cmdlets.html#add-msixpsfmfrfixup">Add-MSIXPSFMFRFixup</a></code></article>
         <article class="card"><h3>Shortcuts</h3><p>Add a working Start&nbsp;Menu / Desktop shortcut with a PNG icon.</p><code><a href="cmdlets.html#add-msixdesktop7shortcut">Add-MSIXDesktop7Shortcut</a></code></article>
@@ -125,7 +125,7 @@
             <span class="c-cmt"># 4. wire every application through the PSF launcher</span>
             <span class="c-cmd">Add-MSIXPsfFrameworkFiles</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>
             <span class="c-cmd">foreach</span> (<span class="c-var">$app</span> <span class="c-cmd">in</span> (<span class="c-cmd">Get-MSIXApplications</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span>)) {
-                <span class="c-cmd">Add-MSXIXPSFShim</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-MISXAppID</span> <span class="c-var">$app</span>.Id <span class="c-arg">-PSFArchitektur</span> x64
+                <span class="c-cmd">Add-MSIXPSFShim</span> <span class="c-arg">-MSIXFolder</span> <span class="c-var">$MSIXFolder</span> <span class="c-arg">-MSIXAppID</span> <span class="c-var">$app</span>.Id <span class="c-arg">-PSFArchitektur</span> x64
             }
 
             <span class="c-cmt"># 5. registry + file-redirection fixups</span>
