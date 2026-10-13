@@ -10,8 +10,8 @@ function Update-MSIXTMPSF {
     every EXE and DLL into amd64\ or win32\ sub-folders based on their actual PE machine
     type (detected via Get-MSIXAppMachineType).
 
-    The files are placed under:
-        <module>\MSIXPSF\TimManganPSF\<release-name>\
+    The files are placed under (<tooling> = <module root>\Tooling, e.g. ...\Modules\MSIXForcelets\Tooling):
+        <tooling>\MSIXPSF\TimManganPSF\<release-name>\
             _debug\
                 amd64\   <- x64 binaries
                 win32\   <- x86 binaries
@@ -54,6 +54,8 @@ function Update-MSIXTMPSF {
         [Switch] $Force,
         [System.Nullable[bool]] $CopyVCRuntime
     )
+
+    Assert-MSIXToolingWritable
 
     # Load ZIP support (required in PS 5.1 / .NET Framework 4.5+)
     Add-Type -AssemblyName System.IO.Compression.FileSystem

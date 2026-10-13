@@ -31,8 +31,8 @@ For persistent availability, add the import to your PowerShell profile (`$PROFIL
 ### 1 — Download packaging tools
 
 Downloads `makeappx.exe`, `signtool.exe`, and `msixmgr.exe` from the official Microsoft
-GitHub releases into the module's `Libs\` folder. Only downloads when a newer version is
-available.
+GitHub releases into the tooling folder (see [Tooling location](#tooling-location)). Only
+downloads when a newer version is available.
 
 ```powershell
 Update-MSIXTooling
@@ -52,7 +52,41 @@ Update-MSIXMicrosoftPSF
 Update-MSIXTMPSF
 ```
 
-Both commands place the files under `<module>\MSIXPSF\` in a versioned subfolder.
+Both commands place the files under `<tooling>\MSIXPSF\` in a versioned subfolder.
+
+### Tooling location
+
+The downloaded tooling is kept in the module root **next to** the version folders, so
+`Update-Module` does not trigger a new download, and every installation (AllUsers and
+CurrentUser) keeps its own tooling:
+
+```
+C:\Program Files\WindowsPowerShell\Modules\MSIXForcelets\
+    1.0.5\
+    1.0.6\
+    Tooling\        <- MSIXPSF\, Libs\MSIXPackaging\, Libs\MSIXCore\
+```
+
+On import the module uses the first match:
+
+1. `$env:MSIXFORCELETS_TOOLING`, if set (e.g. a shared folder)
+2. the module folder itself, if it already contains the tooling (source checkout, versions up to 1.0.5)
+3. `<module root>\Tooling` when the module is loaded from a version folder — for an `-Scope AllUsers` installation under Program Files, downloads need an elevated PowerShell
+4. `%LOCALAPPDATA%\MSIXForceletsTooling` otherwise (source checkout without tooling, build stage folder)
+
+The import banner shows the active folder (`Tooling : ...`). After updating from 1.0.5 or
+older, the banner points out that the tooling still sits in the old version folder. Take it
+over without downloading, then remove the old versions:
+
+```powershell
+Update-Module MSIXForcelets
+Import-Module MSIXForcelets -Force   # load the new version; the banner shows the hint
+Copy-MSIXTooling                     # no download; elevated PowerShell for AllUsers
+Import-Module MSIXForcelets -Force   # activate the copied tooling
+Get-InstalledModule MSIXForcelets -AllVersions | Where-Object Version -ne (Get-Module MSIXForcelets).Version | Uninstall-Module
+```
+
+Alternatively download everything fresh with `Install-MSIXForceletsAllRequirements`.
 
 ---
 
@@ -211,7 +245,9 @@ all necessary steps — open, patch, repack — in one call.
 | `Add-MSIXFixAcrobatReaderDC` | Acrobat Reader DC | Registry access fix + virtual key |
 | `Add-MSIXFixGimp` | GIMP 2.x | DLL search path, disables update check, removes TWAIN plug-ins |
 | `Add-MSIXFixLibreOffice` | LibreOffice | ILV, shared fonts, Start Menu grouping |
-| `Add-MSIXFixSSMS` | SQL Server Management Studio | SSMS 20 and earlier only; newer versions are not supported |
+| `Add-MSIXFixSSMS` | SQL Server Management Studio | SSMS 20 and earlier only; for 21/22 use `Add-MSIXFixSSMS22` |
+| `Add-MSIXFixSSMS22` | SQL Server Management Studio 21/22 | Fixes the connection dialog (0x80070490) with a VS setup instance (state.json); removes NGEN images, VS Installer payload, captured services (`-NotRemoveServices` keeps them) and account stores; removes the Visual Studio Installer app and its Start menu entry |
+| `Add-MSIXFixSumatraPDF` | SumatraPDF | Settings file in the real %LOCALAPPDATA% (flexible virtualization, Windows 11) so "Advanced Options" can edit it |
 | `Add-MSIXFixWinRAR` | WinRAR | Classic shell extensions are replaced by static verbs; dynamic menu labels ("Add to 'archive.rar'") are not possible |
 
 ---

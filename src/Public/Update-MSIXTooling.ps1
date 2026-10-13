@@ -4,7 +4,8 @@
     Downloads and installs the latest MSIX packaging tools.
 
 .DESCRIPTION
-    Downloads two sets of tools into the module's Libs folder:
+    Downloads two sets of tools into the Libs folder of the tooling location
+    (<module root>\Tooling, e.g. ...\Modules\MSIXForcelets\Tooling):
 
       1. MSIX Core (msixmgr.exe)
          Source: https://github.com/microsoft/msix-packaging
@@ -47,6 +48,8 @@
         [Switch] $SkipCore,
         [Switch] $SkipPackaging
     )
+
+    Assert-MSIXToolingWritable
 
     # --- MSIX Core (msixmgr.exe) ---
     if (-not $SkipCore) {

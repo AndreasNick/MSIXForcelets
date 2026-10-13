@@ -54,6 +54,8 @@
           <pre><code><span class="c-cmd">Update-MSIXTooling</span>        <span class="c-cmt"># Windows SDK: makeappx, signtool, msixmgr</span>
 <span class="c-cmd">Update-MSIXTMPSF</span>          <span class="c-cmt"># Tim Mangan Package Support Framework</span>
 <span class="c-cmd">Update-MSIXMicrosoftPSF</span>   <span class="c-cmt"># Microsoft Package Support Framework</span></code></pre>
+          <p>The tooling is stored outside the module version folder, so module updates keep it &mdash;
+             see <a href="#tooling">Where the tooling lives</a>.</p>
         </li>
         <li>
           <h3>Open, fix, repack &amp; sign</h3>
@@ -71,6 +73,64 @@
         <a class="btn btn-primary" href="build-your-own-fix.html">Build your own fix &rarr;</a>
         <a class="btn btn-ghost" href="cmdlets.html">Cmdlet reference</a>
       </p>
+    </section>
+
+    <section id="tooling" class="section section-alt">
+      <h2>Where the tooling lives</h2>
+      <p class="section-sub">Since v1.0.6 the downloaded tooling sits in the module root next to the version
+        folders &mdash; <code>Update-Module</code> no longer triggers a new download, and every installation
+        (all users or current user) keeps its own tooling.</p>
+      <pre><code>C:\Program Files\WindowsPowerShell\Modules\MSIXForcelets\
+    1.0.5\
+    1.0.6\
+    Tooling\        <span class="c-cmt"># MSIXPSF\, Libs\MSIXPackaging\, Libs\MSIXCore\</span></code></pre>
+      <div class="table-wrap">
+        <table class="paths">
+          <thead>
+            <tr><th>Installation</th><th>Tooling folder (example)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>-Scope AllUsers</code></td>
+              <td><code>C:\Program Files\WindowsPowerShell\Modules\MSIXForcelets\Tooling</code><br>
+                  <code>C:\Program Files\PowerShell\Modules\MSIXForcelets\Tooling</code><br>
+                  <span class="muted">downloads need an elevated PowerShell</span></td>
+            </tr>
+            <tr>
+              <td><code>-Scope CurrentUser</code></td>
+              <td><code>Documents\WindowsPowerShell\Modules\MSIXForcelets\Tooling</code><br>
+                  <code>Documents\PowerShell\Modules\MSIXForcelets\Tooling</code></td>
+            </tr>
+            <tr>
+              <td>Source checkout</td>
+              <td>the <code>src</code> folder itself</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Installed both for all users and for the current user? Each installation uses its own
+        <code>Tooling</code> folder &mdash; an all-users installation never writes into a user profile.</p>
+
+      <h3>How the module finds it</h3>
+      <p>On import the first match wins &mdash; the banner shows the result in its <code>Tooling</code> line:</p>
+      <ol>
+        <li><code>$env:MSIXFORCELETS_TOOLING</code>, if set &mdash; e.g. a shared team folder</li>
+        <li>the module folder itself, if it already contains the tooling (source checkout, versions up to 1.0.5)</li>
+        <li><code>&lt;module root&gt;\Tooling</code>, when the module is loaded from a version folder</li>
+        <li><code>%LOCALAPPDATA%\MSIXForceletsTooling</code> otherwise (e.g. a source checkout without tooling)</li>
+      </ol>
+
+      <h3>Updating from 1.0.5 or older</h3>
+      <p>Older versions downloaded the tooling into their own version folder. After <code>Update-Module</code>
+        the import banner points this out. Take the tooling over without downloading it again, then remove
+        the old versions &mdash; or simply run <code>Install-MSIXForceletsAllRequirements</code> to download it fresh.</p>
+      <pre><code><span class="c-cmd">Update-Module</span> MSIXForcelets
+<span class="c-cmd">Import-Module</span> MSIXForcelets <span class="c-arg">-Force</span>   <span class="c-cmt"># load the new version; the banner shows the hint</span>
+<span class="c-cmd">Copy-MSIXTooling</span>                     <span class="c-cmt"># no download; elevated for AllUsers</span>
+<span class="c-cmd">Import-Module</span> MSIXForcelets <span class="c-arg">-Force</span>   <span class="c-cmt"># activate the copied tooling</span>
+<span class="c-cmd">Get-InstalledModule</span> MSIXForcelets <span class="c-arg">-AllVersions</span> |
+    <span class="c-cmd">Where-Object</span> Version <span class="c-arg">-ne</span> (<span class="c-cmd">Get-Module</span> MSIXForcelets).Version |
+    <span class="c-cmd">Uninstall-Module</span></code></pre>
     </section>
   </main>
 

@@ -8,8 +8,8 @@
     package, downloads the .nupkg (which is a ZIP archive), and sorts all EXE and DLL files
     into the correct sub-folders, matching the same layout used by Update-MSIXTMPSF.
 
-    Files are placed under:
-        <module>\MSIXPSF\MicrosoftPSF\<version>\
+    Files are placed under (<tooling> = <module root>\Tooling, e.g. ...\Modules\MSIXForcelets\Tooling):
+        <tooling>\MSIXPSF\MicrosoftPSF\<version>\
             amd64\   <- x64-specific binaries
             win32\   <- x86-specific binaries
                      <- shared binaries (32/64 suffix pairs) and scripts
@@ -53,6 +53,8 @@
         [Switch] $Force,
         [System.Nullable[bool]] $CopyVCRuntime
     )
+
+    Assert-MSIXToolingWritable
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 

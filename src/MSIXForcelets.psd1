@@ -1,11 +1,11 @@
-#
+﻿#
 # Module manifest for module 'MSIXForcelets'
 # Andreas Nick
 #
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.5'
+    ModuleVersion        = '1.0.6'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -26,7 +26,9 @@
         'Add-MSIXFixGimp',
         'Add-MSIXFixLibreOffice',
         'Add-MSIXFixNotepadPlusPlus',
-        'Add-MSIXFIXSSMS',
+        'Add-MSIXFixSSMS',
+        'Add-MSIXFixSSMS22',
+        'Add-MSIXFixSumatraPDF',
         'Add-MSIXFixWinRAR',
         'Add-MSIXFixWinRARModernShell',
         'Add-MSIXFlexibleVirtualization',
@@ -51,6 +53,7 @@
         'Backup-MSIXManifest',
         'Close-MSIXPackage',
         'Convert-MSIXClassicContextMenuToVerbs',
+        'Copy-MSIXTooling',
         'Copy-ToMSIXPackage',
         'Find-MSIXFonts',
         'Get-MSIXFileTypeAssociation',
@@ -68,6 +71,7 @@
         'Get-MSIXPSFFrameworkPath',
         'Get-MSIXServices',
         'Get-MSIXVirtualProcess',
+        'Get-MSIXVirtualRegistryKeysAndValues',
         'Import-MSIXSparseShellExtension',
         'Invoke-MSIXCleanup',
         'New-MSIXAppInstallerConfiguration',
@@ -85,6 +89,8 @@
         'Remove-MSIXPSFFiles',
         'Remove-MSIXPSFMonitorFiles',
         'Remove-MSIXServices',
+        'Remove-MSIXVirtualRegistryKey',
+        'Remove-MSIXVirtualRegistryValue',
         'Repair-MSIXDesktop7Shortcut',
         'Set-MSIXActivePSFFramework',
         'Set-MSIXApplicationIcon',
@@ -95,6 +101,7 @@
         'Set-MSIXPackageVersion',
         'Set-MSIXPublisher',
         'Set-MSIXSignature',
+        'Set-MSIXVirtualRegistryKey',
         'Start-MSIXTracing',
         'Stop-MSIXTracing',
         'Test-MSIXManifest',
@@ -118,7 +125,7 @@
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
-            ReleaseNotes = 'v1.0.5 - PSF reliability fixes (config.json booleans, backslash path escaping) plus application-variant and configuration improvements. Renamed misspelled Add-MSXIXPSFShim -> Add-MSIXPSFShim and -MISXAppID -> -MSIXAppID (old names kept as aliases). Full changelog: https://msixforcelets.nick-it.de/changelog.html'
+            ReleaseNotes = 'v1.0.6 - Tooling now lives in the module root and survives Update-Module (Copy-MSIXTooling takes it over from an older version). Virtual registry cmdlets Get-/Set-/Remove-MSIXVirtualRegistry* are now public and reworked. New fixes Add-MSIXFixSumatraPDF and Add-MSIXFixSSMS22 (SSMS 21/22). Invoke-MSIXCleanup fixes for Windows PowerShell 5.1. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
         }
     }
 }

@@ -67,7 +67,7 @@ function Add-MSIXFixWinRARModernShell {
         [string] $Subject = '',
         [string] $Version = '',
 
-        [string] $HandlerLibsPath = (Join-Path $PSScriptRoot '..\Libs\Fixes\WinRarModernContextMenuReplacement'),
+        [string] $HandlerLibsPath = (Join-Path $Script:ScriptPath 'Libs\Fixes\WinRarModernContextMenuReplacement'),
 
         [switch] $Force,
         [switch] $KeepMSIXFolder

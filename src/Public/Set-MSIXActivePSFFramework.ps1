@@ -5,7 +5,7 @@ function Set-MSIXActivePSFFramework {
     Sets the active PSF (Package Support Framework) used by all PSF cmdlets.
 
     .DESCRIPTION
-    Discovers all PSF installations under the module MSIXPSF folder by searching for
+    Discovers all PSF installations under the MSIXPSF folder of the tooling location by searching for
     directories that contain PsfLauncher64.exe or PsfLauncher32.exe. Sets the module-scope
     variable $Script:PsfBasePath so that Add-MSIXPsfFrameworkFiles and related cmdlets
     automatically use the correct files.

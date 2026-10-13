@@ -62,7 +62,7 @@ $categories = [ordered]@{
         'Get-MSIXPackageVersion','Set-MSIXPackageVersion','Test-MSIXManifest','New-MSIXSelfSigningCert')
     'Pre-built application fixes' = @(
         'Add-MSIXFixAcrobatReaderDC','Add-MSIXFixGimp','Add-MSIXFixLibreOffice',
-        'Add-MSIXFixNotepadPlusPlus','Add-MSIXFixSSMS','Add-MSIXFixWinRAR','Add-MSIXFixWinRARModernShell')
+        'Add-MSIXFixNotepadPlusPlus','Add-MSIXFixSSMS','Add-MSIXFixSSMS22','Add-MSIXFixSumatraPDF','Add-MSIXFixWinRAR','Add-MSIXFixWinRARModernShell')
     'Package Support Framework (PSF)' = @(
         'Set-MSIXActivePSFFramework','Get-MSIXPSFFrameworkPath','Add-MSIXPsfFrameworkFiles',
         'Add-MSIXPSFShim','Add-MSIXPSFMFRFixup','Add-MSIXPSFRegLegacyFixup','Add-MSIXPSFDefaultRegLegacy',
@@ -79,7 +79,8 @@ $categories = [ordered]@{
     'Capabilities, virtualization &amp; registry' = @(
         'Add-MSIXCapabilities','Add-MSIXFlexibleVirtualization','Add-MSIXDisableWriteVirtualization',
         'Add-MSIXInstalledLocationVirtualization','Add-MSIXloaderSearchPathOverride','Add-MSIXRegAccessFix',
-        'Remove-MSIXPackageIntegrity','Add-MSIXFirewallRule','Add-MSIXSharedContainer','Add-MSIXSharedFonts')
+        'Remove-MSIXPackageIntegrity','Add-MSIXFirewallRule','Add-MSIXSharedContainer','Add-MSIXSharedFonts',
+        'Get-MSIXVirtualRegistryKeysAndValues','Set-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryValue')
     'Assets &amp; visual elements' = @(
         'New-MSIXAssetFrom','Set-MSIXApplicationVisualElements','Set-MSIXApplicationIcon')
     'App Attach &amp; deployment' = @(
@@ -89,7 +90,7 @@ $categories = [ordered]@{
         'Start-MSIXTracing','Stop-MSIXTracing','Wait-MSIXTracing','Get-MSIXVirtualProcess',
         'Get-MSIXAppMachineType','Get-MSIXAppExeDetailInfo','Get-AppXManifestInfo','Invoke-MSIXCleanup','Find-MSIXFonts')
     'Setup, tooling &amp; configuration' = @(
-        'Install-MSIXForceletsAllRequirements',
+        'Install-MSIXForceletsAllRequirements','Copy-MSIXTooling',
         'Update-MSIXTooling','Update-MSIXMicrosoftPSF','Update-MSIXTMPSF','Set-MSIXCore',
         'Get-MSIXForceletsConfiguration','Set-MSIXForceletsConfiguration')
 }
@@ -97,7 +98,7 @@ $categories = [ordered]@{
 # Descriptions for cmdlets whose comment-based .SYNOPSIS is empty.
 $overrides = @{
     'Add-MSIXFirewallRule'             = 'Adds a Windows Firewall rule (windows.firewallRules) for a packaged executable.'
-    'Add-MSIXFixSSMS'                  = 'Pre-built fix for SQL Server Management Studio (SSMS) MSIX packages.'
+    'Add-MSIXFixSSMS'                  = 'Pre-built fix for SQL Server Management Studio (SSMS) 20 and earlier MSIX packages.'
     'Add-MSIXPSFFileRedirectionFixup'  = 'Adds a FileRedirectionFixup entry (package-relative or known-folder paths) to the PSF config.'
     'Add-MSIXPSFPowerShellScript'      = 'Configures PSF start/end PowerShell scripts for a packaged application.'
     'Copy-ToMSIXPackage'               = 'Copies files into an expanded MSIX package at a package-root-relative path.'
@@ -122,14 +123,19 @@ foreach ($c in $cmds) {
 
 $publicDir = Join-Path $moduleRoot 'src\Public'
 function Get-SourceLink([string]$name) {
-    $file = "$name.ps1"
-    if (-not (Test-Path (Join-Path $publicDir $file))) {
-        $hit = Get-ChildItem $publicDir -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue |
+    # Cmdlets may live in sub-folders (e.g. Public\Fixes). Prefer the file named after the cmdlet,
+    # otherwise search for the function definition. The link keeps the file's real casing (GitHub
+    # paths are case-sensitive).
+    $hit = Get-ChildItem $publicDir -Filter "$name.ps1" -Recurse -File -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if (-not $hit) {
+        $hit = Get-ChildItem $publicDir -Filter *.ps1 -Recurse -File -ErrorAction SilentlyContinue |
             Where-Object { Select-String -Path $_.FullName -Pattern "function\s+$([regex]::Escape($name))\b" -Quiet } |
             Select-Object -First 1
-        if ($hit) { $file = $hit.Name }
     }
-    return "$RepoBase/blob/$Ref/src/Public/$file"
+    if ($hit) { $relative = $hit.FullName.Substring($publicDir.Length + 1) -replace '\\', '/' }
+    else      { $relative = "$name.ps1" }
+    return "$RepoBase/blob/$Ref/src/Public/$relative"
 }
 
 function HtmlEncode([string]$s) {

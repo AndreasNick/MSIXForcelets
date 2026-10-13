@@ -138,9 +138,13 @@ function Invoke-MSIXCleanup {
             }
         }
 
+        # In Windows PowerShell 5.1 -Filter also matches 8.3 short names ('Text.Logic' -> 'TEXT~1.LOG',
+        # 'x.bin.LOG1', 'page.tmpl' -> 'PAGE~1.TMP'), so every filtered search re-checks the real extension.
+
         # --- Remove debug symbols ---
         if ($RemoveDebugSymbols) {
-            $pdbFiles = Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.pdb' -Recurse -ErrorAction SilentlyContinue
+            $pdbFiles = @(Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.pdb' -Recurse -File -ErrorAction SilentlyContinue |
+                Where-Object Extension -eq '.pdb')
             foreach ($file in $pdbFiles) {
                 if ($PSCmdlet.ShouldProcess($file.FullName, 'Remove .pdb file')) {
                     Remove-Item $file.FullName -Force
@@ -164,7 +168,8 @@ function Invoke-MSIXCleanup {
                 }
             }
 
-            $tmpFiles = Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.tmp' -Recurse -ErrorAction SilentlyContinue
+            $tmpFiles = @(Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.tmp' -Recurse -File -ErrorAction SilentlyContinue |
+                Where-Object Extension -eq '.tmp')
             foreach ($file in $tmpFiles) {
                 if ($PSCmdlet.ShouldProcess($file.FullName, 'Remove .tmp file')) {
                     Remove-Item $file.FullName -Force
@@ -180,7 +185,8 @@ function Invoke-MSIXCleanup {
 
         # --- Remove log files ---
         if ($RemoveLogFiles) {
-            $logFiles = Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.log' -Recurse -ErrorAction SilentlyContinue
+            $logFiles = @(Get-ChildItem -Path $MSIXFolder.FullName -Filter '*.log' -Recurse -File -ErrorAction SilentlyContinue |
+                Where-Object Extension -eq '.log')
             foreach ($file in $logFiles) {
                 if ($PSCmdlet.ShouldProcess($file.FullName, 'Remove .log file')) {
                     Remove-Item $file.FullName -Force
@@ -194,19 +200,27 @@ function Invoke-MSIXCleanup {
             }
         }
 
-        # --- Remove empty directories (bottom-up pass) ---
+        # --- Remove empty directories ---
+        # Repeat while a pass removed something (a parent becomes empty once its children are gone).
+        # Stop as soon as a pass removes nothing: with -WhatIf nothing is ever deleted and a locked
+        # folder fails silently - both previously kept the loop running forever.
         if ($RemoveEmptyDirectories) {
             $removed = 0
             do {
-                $emptyDirs = Get-ChildItem -Path $MSIXFolder.FullName -Recurse -Directory -ErrorAction SilentlyContinue |
-                    Where-Object { (Get-ChildItem $_.FullName -Force -ErrorAction SilentlyContinue).Count -eq 0 }
+                $removedThisPass = 0
+                $emptyDirs = @(Get-ChildItem -Path $MSIXFolder.FullName -Recurse -Directory -ErrorAction SilentlyContinue |
+                    Where-Object { -not (Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue) } |
+                    Sort-Object { $_.FullName.Length } -Descending)
                 foreach ($dir in $emptyDirs) {
                     if ($PSCmdlet.ShouldProcess($dir.FullName, 'Remove empty directory')) {
-                        Remove-Item $dir.FullName -Force -ErrorAction SilentlyContinue
-                        $removed++
+                        Remove-Item -LiteralPath $dir.FullName -Force -ErrorAction SilentlyContinue
+                        if (-not (Test-Path -LiteralPath $dir.FullName)) {
+                            $removedThisPass++
+                        }
                     }
                 }
-            } while ($emptyDirs.Count -gt 0)
+                $removed += $removedThisPass
+            } while ($removedThisPass -gt 0)
 
             if ($removed -gt 0) {
                 Write-Verbose "Removed $removed empty director(ies)."

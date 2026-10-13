@@ -38,7 +38,67 @@
 
   <main>
     <section class="section">
-      <h2>v1.0.5 <span class="version-tag">latest</span></h2>
+      <h2>v1.0.6 <span class="version-tag">latest</span></h2>
+      <p class="muted">Tooling survives module updates, public virtual-registry cmdlets, cleanup fixes.</p>
+      <ul class="changelog">
+        <li>
+          <strong>Tooling survives <code>Update-Module</code></strong> &mdash; the downloaded tooling (PSF builds,
+          Windows SDK packaging tools, MSIX Core) now lives in a <code>Tooling</code> folder in the module root,
+          next to the version folders, instead of inside a version folder. The import banner points out tooling
+          left behind by an older version, and the new
+          <a href="cmdlets.html#copy-msixtooling">Copy-MSIXTooling</a> takes it over without downloading it
+          again. See <a href="quickstart.html#tooling">Where the tooling lives</a>.
+        </li>
+        <li>
+          <strong>Virtual registry cmdlets are public</strong> &mdash;
+          <a href="cmdlets.html#get-msixvirtualregistrykeysandvalues">Get-MSIXVirtualRegistryKeysAndValues</a>,
+          <a href="cmdlets.html#set-msixvirtualregistrykey">Set-MSIXVirtualRegistryKey</a>,
+          <a href="cmdlets.html#remove-msixvirtualregistrykey">Remove-MSIXVirtualRegistryKey</a> and
+          <a href="cmdlets.html#remove-msixvirtualregistryvalue">Remove-MSIXVirtualRegistryValue</a> read and
+          write the package hives (<code>User.dat</code> = HKCU, <code>Registry.dat</code> = HKLM) directly, so
+          app defaults can be set in your own scripts without writing an <code>Add-MSIXFix*</code> cmdlet.
+          The cmdlets were reworked on the way: a value larger than 4&nbsp;KB no longer hangs the reader in an
+          endless loop, DWord/QWord/Binary data comes back as numbers and bytes instead of garbled text, all
+          common value types (String, ExpandString, MultiString, DWord, QWord, Binary) are written correctly,
+          removals are idempotent, <code>-WhatIf</code> is supported, and errors name the Win32 cause.
+          Writing to the hives of a real package needs an elevated PowerShell.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#invoke-msixcleanup">Invoke-MSIXCleanup</a></strong> &mdash; on Windows
+          PowerShell&nbsp;5.1 the <code>.pdb</code>/<code>.tmp</code>/<code>.log</code> cleanup also matched
+          8.3 short names and could delete unrelated files (e.g. <code>X.Logic</code> &rarr;
+          <code>X4FD2~1.LOG</code>); only real extensions match now. Removing empty folders no longer loops
+          endlessly with <code>-WhatIf</code> or when a folder cannot be deleted.
+        </li>
+        <li>
+          <strong>New fix: <a href="cmdlets.html#add-msixfixsumatrapdf">Add-MSIXFixSumatraPDF</a></strong>
+          &mdash; excludes <code>%LOCALAPPDATA%\SumatraPDF</code> from write virtualization, so
+          <code>SumatraPDF-settings.txt</code> lives in the real LocalAppData and the external editor opened via
+          &ldquo;Advanced Options&rdquo; finds it (Windows&nbsp;10 build 20348+ / Windows&nbsp;11).
+        </li>
+        <li>
+          <strong>New fix: <a href="cmdlets.html#add-msixfixssms22">Add-MSIXFixSSMS22</a></strong> &mdash; fixes
+          &ldquo;Error opening the connection dialog &ndash; Element not found (0x80070490)&rdquo; in SSMS 21/22
+          packages by recreating the Visual Studio setup instance (<code>state.json</code>) the connection dialog
+          looks up. It also drops the packaging machine&rsquo;s NGEN images, the VS Installer payload, the captured
+          account stores, the captured services (VS Installer elevation and diagnostics collector; keep them with
+          <code>-NotRemoveServices</code>), the unused WindowsAppRuntime dependency and the .NETFramework machine keys,
+          and removes the Visual Studio Installer app and its Start menu entry.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#close-msixpackage">Close-MSIXPackage</a></strong> &mdash; the
+          &ldquo;No config.json.xml found&rdquo; warning now only appears when the package contains PSF launchers;
+          packages without PSF close quietly.
+        </li>
+        <li>
+          <strong>Source layout</strong> &mdash; the ready-made <code>Add-MSIXFix*</code> cmdlets now live
+          together in <code>src/Public/Fixes</code> (see <a href="build-your-own-fix.html">Build your own fix</a>).
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.5</h2>
       <p class="muted">PSF reliability fixes, application-variant and configuration improvements.</p>
       <ul class="changelog">
         <li>

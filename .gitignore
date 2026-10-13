@@ -10,8 +10,6 @@
 /Test
 /.vscode
 workspace.code-workspace
-CLAUDE.md
 Project.md
-.claude/
 Build-PublishPackage.ps1
 

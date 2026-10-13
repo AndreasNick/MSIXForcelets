@@ -1,10 +1,32 @@
 # root path
 $root = Split-Path -Parent -Path $MyInvocation.MyCommand.Path
-$Script:MSIXPackagingPath = "$PSScriptRoot\Libs\MSIXPackaging\WindowsSDK\11\10.0.22000.0\x64"
-$Script:MSIXPSFPath     = "$PSScriptRoot\MSIXPSF"
 $Script:MicrosoftPSFNuGetUrl = "https://api.nuget.org/v3-flatcontainer/microsoft.packagesupportframework"
-$Script:MSIXCorePath    = "$PSScriptRoot\Libs\MSIXCore"
 $Script:ScriptPath      = $PSScriptRoot
+
+# Downloaded tooling (PSF builds, Windows SDK packaging tools, MSIX Core) lives in the module root
+# next to the version folders (...\Modules\MSIXForcelets\Tooling): Update-Module does not force a
+# re-download, and every installation (AllUsers / CurrentUser) keeps its own tooling. First match wins:
+#   1. $env:MSIXFORCELETS_TOOLING                      explicit override
+#   2. the module folder, if it already holds tooling   development tree / installs up to 1.0.5
+#   3. module loaded from a version folder              -> <module root>\Tooling
+#   4. otherwise (source checkout, build stage folder)  -> %LOCALAPPDATA%\MSIXForceletsTooling
+$Script:ToolingFolders = @('MSIXPSF', 'Libs\MSIXPackaging', 'Libs\MSIXCore')
+$_moduleRoot = $PSScriptRoot
+if ($env:MSIXFORCELETS_TOOLING) {
+    $Script:ToolingPath = $env:MSIXFORCELETS_TOOLING
+}
+elseif ($Script:ToolingFolders | Where-Object { Test-Path (Join-Path $_moduleRoot $_) }) {
+    $Script:ToolingPath = $_moduleRoot
+}
+elseif ((Split-Path $_moduleRoot -Leaf) -as [version]) {
+    $Script:ToolingPath = Join-Path (Split-Path $_moduleRoot -Parent) 'Tooling'
+}
+else {
+    $Script:ToolingPath = Join-Path $env:LOCALAPPDATA 'MSIXForceletsTooling'
+}
+$Script:MSIXPackagingPath = Join-Path $Script:ToolingPath 'Libs\MSIXPackaging\WindowsSDK\11\10.0.22000.0\x64'
+$Script:MSIXPSFPath       = Join-Path $Script:ToolingPath 'MSIXPSF'
+$Script:MSIXCorePath      = Join-Path $Script:ToolingPath 'Libs\MSIXCore'
 
 # Module-wide configuration — use Set-MSIXForceletsConfiguration to change defaults
 $Script:MSIXForceletsConfig = [ordered]@{
@@ -333,8 +355,10 @@ Get-ChildItem "$($root)/Private/*.ps1" | Resolve-Path | ForEach-Object { . $_ }
 #List of existing Functions
 $sysfuncs = Get-ChildItem Function:
 
-# load public functions
-Get-ChildItem "$($root)/Public/*.ps1" | Resolve-Path | ForEach-Object { . $_ }
+# load public functions, including sub-folders such as Public\Fixes (the Add-MSIXFix* cmdlets).
+# The extension check guards against 8.3 short-name matches of -Filter in Windows PowerShell 5.1.
+Get-ChildItem -Path "$($root)/Public" -Filter '*.ps1' -Recurse -File |
+    Where-Object Extension -eq '.ps1' | ForEach-Object { . $_.FullName }
 
 # get functions from memory and compare to existing to find new functions added
 $funcs = Get-ChildItem Function: | Where-Object { $sysfuncs -notcontains $_ }
@@ -348,6 +372,14 @@ $VerbosePreference = $_savedVerbose
 
 # Collect all status and warning lines — printed at the end after verbose output has scrolled past
 $_summary = [System.Collections.Generic.List[object]]::new()
+$_summary.Add([PSCustomObject]@{ Text = "  Tooling  : $($Script:ToolingPath)"; Color = 'Green' })
+
+# After Update-Module the new version starts with an empty tooling folder, while the previous
+# version folder may still hold the downloaded tooling - detect that to point at Copy-MSIXTooling.
+$_legacyTooling = $null
+if (-not ($Script:ToolingFolders | Where-Object { Test-Path (Join-Path $Script:ToolingPath $_) })) {
+    $_legacyTooling = Get-MSIXLegacyToolingSource
+}
 
 # Set default PSF: prefer latest Tim Mangan release, fall back to Microsoft PSF
 $_psfActivated = $false
@@ -422,9 +454,22 @@ foreach ($_item in $_coreOut) {
     }
 }
 
-# If anything above is missing, point the user at the umbrella update cmdlet that
+# Tooling still sits in an older module version (typical right after Update-Module):
+# offer to take it over instead of downloading it again, then to remove the old versions.
+if ($_legacyTooling) {
+    $_elevated = ''
+    if ($Script:ToolingPath.StartsWith($env:ProgramFiles, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $_elevated = '  (elevated PowerShell)'
+    }
+    $_currentVersion = Split-Path $PSScriptRoot -Leaf
+    $_summary.Add([PSCustomObject]@{ Text = "  NOTE     : The tooling is still in the old module version $($_legacyTooling.Name). Either"; Color = 'Cyan' })
+    $_summary.Add([PSCustomObject]@{ Text = "             Copy-MSIXTooling                      take it over, no download$_elevated"; Color = 'Cyan' })
+    $_summary.Add([PSCustomObject]@{ Text = "             Install-MSIXForceletsAllRequirements  download it fresh$_elevated"; Color = 'Cyan' })
+    $_summary.Add([PSCustomObject]@{ Text = "             Then remove old versions: Get-InstalledModule MSIXForcelets -AllVersions | Where-Object Version -ne '$_currentVersion' | Uninstall-Module"; Color = 'Cyan' })
+}
+# Otherwise, if anything above is missing, point the user at the umbrella update cmdlet that
 # downloads / refreshes all required binaries (PSF + Tooling) in a single call.
-if (($_summary | Where-Object { $_.Color -eq 'Yellow' }).Count -gt 0) {
+elseif (($_summary | Where-Object { $_.Color -eq 'Yellow' }).Count -gt 0) {
     $_summary.Add([PSCustomObject]@{
         Text  = "  TIP      : Run Install-MSIXForceletsAllRequirements -Force to install/update ALL required binaries in one call (no prompts)."
         Color = 'Cyan'

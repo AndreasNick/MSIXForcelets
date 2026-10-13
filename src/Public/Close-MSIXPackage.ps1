@@ -87,7 +87,13 @@ function Close-MSIXPackage {
             if(Test-Path $configFile){
                 Convert-MSIXPSFXML2JSON -xml $configFile -xsl (Join-Path -path $Script:ScriptPath -ChildPath "Data\Format.xsl") -output (Join-Path $MSIXFolder -ChildPath "config.json")
             } else {
-                Write-Warning "No config.json.xml found. A config.json is not created."
+                # Packages without PSF have no config - only warn when PSF launchers are present.
+                $hasPsfLauncher = @(Get-ChildItem -Path $MSIXFolder.FullName -Filter '*PsfLauncher*.exe' -File -ErrorAction SilentlyContinue).Count -gt 0
+                if ($hasPsfLauncher -and -not (Test-Path (Join-Path $MSIXFolder -ChildPath "config.json"))) {
+                    Write-Warning "No config.json.xml found. A config.json is not created."
+                } else {
+                    Write-Verbose "No config.json.xml found - no PSF configuration to convert."
+                }
             }
             # Remove original PSF launcher stubs when renamed per-app copies exist.
             # Best practice renames PsfLauncher64/32.exe to <AppId>_PsfLauncherX.exe;

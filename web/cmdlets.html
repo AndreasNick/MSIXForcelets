@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cmdlet reference - MSIXForcelets (91 cmdlets)</title>
+  <title>Cmdlet reference - MSIXForcelets (98 cmdlets)</title>
   <meta name="description" content="Complete cmdlet reference for MSIXForcelets: open, repack, sign and fix MSIX packages, Package Support Framework, desktop7 shortcuts, virtual registry, capabilities and pre-built application fixes.">
   <link rel="canonical" href="https://msixforcelets.nick-it.de/cmdlets.html">
   <meta name="theme-color" content="#0d1117">
@@ -15,7 +15,7 @@
     <nav class="nav"><a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
       <div class="nav-links"><a href="quickstart.html">Quickstart</a><a href="build-your-own-fix.html">Build a fix</a><a href="cmdlets.html">Cmdlets</a><a href="about.html">About</a><a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a></div></nav>
     <div class="hero-content"><h1>Cmdlet reference</h1>
-    <p class="lead">91 cmdlets, grouped by task. Each links to its source on GitHub (ref <code>master</code>).</p></div>
+    <p class="lead">98 cmdlets, grouped by task. Each links to its source on GitHub (ref <code>master</code>).</p></div>
   </header>
   <main class="section">
   <nav class="toc">
@@ -70,25 +70,31 @@
   </div></section>
   <section class="cat"><h2 id="pre-built-application-fixes">Pre-built application fixes</h2><div class="grid">
     <article class="card cmd" id="add-msixfixacrobatreaderdc">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixAcrobatReaderDC.ps1" title="View source on GitHub">Add-MSIXFixAcrobatReaderDC</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixAcrobatReaderDC.ps1" title="View source on GitHub">Add-MSIXFixAcrobatReaderDC</a></h3>
       <p>Adds a fix for Acrobat Reader DC to an MSIX package.</p></article>
     <article class="card cmd" id="add-msixfixgimp">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixGimp.ps1" title="View source on GitHub">Add-MSIXFixGimp</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixGimp.ps1" title="View source on GitHub">Add-MSIXFixGimp</a></h3>
       <p>Adds a GIMP fix to an MSIX package.</p></article>
     <article class="card cmd" id="add-msixfixlibreoffice">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixLibreOffice.ps1" title="View source on GitHub">Add-MSIXFixLibreOffice</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixLibreOffice.ps1" title="View source on GitHub">Add-MSIXFixLibreOffice</a></h3>
       <p>Applies LibreOffice-specific fixes to an MSIX package.</p></article>
     <article class="card cmd" id="add-msixfixnotepadplusplus">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixNotepadPlusPlus.ps1" title="View source on GitHub">Add-MSIXFixNotepadPlusPlus</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixNotepadPlusPlus.ps1" title="View source on GitHub">Add-MSIXFixNotepadPlusPlus</a></h3>
       <p>Applies PSF and shell extension fixes to a Notepad++ MSIX package.</p></article>
     <article class="card cmd" id="add-msixfixssms">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixSSMS.ps1" title="View source on GitHub">Add-MSIXFixSSMS</a></h3>
-      <p>Pre-built fix for SQL Server Management Studio (SSMS) MSIX packages.</p></article>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixSSMS.ps1" title="View source on GitHub">Add-MSIXFixSSMS</a></h3>
+      <p>Pre-built fix for SQL Server Management Studio (SSMS) 20 and earlier MSIX packages.</p></article>
+    <article class="card cmd" id="add-msixfixssms22">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixSSMS22.ps1" title="View source on GitHub">Add-MSIXFixSSMS22</a></h3>
+      <p>Fixes "Error opening the connection dialog - Element not found (0x80070490)" in an SSMS 21/22 MSIX package.</p></article>
+    <article class="card cmd" id="add-msixfixsumatrapdf">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixSumatraPDF.ps1" title="View source on GitHub">Add-MSIXFixSumatraPDF</a></h3>
+      <p>Applies the SumatraPDF fix to an MSIX package: settings file in the real %LOCALAPPDATA%.</p></article>
     <article class="card cmd" id="add-msixfixwinrar">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixWinRAR.ps1" title="View source on GitHub">Add-MSIXFixWinRAR</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixWinRAR.ps1" title="View source on GitHub">Add-MSIXFixWinRAR</a></h3>
       <p>Injects the Package Support Framework into a WinRAR 64-bit MSIX package.</p></article>
     <article class="card cmd" id="add-msixfixwinrarmodernshell">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXFixWinRARModernShell.ps1" title="View source on GitHub">Add-MSIXFixWinRARModernShell</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Fixes/Add-MSIXFixWinRARModernShell.ps1" title="View source on GitHub">Add-MSIXFixWinRARModernShell</a></h3>
       <p>Replaces the WinRAR classic context menu with MsixModernContextMenuHandler for the Windows 11 modern context menu (top section, IExplorerCommand).</p></article>
   </div></section>
   <section class="cat"><h2 id="package-support-framework-psf">Package Support Framework (PSF)</h2><div class="grid">
@@ -121,7 +127,7 @@
       <p>Adds a FileRedirectionFixup entry (package-relative or known-folder paths) to the PSF config.</p></article>
     <article class="card cmd" id="add-msixpsfdynamiclibraryfixup">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFDynamicLibraryFixup.ps1" title="View source on GitHub">Add-MSIXPSFDynamicLibraryFixup</a></h3>
-      <p>Adds a DynamicLibraryFixup configuration entry for all package DLLs to config.json.xml.</p></article>
+      <p>Adds DynamicLibraryFixup entries to config.json.xml — all package DLLs (scan), or a single explicit DLL via -DllFile.</p></article>
     <article class="card cmd" id="add-msixpsfenvvarfixup">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFEnvVarFixup.ps1" title="View source on GitHub">Add-MSIXPSFEnvVarFixup</a></h3>
       <p>Adds an EnvVarFixup entry to an MSIX package PSF configuration.</p></article>
@@ -138,7 +144,7 @@
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXPSFPowerShellScript.ps1" title="View source on GitHub">Add-MSIXPSFPowerShellScript</a></h3>
       <p>Configures PSF start/end PowerShell scripts for a packaged application.</p></article>
     <article class="card cmd" id="remove-msixpsffiles">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPsfFiles.ps1" title="View source on GitHub">Remove-MSIXPsfFiles</a></h3>
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPSFFiles.ps1" title="View source on GitHub">Remove-MSIXPsfFiles</a></h3>
       <p>Removes MSIX PSF files.</p></article>
     <article class="card cmd" id="remove-msixpsfmonitorfiles">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXPSFMonitorFiles.ps1" title="View source on GitHub">Remove-MSIXPSFMonitorFiles</a></h3>
@@ -242,6 +248,18 @@
     <article class="card cmd" id="add-msixsharedfonts">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXSharedFonts.ps1" title="View source on GitHub">Add-MSIXSharedFonts</a></h3>
       <p>Adds found font files to the AppxManifest.xml under the uap7:SharedFonts section.</p></article>
+    <article class="card cmd" id="get-msixvirtualregistrykeysandvalues">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXVirtualRegistryKeysAndValues.ps1" title="View source on GitHub">Get-MSIXVirtualRegistryKeysAndValues</a></h3>
+      <p>Lists the values and subkeys of a key in an MSIX registry hive file (Registry.dat / User.dat).</p></article>
+    <article class="card cmd" id="set-msixvirtualregistrykey">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXVirtualRegistryKey.ps1" title="View source on GitHub">Set-MSIXVirtualRegistryKey</a></h3>
+      <p>Sets a value in an MSIX registry hive file (Registry.dat / User.dat) and creates the key if needed.</p></article>
+    <article class="card cmd" id="remove-msixvirtualregistrykey">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXVirtualRegistryKey.ps1" title="View source on GitHub">Remove-MSIXVirtualRegistryKey</a></h3>
+      <p>Removes a key from an MSIX registry hive file (Registry.dat / User.dat).</p></article>
+    <article class="card cmd" id="remove-msixvirtualregistryvalue">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Remove-MSIXVirtualRegistryValue.ps1" title="View source on GitHub">Remove-MSIXVirtualRegistryValue</a></h3>
+      <p>Removes a value from a key in an MSIX registry hive file (Registry.dat / User.dat).</p></article>
   </div></section>
   <section class="cat"><h2 id="assets-visual-elements">Assets &amp; visual elements</h2><div class="grid">
     <article class="card cmd" id="new-msixassetfrom">
@@ -304,6 +322,9 @@
     <article class="card cmd" id="install-msixforceletsallrequirements">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Install-MSIXForceletsAllRequirements.ps1" title="View source on GitHub">Install-MSIXForceletsAllRequirements</a></h3>
       <p>Installs (or updates) all external binaries needed by MSIXForcelets in one call: MSIX Core, Windows SDK Packaging Tools and Tim Mangan's PSF (optionally also the Microsoft PSF).</p></article>
+    <article class="card cmd" id="copy-msixtooling">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Copy-MSIXTooling.ps1" title="View source on GitHub">Copy-MSIXTooling</a></h3>
+      <p>Copies the downloaded tooling from an older module version into the module-root Tooling folder.</p></article>
     <article class="card cmd" id="update-msixtooling">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Update-MSIXTooling.ps1" title="View source on GitHub">Update-MSIXTooling</a></h3>
       <p>Downloads and installs the latest MSIX packaging tools.</p></article>

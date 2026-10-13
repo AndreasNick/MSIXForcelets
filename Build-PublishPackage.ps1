@@ -64,9 +64,10 @@ Write-Verbose ("Manifest OK: {0} v{1}" -f $manifest.Name, $manifest.Version) -Ve
 
 # --- 5. Import + export-count cross-check ----------------------------------------
 Import-Module $Out -Force
-$publicNames   = (Get-ChildItem (Join-Path $Src 'Public') -Filter *.ps1).BaseName
-$exportedNames = (Get-Command -Module $ModuleName).Name
-Write-Verbose ("Exported: {0}  /  Public/*.ps1: {1}" -f $exportedNames.Count, $publicNames.Count) -Verbose
+$publicNames   = (Get-ChildItem (Join-Path $Src 'Public') -Filter *.ps1 -Recurse -File |
+    Where-Object Extension -eq '.ps1').BaseName
+$exportedNames = (Get-Command -Module $ModuleName -CommandType Function).Name
+Write-Verbose ("Exported: {0}  /  Public\**\*.ps1: {1}" -f $exportedNames.Count, $publicNames.Count) -Verbose
 $notExported = @($publicNames | Where-Object { $_ -notin $exportedNames })
 if ($notExported.Count) {
     Write-Verbose "Public functions NOT in FunctionsToExport (intentional?):" -Verbose
@@ -91,15 +92,10 @@ if (-not $SkipAnalyzer) {
 }
 
 # --- 7. Done ---------------------------------------------------------------------
-# Unload the staged module so subsequent Update-* cmdlets in this session do not write
-# their downloads into the stage folder (Update-MSIXTMPSF / -MSIXTooling resolve their
-# target paths relative to the loaded module's $PSScriptRoot).
+# Unload the staged module so later commands in this session use the regular installation.
 Remove-Module $ModuleName -ErrorAction SilentlyContinue
 
 Write-Output ""
 Write-Output ("Staged package: {0}" -f $Out)
 Write-Output "Next step (manual, requires your NuGet API key from powershellgallery.com):"
 Write-Output ("  Publish-Module -Path '{0}' -NuGetApiKey '<your-key>'" -f $Out)
-Write-Output ""
-Write-Output "Note: to test Update-MSIXTMPSF / Update-MSIXTooling, Import-Module from src/ or"
-Write-Output "      the installed module path, NOT from this stage folder."

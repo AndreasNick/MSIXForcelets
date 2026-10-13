@@ -331,3 +331,16 @@ html.consent-locked, html.consent-locked body { overflow: hidden; }
   line-height: 1.55;
 }
 .changelog li strong a { color: var(--accent); }
+
+/* Simple data table, e.g. the tooling locations on the quickstart page. */
+.table-wrap { overflow-x: auto; margin: 0 0 1.4rem; }
+table.paths { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+table.paths th,
+table.paths td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+table.paths th { color: var(--muted); font-weight: 600; }
+table.paths code { overflow-wrap: anywhere; }
