@@ -193,7 +193,8 @@ function Close-MSIXPackage {
 
                 if (-not $keepFolder) {
                     Write-Verbose "Remove MSIX temp folder $MSIXFolder"
-                    Remove-Item $MSIXFolder -Recurse -Confirm:$false -ErrorAction SilentlyContinue
+                    # -Force: the hive logs (Registry.dat.LOG1/2) are hidden system files.
+                    Remove-Item $MSIXFolder -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
                     if (Test-Path $MSIXFolder) {
                         Write-Verbose "Force remove MSIX temp folder $MSIXFolder"
                         & Cmd.exe /C rmdir /S /Q "$MSIXFolder" 2>$null

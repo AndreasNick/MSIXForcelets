@@ -1,4 +1,4 @@
-# root path
+﻿# root path
 $root = Split-Path -Parent -Path $MyInvocation.MyCommand.Path
 $Script:MicrosoftPSFNuGetUrl = "https://api.nuget.org/v3-flatcontainer/microsoft.packagesupportframework"
 $Script:ScriptPath      = $PSScriptRoot
@@ -189,7 +189,8 @@ $Script:SystemKnownFolders = [ordered] @{
 
 $AppxManifestInfo = "Name, DisplayName, Publisher, ProcessorArchitecture, Version, Description, ConfigPath, UncompressedSize, MaxfileSize, MaxfilePath, FileCount, Applications"
 $AppxManifestInfo = @($AppxManifestInfo.replace("`n", "").replace("`r", "").replace(" ", "").split(',') )
-Remove-TypeData -TypeName 'AppxManifestInfo' -ea SilentlyContinue
+# Check first: Remove-TypeData -ErrorAction SilentlyContinue would still add an entry to $Error.
+if (Get-TypeData -TypeName 'AppxManifestInfo') { Remove-TypeData -TypeName 'AppxManifestInfo' }
 
 $AppxManifestConfig = @{
   MemberType = 'NoteProperty'
@@ -398,7 +399,7 @@ if (Test-Path $_tmRoot) {
 }
 
 if ($_tmReleases.Count -gt 0) {
-    $_latest = ($_tmReleases | Sort-Object Name -Descending)[0]
+    $_latest = ($_tmReleases | Sort-Object { Get-MSIXPSFReleaseVersion $_.Name }, Name -Descending)[0]
     $Script:PSFVersion  = "TimManganPSF\$($_latest.Name)"
     $Script:PsfBasePath = $_latest.FullName
     $_psfActivated = $true
@@ -417,7 +418,7 @@ if (-not $_psfActivated) {
         }
     }
     if ($_msReleases.Count -gt 0) {
-        $_latest = ($_msReleases | Sort-Object Name -Descending)[0]
+        $_latest = ($_msReleases | Sort-Object { Get-MSIXPSFReleaseVersion $_.Name }, Name -Descending)[0]
         $Script:PSFVersion  = "MicrosoftPSF\$($_latest.Name)"
         $Script:PsfBasePath = $_latest.FullName
         $_psfActivated = $true
@@ -433,10 +434,11 @@ if (-not $_psfActivated) {
 # Set up Windows SDK Packaging Tools aliases (makeappx, signtool)
 $_makeappx = Join-Path $Script:MSIXPackagingPath 'makeappx.exe'
 if (Test-Path $_makeappx) {
-    if (-not (Get-Alias makeappx -ErrorAction SilentlyContinue)) {
+    # Test-Path instead of Get-Alias -ErrorAction SilentlyContinue, which still records an error in $Error.
+    if (-not (Test-Path Alias:makeappx)) {
         New-Alias -Name makeappx -Value $_makeappx -Scope Global
     }
-    if (-not (Get-Alias signtool -ErrorAction SilentlyContinue)) {
+    if (-not (Test-Path Alias:signtool)) {
         New-Alias -Name signtool -Value (Join-Path $Script:MSIXPackagingPath 'signtool.exe') -Scope Global
     }
     $_summary.Add([PSCustomObject]@{ Text = "  Packaging : $($Script:MSIXPackagingPath)"; Color = 'Green' })

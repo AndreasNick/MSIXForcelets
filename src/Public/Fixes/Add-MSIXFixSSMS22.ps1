@@ -136,14 +136,16 @@
 
             # VS Setup instance (state.json)
             $vsPackages  = Join-Path $root 'VFS\Local AppData\Microsoft\VisualStudio\Packages'
-            $instanceDir = Get-ChildItem -LiteralPath (Join-Path $vsPackages '_Instances') -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-            $channelDir  = Get-ChildItem -LiteralPath (Join-Path $vsPackages '_Channels') -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+            # @(...)[0] instead of Select-Object -First 1: on Windows PowerShell 5.1 that reports a
+            # StopUpstreamCommandsException to a caller's -ErrorVariable.
+            $instanceDir = @(Get-ChildItem -LiteralPath (Join-Path $vsPackages '_Instances') -Directory -ErrorAction SilentlyContinue)[0]
+            $channelDir  = @(Get-ChildItem -LiteralPath (Join-Path $vsPackages '_Channels') -Directory -ErrorAction SilentlyContinue)[0]
             if ($null -eq $instanceDir -or $null -eq $channelDir) {
                 throw "No captured VS setup instance/channel found under $vsPackages"
             }
 
             $channelManifest = Get-Content -LiteralPath (Join-Path $channelDir.FullName 'channelManifest.json') -Raw | ConvertFrom-Json
-            $product         = $channelManifest.channelItems | Where-Object { $_.type -eq 'ChannelProduct' } | Select-Object -First 1
+            $product         = @($channelManifest.channelItems | Where-Object { $_.type -eq 'ChannelProduct' })[0]
 
             # Only catalog.info is needed: a flat object at the start of the ~18 MB catalog.json.
             # Read the first 64 KB instead of parsing the whole file; fall back to a full parse.

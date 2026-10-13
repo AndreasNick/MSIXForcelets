@@ -106,7 +106,7 @@
                         Copy-Item -Path (Join-Path $tempExtract "*") -Destination $msixCoreDir -Recurse -Force
                         Set-Content -Path $versionFile -Value $latestTag -Encoding UTF8
                         Write-Host "MSIX Core $latestTag installed to $msixCoreDir" -ForegroundColor Green
-                        if (Get-Alias msixmgr -ErrorAction SilentlyContinue) {
+                        if (Test-Path Alias:msixmgr) {
                             Remove-Item -Path Alias:msixmgr -Force
                         }
                         New-Alias -Name msixmgr -Value $msixmgrPath -Scope Script
@@ -204,8 +204,8 @@
                         # Refresh aliases for the current session
                         $makeappxExe = Join-Path $Script:MSIXPackagingPath 'makeappx.exe'
                         if (Test-Path $makeappxExe) {
-                            if (Get-Alias makeappx -ErrorAction SilentlyContinue) { Remove-Item Alias:makeappx -Force }
-                            if (Get-Alias signtool -ErrorAction SilentlyContinue) { Remove-Item Alias:signtool -Force }
+                            if (Test-Path Alias:makeappx) { Remove-Item Alias:makeappx -Force }
+                            if (Test-Path Alias:signtool) { Remove-Item Alias:signtool -Force }
                             New-Alias -Name makeappx -Value $makeappxExe -Scope Global
                             New-Alias -Name signtool -Value (Join-Path $Script:MSIXPackagingPath 'signtool.exe') -Scope Global
                         }

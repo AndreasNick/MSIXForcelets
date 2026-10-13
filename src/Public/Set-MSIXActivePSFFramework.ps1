@@ -140,7 +140,7 @@ function Set-MSIXActivePSFFramework {
     if ($null -eq $selected) {
         $selected = $discovered |
             Where-Object { $_.Name -like ($Framework + '\*') -and $_.Name -notlike '*debug*' } |
-            Sort-Object Name -Descending | Select-Object -First 1
+            Sort-Object { Get-MSIXPSFReleaseVersion $_.Name }, Name -Descending | Select-Object -First 1
         if ($null -ne $selected) {
             Write-Verbose "Resolved '$Framework' to latest release '$($selected.Name)'."
         }

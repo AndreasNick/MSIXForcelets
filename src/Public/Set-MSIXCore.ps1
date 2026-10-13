@@ -27,7 +27,7 @@ function Set-MSIXCore {
         return
     }
 
-    if (-not (Get-Alias msixmgr -ErrorAction SilentlyContinue)) {
+    if (-not (Test-Path Alias:msixmgr)) {
         New-Alias -Name msixmgr -Value $Script:MSIXMgrPath -Scope Script
     }
 

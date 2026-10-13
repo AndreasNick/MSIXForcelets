@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.6'
+    ModuleVersion        = '1.0.7'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -71,7 +71,7 @@
         'Get-MSIXPSFFrameworkPath',
         'Get-MSIXServices',
         'Get-MSIXVirtualProcess',
-        'Get-MSIXVirtualRegistryKeysAndValues',
+        'Get-MSIXVirtualRegistryKey',
         'Import-MSIXSparseShellExtension',
         'Invoke-MSIXCleanup',
         'New-MSIXAppInstallerConfiguration',
@@ -118,14 +118,11 @@
 
     PrivateData = @{
         PSData = @{
-            Tags         = @('MSIX', 'AppX', 'PSF', 'PackageSupportFramework', 'Packaging',
-                             'WindowsApps', 'MSIXPackagingTool', 'CodeSigning', 'Signing',
-                             'Manifest', 'AppAttach', 'AVD', 'AzureVirtualDesktop',
-                             'Repackaging', 'desktop7', 'AppV')
+            Tags         = @('MSIX', 'AppX', 'PSF', 'PackageSupportFramework', 'Packaging', 'Repackaging')
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
-            ReleaseNotes = 'v1.0.6 - Tooling now lives in the module root and survives Update-Module (Copy-MSIXTooling takes it over from an older version). Virtual registry cmdlets Get-/Set-/Remove-MSIXVirtualRegistry* are now public and reworked. New fixes Add-MSIXFixSumatraPDF and Add-MSIXFixSSMS22 (SSMS 21/22). Invoke-MSIXCleanup fixes for Windows PowerShell 5.1. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
+            ReleaseNotes = 'v1.0.7 - Includes all v1.0.6 changes (tooling in the module root, public virtual-registry cmdlets, new SSMS 21/22 and SumatraPDF fixes, Invoke-MSIXCleanup fixes). New in v1.0.7: Windows PowerShell 5.1 selects the newest PSF release by version, Get-MSIXVirtualRegistryKeysAndValues renamed to Get-MSIXVirtualRegistryKey, clean error stream after import. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
         }
     }
 }

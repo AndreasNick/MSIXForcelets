@@ -29,7 +29,7 @@
     "name": "MSIXForcelets",
     "description": "PowerShell framework to open, repack, sign and fix MSIX packages with ready-made application fixes.",
     "codeRepository": "https://github.com/AndreasNick/MSIXForcelets",
-    "softwareVersion": "1.0.6",
+    "softwareVersion": "1.0.7",
     "programmingLanguage": "PowerShell",
     "operatingSystem": "Windows",
     "author": { "@type": "Person", "name": "Andreas Nick", "url": "https://www.nick-it.de" }
@@ -50,7 +50,7 @@
     </nav>
 
     <div class="hero-content">
-      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.6</a></p>
+      <p class="eyebrow">PowerShell &bull; MSIX packaging framework &bull; <a class="version-pill" href="#whats-new">v1.0.7</a></p>
       <h1>Automate your <span class="accent">MSIX</span> &amp; PSF fixes</h1>
       <p class="lead">
         MSIXForcelets started out to automate Package Support Framework and MSIX fixes &mdash; and to
@@ -93,8 +93,14 @@
     </section>
 
     <section id="whats-new" class="section">
-      <h2>What&rsquo;s new <span class="version-tag">v1.0.6</span></h2>
+      <h2>What&rsquo;s new <span class="version-tag">v1.0.7</span></h2>
       <ul class="changelog">
+        <li>
+          <strong>Reliability fixes</strong> &mdash; Windows PowerShell&nbsp;5.1 now also picks the newest
+          Tim&nbsp;Mangan PSF release by default, <code>Import-Module</code> leaves a clean <code>$Error</code>,
+          and <a href="cmdlets.html#get-msixvirtualregistrykey">Get-MSIXVirtualRegistryKey</a> got its final name.
+          v1.0.7 is the first Gallery release with all v1.0.6 changes below.
+        </li>
         <li>
           <strong>Tooling survives <code>Update-Module</code></strong> &mdash; the tooling now lives in the
           module root; <a href="cmdlets.html#copy-msixtooling">Copy-MSIXTooling</a> takes it over from an older

@@ -38,7 +38,41 @@
 
   <main>
     <section class="section">
-      <h2>v1.0.6 <span class="version-tag">latest</span></h2>
+      <h2>v1.0.7 <span class="version-tag">latest</span></h2>
+      <p class="muted">Reliability fixes on top of v1.0.6 &mdash; and the first PowerShell Gallery release that
+        contains the v1.0.6 changes.</p>
+      <ul class="changelog">
+        <li>
+          <strong>PSF default selection on Windows PowerShell&nbsp;5.1</strong> &mdash; the module import and
+          <a href="cmdlets.html#set-msixactivepsfframework">Set-MSIXActivePSFFramework</a>
+          <code>-Framework TimManganPSF</code> now pick the newest release by version. The release folders use
+          different tag formats (<code>2026-2-22</code>, <code>2026.05.01</code>); they were compared as text,
+          and Windows PowerShell&nbsp;5.1 picked an older release than PowerShell&nbsp;7.
+        </li>
+        <li>
+          <strong>Renamed</strong> <code>Get-MSIXVirtualRegistryKeysAndValues</code> (v1.0.6) to
+          <a href="cmdlets.html#get-msixvirtualregistrykey">Get-MSIXVirtualRegistryKey</a>, in line with
+          Set-/Remove-MSIXVirtualRegistryKey.
+        </li>
+        <li>
+          <strong>Clean error stream</strong> &mdash; <code>Import-Module</code> no longer leaves entries in
+          <code>$Error</code>, <a href="cmdlets.html#close-msixpackage">Close-MSIXPackage</a> removes the temporary
+          folder including the hidden hive logs, and
+          <a href="cmdlets.html#add-msixfixssms22">Add-MSIXFixSSMS22</a> no longer reports a
+          <code>StopUpstreamCommandsException</code> on Windows PowerShell&nbsp;5.1.
+        </li>
+        <li>
+          <strong>PowerShell Gallery tags</strong> &mdash; trimmed to the essentials: MSIX, AppX, PSF,
+          PackageSupportFramework, Packaging, Repackaging.
+        </li>
+        <li>
+          <strong>Cmdlet reference</strong> &mdash; lists exactly the exported cmdlets.
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.6</h2>
       <p class="muted">Tooling survives module updates, public virtual-registry cmdlets, cleanup fixes.</p>
       <ul class="changelog">
         <li>
@@ -51,7 +85,7 @@
         </li>
         <li>
           <strong>Virtual registry cmdlets are public</strong> &mdash;
-          <a href="cmdlets.html#get-msixvirtualregistrykeysandvalues">Get-MSIXVirtualRegistryKeysAndValues</a>,
+          <code>Get-MSIXVirtualRegistryKeysAndValues</code> (renamed to Get-MSIXVirtualRegistryKey in v1.0.7),
           <a href="cmdlets.html#set-msixvirtualregistrykey">Set-MSIXVirtualRegistryKey</a>,
           <a href="cmdlets.html#remove-msixvirtualregistrykey">Remove-MSIXVirtualRegistryKey</a> and
           <a href="cmdlets.html#remove-msixvirtualregistryvalue">Remove-MSIXVirtualRegistryValue</a> read and

@@ -1,4 +1,4 @@
-﻿function Get-MSIXVirtualRegistryKeysAndValues {
+﻿function Get-MSIXVirtualRegistryKey {
 <#
 .SYNOPSIS
     Lists the values and subkeys of a key in an MSIX registry hive file (Registry.dat / User.dat).
@@ -12,7 +12,7 @@
     anything else -> byte[].
 
 .EXAMPLE
-    Get-MSIXVirtualRegistryKeysAndValues -HiveFilePath "$pkg\Registry.dat" -KeyPath 'REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown'
+    Get-MSIXVirtualRegistryKey -HiveFilePath "$pkg\Registry.dat" -KeyPath 'REGISTRY\MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown'
 
 .NOTES
     RegLoadAppKey works on the hive file directly (no reg load). Reading needs no administrative

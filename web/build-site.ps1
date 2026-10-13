@@ -52,7 +52,8 @@ if ($Ref -ne 'master') {
 }
 
 $moduleRoot = Split-Path $PSScriptRoot -Parent
-Import-Module (Join-Path $moduleRoot 'src\MSIXForcelets.psm1') -Force *> $null
+# Load via the manifest so the page lists exactly the cmdlets in FunctionsToExport.
+Import-Module (Join-Path $moduleRoot 'src\MSIXForcelets.psd1') -Force *> $null
 
 # --- Category map (display order). Unmapped cmdlets fall into 'Other'. --------
 $categories = [ordered]@{
@@ -80,10 +81,11 @@ $categories = [ordered]@{
         'Add-MSIXCapabilities','Add-MSIXFlexibleVirtualization','Add-MSIXDisableWriteVirtualization',
         'Add-MSIXInstalledLocationVirtualization','Add-MSIXloaderSearchPathOverride','Add-MSIXRegAccessFix',
         'Remove-MSIXPackageIntegrity','Add-MSIXFirewallRule','Add-MSIXSharedContainer','Add-MSIXSharedFonts',
-        'Get-MSIXVirtualRegistryKeysAndValues','Set-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryValue')
+        'Get-MSIXVirtualRegistryKey','Set-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryKey','Remove-MSIXVirtualRegistryValue')
     'Assets &amp; visual elements' = @(
         'New-MSIXAssetFrom','Set-MSIXApplicationVisualElements','Set-MSIXApplicationIcon')
-    'App Attach &amp; deployment' = @(
+    # The App Attach cmdlets are not exported yet; they show up here once they are.
+    'Deployment' = @(
         'New-MSIXAppAttachImage','New-MSIXDynamicAppAttachDisk','Invoke-MSIXCreateImage',
         'New-MSIXAppInstallerConfiguration','New-MSIXPortalPage')
     'Diagnostics &amp; inspection' = @(

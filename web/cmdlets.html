@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cmdlet reference - MSIXForcelets (98 cmdlets)</title>
+  <title>Cmdlet reference - MSIXForcelets (95 cmdlets)</title>
   <meta name="description" content="Complete cmdlet reference for MSIXForcelets: open, repack, sign and fix MSIX packages, Package Support Framework, desktop7 shortcuts, virtual registry, capabilities and pre-built application fixes.">
   <link rel="canonical" href="https://msixforcelets.nick-it.de/cmdlets.html">
   <meta name="theme-color" content="#0d1117">
@@ -15,7 +15,7 @@
     <nav class="nav"><a class="brand" href="index.html">MSIX<span class="accent">Forcelets</span></a>
       <div class="nav-links"><a href="quickstart.html">Quickstart</a><a href="build-your-own-fix.html">Build a fix</a><a href="cmdlets.html">Cmdlets</a><a href="about.html">About</a><a href="https://github.com/AndreasNick/MSIXForcelets">GitHub</a></div></nav>
     <div class="hero-content"><h1>Cmdlet reference</h1>
-    <p class="lead">98 cmdlets, grouped by task. Each links to its source on GitHub (ref <code>master</code>).</p></div>
+    <p class="lead">95 cmdlets, grouped by task. Each links to its source on GitHub (ref <code>master</code>).</p></div>
   </header>
   <main class="section">
   <nav class="toc">
@@ -26,7 +26,7 @@
     <a href="#shortcuts-shell-context-menus">Shortcuts, shell &amp; context menus</a>
     <a href="#capabilities-virtualization-registry">Capabilities, virtualization &amp; registry</a>
     <a href="#assets-visual-elements">Assets &amp; visual elements</a>
-    <a href="#app-attach-deployment">App Attach &amp; deployment</a>
+    <a href="#deployment">Deployment</a>
     <a href="#diagnostics-inspection">Diagnostics &amp; inspection</a>
     <a href="#setup-tooling-configuration">Setup, tooling &amp; configuration</a>
   </nav>
@@ -248,8 +248,8 @@
     <article class="card cmd" id="add-msixsharedfonts">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Add-MSIXSharedFonts.ps1" title="View source on GitHub">Add-MSIXSharedFonts</a></h3>
       <p>Adds found font files to the AppxManifest.xml under the uap7:SharedFonts section.</p></article>
-    <article class="card cmd" id="get-msixvirtualregistrykeysandvalues">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXVirtualRegistryKeysAndValues.ps1" title="View source on GitHub">Get-MSIXVirtualRegistryKeysAndValues</a></h3>
+    <article class="card cmd" id="get-msixvirtualregistrykey">
+      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Get-MSIXVirtualRegistryKey.ps1" title="View source on GitHub">Get-MSIXVirtualRegistryKey</a></h3>
       <p>Lists the values and subkeys of a key in an MSIX registry hive file (Registry.dat / User.dat).</p></article>
     <article class="card cmd" id="set-msixvirtualregistrykey">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXVirtualRegistryKey.ps1" title="View source on GitHub">Set-MSIXVirtualRegistryKey</a></h3>
@@ -272,16 +272,7 @@
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/Set-MSIXApplicationIcon.ps1" title="View source on GitHub">Set-MSIXApplicationIcon</a></h3>
       <p>Regenerates an application's icon assets (incl. unplated target sizes) and wires them in.</p></article>
   </div></section>
-  <section class="cat"><h2 id="app-attach-deployment">App Attach &amp; deployment</h2><div class="grid">
-    <article class="card cmd" id="new-msixappattachimage">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppAttachImage.ps1" title="View source on GitHub">New-MSIXAppAttachImage</a></h3>
-      <p>Unpacks an MSIX package into a VHD, VHDX or CIM App Attach image.</p></article>
-    <article class="card cmd" id="new-msixdynamicappattachdisk">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXDynamicAppAttachDisk.ps1" title="View source on GitHub">New-MSIXDynamicAppAttachDisk</a></h3>
-      <p>Creates an empty, formatted, dynamic VHD or VHDX disk image for App Attach.</p></article>
-    <article class="card cmd" id="invoke-msixcreateimage">
-      <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppAttachImage.ps1" title="View source on GitHub">Invoke-MSIXCreateImage</a></h3>
-      <p>Creates an App Attach image (VHD/VHDX/CIM) from an MSIX via msixmgr.</p></article>
+  <section class="cat"><h2 id="deployment">Deployment</h2><div class="grid">
     <article class="card cmd" id="new-msixappinstallerconfiguration">
       <h3><a href="https://github.com/AndreasNick/MSIXForcelets/blob/master/src/Public/New-MSIXAppInstallerConfiguration.ps1" title="View source on GitHub">New-MSIXAppInstallerConfiguration</a></h3>
       <p>Generates an .appinstaller configuration for auto-update deployment.</p></article>

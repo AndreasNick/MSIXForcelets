@@ -63,7 +63,7 @@ CurrentUser) keeps its own tooling:
 ```
 C:\Program Files\WindowsPowerShell\Modules\MSIXForcelets\
     1.0.5\
-    1.0.6\
+    1.0.7\
     Tooling\        <- MSIXPSF\, Libs\MSIXPackaging\, Libs\MSIXCore\
 ```
 
