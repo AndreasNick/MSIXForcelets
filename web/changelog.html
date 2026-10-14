@@ -68,6 +68,13 @@
         <li>
           <strong>Cmdlet reference</strong> &mdash; lists exactly the exported cmdlets.
         </li>
+        <li>
+          <strong>VC++ runtime without installation</strong> &mdash; the PSF fixups need
+          <code>msvcp140.dll</code> / <code>vcruntime140.dll</code> in the package, and Tim Mangan&rsquo;s PSF does
+          not ship them. The new script <code>Tools\Export-VCRuntimeForPSF.ps1</code> collects them on a machine
+          that has the VC++ Redistributable, in the PSF folder layout (<code>amd64\</code>, <code>win32\</code>), so a
+          packaging machine does not need the redistributable installed.
+        </li>
       </ul>
     </section>
 
