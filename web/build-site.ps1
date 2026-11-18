@@ -90,7 +90,7 @@ $categories = [ordered]@{
         'New-MSIXAppInstallerConfiguration','New-MSIXPortalPage')
     'Diagnostics &amp; inspection' = @(
         'Start-MSIXTracing','Stop-MSIXTracing','Wait-MSIXTracing','Get-MSIXVirtualProcess',
-        'Get-MSIXAppMachineType','Get-MSIXAppExeDetailInfo','Get-AppXManifestInfo','Invoke-MSIXCleanup','Find-MSIXFonts')
+        'Get-MSIXAppMachineType','Get-MSIXAppExeDetailInfo','Get-AppXManifestInfo','Invoke-MSIXCleanup','Find-MSIXFonts','Find-MSIXPackageIssue')
     'Setup, tooling &amp; configuration' = @(
         'Install-MSIXForceletsAllRequirements','Copy-MSIXTooling',
         'Update-MSIXTooling','Update-MSIXMicrosoftPSF','Update-MSIXTMPSF','Set-MSIXCore',

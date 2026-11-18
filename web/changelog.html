@@ -38,7 +38,54 @@
 
   <main>
     <section class="section">
-      <h2>v1.0.7 <span class="version-tag">latest</span></h2>
+      <h2>v1.0.8 <span class="version-tag">latest</span></h2>
+      <p class="muted">Package analysis, correct PSF <code>config.json</code> for special characters and
+        environment variables, clearer messages when the tooling is missing.</p>
+      <ul class="changelog">
+        <li>
+          <strong>Package analysis</strong> &mdash; the new
+          <a href="cmdlets.html#find-msixpackageissue">Find-MSIXPackageIssue</a> analyses an expanded package
+          (files, <code>AppxManifest.xml</code>, registry hives) without changing it and returns one object per
+          likely problem, each with the Forcelets command that addresses it. With <code>-FixScriptPath</code> it
+          writes a fix script: steps that can be applied automatically are active, everything that needs a
+          decision is commented out. A known application gets its <code>Add-MSIXFix*</code> cmdlet instead of
+          the generic steps.
+        </li>
+        <li>
+          <strong>EnvVarFixup works</strong> &mdash; variables added with
+          <a href="cmdlets.html#add-msixpsfenvvarfixup">Add-MSIXPSFEnvVarFixup</a> had no effect at runtime:
+          the generated <code>config.json</code> used the key <code>envVariables</code>, the PSF reads
+          <code>envVars</code> and needs <code>useregistry</code> on every entry. Both are written now; the new
+          switch <code>-UseRegistry</code> sets <code>useregistry</code> to <code>true</code>.
+        </li>
+        <li>
+          <strong>Quotes and special characters in PSF values</strong> &mdash; a double quote in a value, e.g.
+          <a href="cmdlets.html#add-msixpsfshim">Add-MSIXPSFShim</a> <code>-Arguments '"%1"'</code>, made
+          <a href="cmdlets.html#close-msixpackage">Close-MSIXPackage</a> fail with a JSON conversion error, and
+          <code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code> ended up as XML entities in
+          <code>config.json</code>. <code>config.json.xml</code> now holds plain values and the JSON escaping
+          happens in one place when the package is closed. Patterns and paths passed with JSON-style double
+          backslashes (<code>'.*\\.txt'</code>) give the same result as before.
+        </li>
+        <li>
+          <strong>Missing tooling is reported clearly</strong> &mdash; <code>Import-Module</code> raises a real
+          warning when the tooling is incomplete (the banner alone is easily missed in logs and scheduled
+          tasks), and <a href="cmdlets.html#open-msixpackage">Open-MSIXPackage</a> /
+          <a href="cmdlets.html#close-msixpackage">Close-MSIXPackage</a> name the missing
+          <code>makeappx.exe</code> and point to
+          <a href="cmdlets.html#install-msixforceletsallrequirements">Install-MSIXForceletsAllRequirements</a>
+          instead of failing with &ldquo;not recognized as the name of a cmdlet&rdquo;.
+        </li>
+        <li>
+          <strong><a href="cmdlets.html#set-msixsignature">Set-MSIXSignature</a></strong> &mdash;
+          <code>-Certumfix</code> is obsolete and has no effect any more; Certum tokens sign with the standard
+          thumbprint path. Existing scripts that pass the switch keep working and get a warning.
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>v1.0.7</h2>
       <p class="muted">Reliability fixes on top of v1.0.6 &mdash; and the first PowerShell Gallery release that
         contains the v1.0.6 changes.</p>
       <ul class="changelog">
