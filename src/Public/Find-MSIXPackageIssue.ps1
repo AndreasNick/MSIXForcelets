@@ -10,6 +10,8 @@
     Export-Clixml or ConvertTo-Json to store them. With -FixScriptPath a fix script is written: AutoFix
     commands are active, everything that needs a decision is commented out. When a known application
     is detected, the script runs its Add-MSIXFix* function instead of the generic steps.
+    InstalledLocationVirtualization is always proposed; the PSF only when a rule finds a reason for it,
+    or with -ForcePSF (launcher, MFRFixup and RegLegacy defaults for every application).
     Commands refer to the package folder as $Package.
 
 .EXAMPLE
@@ -21,7 +23,10 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
         [System.IO.DirectoryInfo] $MSIXFolder,
 
-        [string] $FixScriptPath
+        [string] $FixScriptPath,
+
+        # Adds the PSF with MFRFixup and RegLegacy defaults even when no rule asks for it.
+        [switch] $ForcePSF
     )
 
     begin {
@@ -349,8 +354,11 @@
                 @{ Pattern = '^SumatraPDF\.exe$'; Fix = 'Add-MSIXFixSumatraPDF'; App = 'SumatraPDF'; Note = '' },
                 @{ Pattern = '^Ssms\.exe$'; Fix = 'SSMS'; App = 'SQL Server Management Studio'; Note = '' }
             )
+            # Only next to a manifest application: a bundled copy deeper in the package (e.g. the SumatraPDF
+            # viewer inside RStudio) does not make the package that application.
+            $appFolders = @($apps | ForEach-Object { Split-Path $_.Executable -Parent } | Select-Object -Unique)
             foreach ($k in $known) {
-                $hit = @($files | Where-Object { $_.Name -match $k.Pattern }) | Select-Object -First 1
+                $hit = @($files | Where-Object { $_.Name -match $k.Pattern -and $appFolders -contains (Split-Path $_.Path -Parent) }) | Select-Object -First 1
                 if (-not $hit) { continue }
                 $fix = $k.Fix
                 if ($fix -eq 'SSMS') {
@@ -563,6 +571,9 @@
                             if ($p[1] -in 'x86', 'x64') { Get-RuntimeCopyCommand -Dll $p[0] -Arch $p[1] }
                             else { "# $($p[0]) ($($p[1])): copy the matching DLL to VFS\SystemX64 manually" }
                         })
+                    if ($g.SkipWithVcLibs) {
+                        $cmd += '# Alternative to copying: declare the framework package Microsoft.VCLibs.140.00.UWPDesktop as PackageDependency in AppxManifest.xml (it must be installed on the target systems).'
+                    }
                     Write-Finding Warning 'Runtime' "$($g.Name) runtime needed but not in the package" `
                         "Missing: $display. Without the runtime on the target system the application does not start." `
                         'Copy the runtime DLLs of the packaging machine to VFS\SystemX64 / VFS\SystemX86 (app-local deployment, no dependency needed).' `
@@ -574,6 +585,46 @@
                         'Install the matching Visual C++ Redistributable on the target systems, or add the DLLs together with their Microsoft.VC*.CRT manifest folder next to the executable.' `
                         -Locations @($users | Select-Object -Unique | Select-Object -First 50) -Stage 1
                 }
+            }
+        }
+        # An executable finds DLLs in its own folder and in VFS\System*. A DLL that exists only elsewhere in
+        # the package is not found unless the application extends the search path itself. Only executables
+        # are checked: plug-in DLLs import from their host process, which is already loaded.
+        $rules['DLL search path'] = {
+            $pe = & $getPE
+            $dllPaths = @{}
+            foreach ($f in @($files | Where-Object { $_.Name -like '*.dll' })) {
+                $name = $f.Name.ToLowerInvariant()
+                if (-not $dllPaths.ContainsKey($name)) { $dllPaths[$name] = @() }
+                $dllPaths[$name] += $f.Path
+            }
+            $declared = @($manifest.SelectNodes("//*[local-name()='LoaderSearchPathEntry']") | ForEach-Object { $_.GetAttribute('FolderPath').TrimEnd('\') })
+            $folders = @()
+            $locations = @()
+            foreach ($path in @($pe.Keys | Where-Object { $_ -like '*.exe' })) {
+                $dir = Split-Path $path -Parent
+                foreach ($dll in $pe[$path].Imports) {
+                    $name = $dll.ToLowerInvariant()
+                    if (-not $dllPaths.ContainsKey($name)) { continue }
+                    $reachable = @($dllPaths[$name] | Where-Object {
+                            $d = Split-Path $_ -Parent
+                            $d -eq $dir -or $d -like 'VFS\System*' -or $declared -contains $d
+                        })
+                    if ($reachable.Count -gt 0) { continue }
+                    $match = @($dllPaths[$name] | Where-Object { $pe.ContainsKey($_) -and $pe[$_].Machine -eq $pe[$path].Machine }) | Select-Object -First 1
+                    if (-not $match) { continue }
+                    $folder = Split-Path $match -Parent
+                    if (-not $folder) { continue }
+                    if ($folders -notcontains $folder) { $folders += $folder }
+                    $locations += "$path -> $folder\$name"
+                }
+            }
+            if ($folders.Count -gt 0) {
+                Write-Finding Warning 'Runtime' 'Imported DLLs outside the search path' `
+                    "Executables import DLLs that exist only in other folders of the package: $($folders -join ', '). Installed, the application finds them through PATH or its own setup; in the container the start can fail." `
+                    'Declare the folders with Add-MSIXloaderSearchPathOverride (at most 5 folders; for more use Add-MSIXPSFDynamicLibraryFixup).' `
+                    -Command @("Add-MSIXloaderSearchPathOverride -MSIXFolderPath `$Package -FolderPaths @($((($folders | Select-Object -First 5) | ForEach-Object { ConvertTo-Literal $_ }) -join ', '))") `
+                    -AutoFix ($folders.Count -le 5) -Locations @($locations | Select-Object -First 50) -Stage 2
             }
         }
         $rules['.NET'] = {
@@ -806,7 +857,23 @@
                 -Command $cmd -AutoFix $true -Locations @($workingDirectories.Values) -Stage 4
         }
 
+        $rules['PSF on request'] = {
+            if (-not $ForcePSF -or $hasPsf -or $appTargets.Count -eq 0) { return }
+            Write-Finding Info 'PSF' 'PSF requested with -ForcePSF' `
+                'The PSF is added without a specific finding: launcher for every application, MFRFixup and the RegLegacy defaults.' `
+                'Test the package first without the PSF; keep it only if the application needs it.' `
+                -Command (& $psfCommands $workingDirectories) -AutoFix $true -Locations @($appTargets | ForEach-Object Executable) -Stage 4
+        }
+
         # ================================================================ manifest
+        # Proposed for every package: harmless when the application never writes to its folder.
+        $rules['Installed location virtualization'] = {
+            if (& $mentions 'InstalledLocationVirtualization') { return }
+            Write-Finding Info 'Manifest' 'No write virtualization for the installation folder' `
+                'The installation folder is read-only in the container; an application that writes there fails or loses the data.' `
+                'Declare InstalledLocationVirtualization (Windows 10 2004 or later): writes are redirected per user.' `
+                -Command @('Add-MSIXInstalledLocationVirtualization -MSIXFolderPath $Package') -AutoFix $true -Locations @('AppxManifest.xml') -Stage 2
+        }
         # MakeAppx creates AppxMetadata\CodeIntegrity.cat itself; only the manifest element enforces it.
         $rules['Package integrity'] = {
             if (@($manifest.SelectNodes("//*[local-name()='PackageIntegrity']")).Count -gt 0) {

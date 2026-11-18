@@ -39,6 +39,7 @@ C:\Temp\Fix-MyApp.ps1 -MsixFile C:\Packages\MyApp.msix -OutputFile C:\Packages\M
 |------------------|-----------------------------------------------------------------------------|
 | `-MSIXFolder`    | Expanded package folder (output of `Open-MSIXPackage`). Accepts pipeline input. |
 | `-FixScriptPath` | Optional. Path of the fix script to write (UTF-8 with BOM).                 |
+| `-ForcePSF`      | Optional. Adds the PSF (launcher, MFRFixup, RegLegacy defaults) even when no rule asks for it. |
 
 ---
 
@@ -129,6 +130,9 @@ written to the script.
 | `SumatraPDF.exe`       | `Add-MSIXFixSumatraPDF`                   | Info | yes  |
 | `Ssms.exe`             | `Add-MSIXFixSSMS22` (file version 21+), otherwise `Add-MSIXFixSSMS` | Info | yes |
 
+The file must lie in the folder of a manifest application. A bundled copy deeper in the package
+(e.g. the SumatraPDF viewer inside RStudio) is not a match.
+
 ### Package errors
 
 | Rule | Trigger | Sev | Auto | Fix |
@@ -161,7 +165,8 @@ runtime counts as missing when an imported DLL name does not exist anywhere in t
 
 | Rule | Trigger | Sev | Auto | Fix |
 |------|---------|-----|------|-----|
-| Visual C++ 2015-2022 | `vcruntime140*`, `msvcp140*`, `concrt140`, `vccorlib140`, `mfc140*`, `vcomp140`; skipped with a `Microsoft.VCLibs.140.00` dependency | Warning | yes | copy per architecture to `VFS\SystemX64` / `VFS\SystemX86` |
+| Visual C++ 2015-2022 | `vcruntime140*`, `msvcp140*`, `concrt140`, `vccorlib140`, `mfc140*`, `vcomp140`; skipped with a `Microsoft.VCLibs.140.00` dependency | Warning | yes | copy per architecture to `VFS\SystemX64` / `VFS\SystemX86`; alternative as comment: `Microsoft.VCLibs.140.00.UWPDesktop` as `PackageDependency` |
+| Imported DLLs outside the search path | an `.exe` imports a DLL that exists in the package, but not in its own folder, `VFS\System*` or a declared `LoaderSearchPathEntry` (same architecture only) | Warning | yes, up to 5 folders | `Add-MSIXloaderSearchPathOverride -FolderPaths <folders of the DLLs>` |
 | Visual C++ 2010-2013 | `msvcr1x0`, `msvcp1x0`, `mfc1x0*`, `vcomp1x0` | Warning | yes | as above |
 | Visual Basic 6 | `msvbvm60.dll` | Warning | yes | as above |
 | Visual C++ 2005/2008 | `msvcr80/90`, `msvcp80/90`, `mfc80/90*` (side-by-side) | Warning | - | hint: redistributable or DLLs plus `Microsoft.VC*.CRT` manifest folder |
@@ -185,6 +190,7 @@ runtime counts as missing when an imported DLL name does not exist anywhere in t
 | Upper-case GUIDs | GUIDs with `A-F` in attributes (build metadata ignored) | Info | yes | inline regex: lower-case all GUIDs in `AppxManifest.xml` |
 | IoT / mobile namespaces | `xmlns:*` pointing to `/iot/` or `/mobile/` | Info | - | none |
 | Package integrity | `PackageIntegrity` element in the manifest | Warning | yes | `Remove-MSIXPackageIntegrity` |
+| Installed location virtualization | no `InstalledLocationVirtualization` in the manifest (every package) | Info | yes | `Add-MSIXInstalledLocationVirtualization` |
 | desktop7 Startup shortcut | `[{Startup}]` / `[{Common Startup}]` | Error | yes | `Remove-MSIXDesktop7Shortcut` |
 | desktop7 all-users Start menu | `[{Common Programs}]` | Info | yes | `Repair-MSIXDesktop7Shortcut` |
 | Declared services | `Get-MSIXServices` returns entries | Warning | - | `Remove-MSIXServices` (commented) |
@@ -198,13 +204,15 @@ runtime counts as missing when an imported DLL name does not exist anywhere in t
 
 ### PSF
 
-Both rules are skipped when the package already contains the PSF (`config.json(.xml)` or a
-`PsfLauncher` entry). Win16 apps are excluded (they get their own launcher entry).
+The PSF is only proposed when a rule finds a reason for it, or with `-ForcePSF`. All rules are
+skipped when the package already contains the PSF (`config.json(.xml)` or a `PsfLauncher` entry).
+Win16 apps are excluded (they get their own launcher entry).
 
 | Rule | Trigger | Sev | Auto | Fix |
 |------|---------|-----|------|-----|
 | Writes to the install folder | `*.log`, `*.tmp`, `*.cache`, `settings.*`, `user.*`, `state.*` next to an app executable | Warning | yes | `Add-MSIXPsfFrameworkFiles -MFFixup -RegLegacyFixup`, `Add-MSIXPSFShim` per app, `Add-MSIXPSFMFRFixup`, `Add-MSIXPSFDefaultRegLegacy` |
 | Working directory | config files (`.ini .cfg .config .txt .dat .xml .json`) next to an app executable | Warning | yes | same PSF block with `-WorkingDirectory`; `Set-MSIXApplication -UAP11WorkingDirectory` (commented, Windows 11) |
+| PSF on request | `-ForcePSF` | Info | yes | same PSF block |
 
 Not counted as config files for the working-directory rule: `*.exe.config`, `*.dll.config`,
 `*.deps.json`, `*.runtimeconfig.json`, XML documentation next to a DLL of the same name, and
