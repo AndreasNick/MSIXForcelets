@@ -50,6 +50,9 @@
     )
 
     process {
+        # Values typed in JSON-escaped form (\\ for one backslash) are detected and unescaped;
+        # config.json.xml stores plain values and Format.xsl escapes them for JSON.
+        $Executable = $Executable.Replace('\\', '\')
         if (-not (Test-Path $MSIXFolder.FullName -PathType Container)) {
             Write-Error "MSIXFolder not found: $($MSIXFolder.FullName)"
             return

@@ -5,7 +5,7 @@
 
 @{
     RootModule           = 'MSIXForcelets.psm1'
-    ModuleVersion        = '1.0.7'
+    ModuleVersion        = '1.0.8'
     GUID                 = '799e7b14-d939-43b3-845e-6cf1be49c36b'
     Author               = 'Andreas Nick'
     CompanyName          = 'Andreas Nick'
@@ -56,6 +56,7 @@
         'Copy-MSIXTooling',
         'Copy-ToMSIXPackage',
         'Find-MSIXFonts',
+        'Find-MSIXPackageIssue',
         'Get-MSIXFileTypeAssociation',
         'Add-MSIXFileTypeAssociation',
         'Set-MSIXFileTypeAssociation',
@@ -122,7 +123,7 @@
             LicenseUri   = 'https://github.com/AndreasNick/MSIXForcelets/blob/master/LICENSE'
             ProjectUri   = 'https://msixforcelets.nick-it.de'
             IconUri      = 'https://raw.githubusercontent.com/AndreasNick/MSIXForcelets/master/Images/f64x64.ico'
-            ReleaseNotes = 'v1.0.7 - Includes all v1.0.6 changes (tooling in the module root, public virtual-registry cmdlets, new SSMS 21/22 and SumatraPDF fixes, Invoke-MSIXCleanup fixes). New in v1.0.7: Windows PowerShell 5.1 selects the newest PSF release by version, Get-MSIXVirtualRegistryKeysAndValues renamed to Get-MSIXVirtualRegistryKey, clean error stream after import. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
+            ReleaseNotes = 'v1.0.8 - Warning on import when tooling is missing; clear error if makeappx.exe is missing. v1.0.7 - Includes all v1.0.6 changes (tooling in the module root, public virtual-registry cmdlets, new SSMS 21/22 and SumatraPDF fixes, Invoke-MSIXCleanup fixes). New in v1.0.7: Windows PowerShell 5.1 selects the newest PSF release by version, Get-MSIXVirtualRegistryKeysAndValues renamed to Get-MSIXVirtualRegistryKey, clean error stream after import. Full changelog: https://msixforcelets.nick-it.de/changelog.html'
         }
     }
 }

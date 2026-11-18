@@ -39,7 +39,9 @@ function Add-MSIXPSFShim {
     Optional working directory passed through to config.json.
 
 .PARAMETER Arguments
-    Optional command-line arguments passed through to config.json.
+    Optional command-line arguments for config.json. Quotes, &, < and > are written as typed
+    (e.g. '"%1"'). A double backslash is read as JSON-escaped and stands for one backslash,
+    so a UNC path is written '\\\\server\\share'.
 
 .PARAMETER PSFArchitektur
     Architecture of the PSF launcher to use: Auto, x64, or x86.
@@ -244,23 +246,22 @@ function Add-MSIXPSFShim {
             $idEl.InnerText = $newAppId
             $r.AppendChild($idEl) | Out-Null
 
-            # Pre-escape inner double-quotes to \" so Convert-MSIXPSFXML2JSON's
-            # XSLT->JSON pipeline produces valid JSON (the XSLT does not escape
-            # values; backslashes are normalised post-transform but quotes are not).
+            # Values are stored plain; Format.xsl escapes them for JSON. Values typed in JSON-escaped
+            # form (\\ for one backslash) are detected and unescaped.
             $exeEl = $conxml.CreateElement('executable')
-            $exeForConfig = if ([string]::IsNullOrEmpty($LauncherExecutable)) { $originalExecutable } else { $LauncherExecutable }
-            $exeEl.InnerText = $exeForConfig.Replace('"', '\"')
+            $exeForConfig = if ([string]::IsNullOrEmpty($LauncherExecutable)) { $originalExecutable } else { $LauncherExecutable.Replace('\\', '\') }
+            $exeEl.InnerText = $exeForConfig
             $r.AppendChild($exeEl) | Out-Null
             if ($LauncherExecutable -ne '') {
                 Write-Verbose "config.json executable overridden: $LauncherExecutable"
             }
 
             $argEl = $conxml.CreateElement('arguments')
-            $argEl.InnerText = $Arguments.Replace('"', '\"')
+            $argEl.InnerText = $Arguments.Replace('\\', '\')
             $r.AppendChild($argEl) | Out-Null
 
             $wdEl = $conxml.CreateElement('workingDirectory')
-            $wdEl.InnerText = $WorkingDirectory.Replace('"', '\"')
+            $wdEl.InnerText = $WorkingDirectory.Replace('\\', '\')
             $r.AppendChild($wdEl) | Out-Null
 
             if ($isTimMangan) {

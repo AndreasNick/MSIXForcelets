@@ -26,7 +26,13 @@ function Add-MSIXPSFEnvVarFixup {
 
 .PARAMETER Value
     Value for the environment variable. Supports standard Windows environment
-    variable expansion (e.g. "%APPDATA%\MyApp").
+    variable expansion (e.g. "%APPDATA%\MyApp"). A double backslash is read as
+    JSON-escaped and stands for one backslash.
+
+.PARAMETER UseRegistry
+    Writes "useregistry": "true". PSF then looks the variable up in the container
+    registry (HKCU, then HKLM) and falls back to -Value; values the app sets go to
+    HKCU\EnvironmentVariables. Without the switch, -Value is used ("false").
 
 .EXAMPLE
     Add-MSIXPSFEnvVarFixup -MSIXFolder "C:\MSIXTemp\MyApp" -Name "MY_VAR" -Value "C:\Data"
@@ -57,10 +63,16 @@ function Add-MSIXPSFEnvVarFixup {
         [String] $Name,
 
         [Parameter(Mandatory = $true)]
-        [String] $Value
+        [String] $Value,
+
+        [switch] $UseRegistry
     )
 
     process {
+        # Values typed in JSON-escaped form (\\ for one backslash) are detected and unescaped;
+        # config.json.xml stores plain values and Format.xsl escapes them for JSON.
+        $Executable = $Executable.Replace('\\', '\')
+        $Value = $Value.Replace('\\', '\')
         if (-not (Test-Path $MSIXFolder.FullName -PathType Container)) {
             Write-Error "MSIXFolder not found: $($MSIXFolder.FullName)"
             return
@@ -119,22 +131,33 @@ function Add-MSIXPSFEnvVarFixup {
         $fixupEl  = $fixupNode.ParentNode
         $varsNode = $fixupEl.SelectSingleNode('config/envVariables')
 
+        $useRegistryText = if ($UseRegistry) { 'true' } else { 'false' }
+
         # Replace existing entry with same name (idempotency)
         $existing = $varsNode.SelectSingleNode("envVariable[name='$Name']")
         if ($null -ne $existing) {
             $existing.SelectSingleNode('value').InnerText = $Value
-            Write-Verbose "Updated EnvVarFixup: $Name = $Value (executable: $Executable)"
+            $useRegEl = $existing.SelectSingleNode('useregistry')
+            if ($null -eq $useRegEl) {
+                $useRegEl = $conxml.CreateElement('useregistry')
+                $existing.AppendChild($useRegEl) | Out-Null
+            }
+            $useRegEl.InnerText = $useRegistryText
+            Write-Verbose "Updated EnvVarFixup: $Name = $Value, useregistry = $useRegistryText (executable: $Executable)"
         }
         else {
-            $varEl   = $conxml.CreateElement('envVariable')
-            $nameEl  = $conxml.CreateElement('name')
-            $valueEl = $conxml.CreateElement('value')
-            $nameEl.InnerText  = $Name
-            $valueEl.InnerText = $Value
-            $varEl.AppendChild($nameEl)  | Out-Null
-            $varEl.AppendChild($valueEl) | Out-Null
+            $varEl    = $conxml.CreateElement('envVariable')
+            $nameEl   = $conxml.CreateElement('name')
+            $valueEl  = $conxml.CreateElement('value')
+            $useRegEl = $conxml.CreateElement('useregistry')
+            $nameEl.InnerText   = $Name
+            $valueEl.InnerText  = $Value
+            $useRegEl.InnerText = $useRegistryText
+            $varEl.AppendChild($nameEl)   | Out-Null
+            $varEl.AppendChild($valueEl)  | Out-Null
+            $varEl.AppendChild($useRegEl) | Out-Null
             $varsNode.AppendChild($varEl) | Out-Null
-            Write-Verbose "Added EnvVarFixup: $Name = $Value (executable: $Executable)"
+            Write-Verbose "Added EnvVarFixup: $Name = $Value, useregistry = $useRegistryText (executable: $Executable)"
         }
 
         $conxml.PreserveWhiteSpace = $false

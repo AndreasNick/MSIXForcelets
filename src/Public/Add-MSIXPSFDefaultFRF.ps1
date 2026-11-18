@@ -125,9 +125,9 @@
         Add-MSIXPSFFileRedirectionFixup -MSIXFolder $MSIXFolder -Executable $Executable `
             -PackageRelative -Base $PackageRelativeBase `
             -Patterns @(
-                '.*\\.[eE][xX][eE]$', '.*\\.[dD][lL][lL]$', '.*\\.[tT][lL][bB]$',
-                '.*\\.[oO][cC][xX]$', '.*\\.[cC][oO][mM]$', '.*\\.[fF][oO][nN]$',
-                '.*\\.[tT][tT][cC]$', '.*\\.[tT][tT][fF]$', '.*\\.[zZ][iI][pP].*'
+                '.*\.[eE][xX][eE]$', '.*\.[dD][lL][lL]$', '.*\.[tT][lL][bB]$',
+                '.*\.[oO][cC][xX]$', '.*\.[cC][oO][mM]$', '.*\.[fF][oO][nN]$',
+                '.*\.[tT][tT][cC]$', '.*\.[tT][tT][fF]$', '.*\.[zZ][iI][pP].*'
             ) -IsExclusion
 
         # Exclusion: VFS\FONTS is managed by the OS font subsystem

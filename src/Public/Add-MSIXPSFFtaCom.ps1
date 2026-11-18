@@ -197,9 +197,7 @@ function Add-MSIXPSFFtaCom {
             $conxmlCheck.Load($configXmlPath)
             $exeNode = $conxmlCheck.SelectSingleNode("//application[id='$SourceAppId']/executable")
             if ($null -ne $exeNode) {
-                # InnerText contains JSON-escaped double backslashes (written by Add-MSIXPSFShim).
-                # Normalise back to single backslash before using in XML manifest attributes.
-                $realExe = $exeNode.InnerText -replace '\\\\', '\'
+                $realExe = $exeNode.InnerText
             }
         }
         if (-not $realExe) {

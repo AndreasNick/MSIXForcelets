@@ -16,17 +16,17 @@
         [Parameter(ParameterSetName = 'PackageRelative')]
         [Parameter(ParameterSetName = 'PackageDriveRelative')]
         [Parameter(ParameterSetName = 'KnownFolders')]
-        [ArgumentCompleter( { 'Contoso\\config', 'VFS\\ProgramFilesX86\\this\\config' })]
+        [ArgumentCompleter( { 'Contoso\config', 'VFS\ProgramFilesX86\this\config' })]
         [string] $Base = "",
         [Parameter(ParameterSetName = 'PackageRelative')]
         [Parameter(ParameterSetName = 'PackageDriveRelative')]
         [Parameter(ParameterSetName = 'KnownFolders')]
-        [ArgumentCompleter( { "'.*\\.txt'", "'.*\\.log'", "'.*\\.ini'", "'.*'", "@('.*\\.[eE][xX][eE]$', '.*\\.[dD][lL][lL]$', '.*\\.[tT][lL][bB]$', '.*\\.[cC][oO][mM]$')" })]
+        [ArgumentCompleter( { "'.*\.txt'", "'.*\.log'", "'.*\.ini'", "'.*'", "@('.*\.[eE][xX][eE]$', '.*\.[dD][lL][lL]$', '.*\.[tT][lL][bB]$', '.*\.[cC][oO][mM]$')" })]
         [String[]] $Patterns,
         [Parameter(ParameterSetName = 'PackageRelative')]
         [Parameter(ParameterSetName = 'PackageDriveRelative')]
         [Parameter(ParameterSetName = 'KnownFolders')]
-        [ArgumentCompleter( { "'H:'", "'H:\\MyApp\\'", "'g:\\temp\\'" })]
+        [ArgumentCompleter( { "'H:'", "'H:\MyApp\'", "'g:\temp\'" })]
         [string] $RedirectTargetBase, #Optional "H:\"
         [Parameter(ParameterSetName = 'PackageRelative')]
         [Parameter(ParameterSetName = 'PackageDriveRelative')]
@@ -64,13 +64,19 @@
             return
         }
 
-        # Validate -Base: must use backslashes; must not be pre-escaped with double backslashes.
+        # Values typed in JSON-escaped form ('.*\\.txt', 'Contoso\\config') are detected and unescaped;
+        # config.json.xml stores plain values and Format.xsl escapes them for JSON.
+        $Executable = $Executable.Replace('\\', '\')
+        $Base = $Base.Replace('\\', '\')
+        $RedirectTargetBase = $RedirectTargetBase.Replace('\\', '\')
+        if ($PSBoundParameters.ContainsKey('Patterns')) {
+            $Patterns = @($Patterns | ForEach-Object { if ($_) { $_.Replace('\\', '\') } else { $_ } })
+        }
+
+        # Validate -Base: must use backslashes.
         if ($PSBoundParameters.ContainsKey('Base') -and $Base -ne '') {
             if ($Base -match '/') {
                 Write-Warning "-Base '$Base' contains a forward slash. Use backslash for VFS paths, e.g. 'VFS\FONTS'."
-            }
-            if ($Base -match '\\\\') {
-                Write-Warning "-Base '$Base' contains double backslashes. Pass a plain path with single backslashes, e.g. 'VFS\FONTS'."
             }
         }
 
@@ -157,7 +163,7 @@
                 #<pathConfig>
                 #<base/>
                 #<patterns>
-                #<pattern>.*\\.txt</pattern>
+                #<pattern>.*\.txt</pattern>
                 #<pattern>Tèƨƭ.*</pattern>
                 #</patterns>
                 #</pathConfig>
@@ -200,7 +206,7 @@
                 #<pathConfig>
                 #<base/>
                 #<patterns>
-                #<pattern>.*\\.txt</pattern>
+                #<pattern>.*\.txt</pattern>
                 #<pattern>Tèƨƭ.*</pattern>
                 #</patterns>
                 #</pathConfig>
@@ -246,7 +252,7 @@
                     <id>ProgramFilesX64</id>
                     <relativePaths>
                         <relativePath>
-                            <base>Contoso\\config</base>
+                            <base>Contoso\config</base>
                             <patterns>
                                 <pattern>.*</pattern>
                             </patterns>

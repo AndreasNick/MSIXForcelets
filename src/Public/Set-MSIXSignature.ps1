@@ -70,9 +70,14 @@ function Set-MSIXSignature {
 
         [switch] $NoTimestamp,
         [switch] $force,
+        # Obsolete: the Certum smartcard PIN-dialog workaround (2026-02) is no longer needed.
+        # Kept so existing scripts that pass -Certumfix keep working.
         [switch] $Certumfix
     )
     process {
+        if ($Certumfix) {
+            Write-Warning '-Certumfix is obsolete and has no effect; Certum tokens sign with the standard thumbprint path.'
+        }
         if (-not (Test-Path $MSIXFile.FullName)) {
             Write-Error "MSIX file not found: $($MSIXFile.FullName)"
             return
@@ -100,23 +105,12 @@ function Set-MSIXSignature {
                 }
             }
             'Thumbprint' {
-                if ($Certumfix) {
-                    # Temporary workaround for Certum smartcard PIN-dialog ordering issue (2026-02-09).
-                    if ($NoTimestamp) {
-                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint $MSIXFile.Fullname
-                    }
-                    else {
-                        signtool sign /v /tr $TimeStampServer /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
-                    }
+                # Hardware token / certificate-store signing by thumbprint.
+                if ($NoTimestamp) {
+                    signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint $MSIXFile.Fullname
                 }
                 else {
-                    # Standard hardware token / certificate-store signing by thumbprint.
-                    if ($NoTimestamp) {
-                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint $MSIXFile.Fullname
-                    }
-                    else {
-                        signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
-                    }
+                    signtool sign /v /td SHA256 /fd SHA256 /sha1 $CertThumbprint /tr $TimeStampServer $MSIXFile.Fullname
                 }
             }
         }

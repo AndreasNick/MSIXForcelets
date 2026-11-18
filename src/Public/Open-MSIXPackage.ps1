@@ -99,6 +99,8 @@ https://www.nick-it.de
         
 
 
+        Assert-MSIXPackagingTool
+
         if($VerbosePreference -eq 'Continue'){
             MakeAppx unpack -o -p $($MsixFile.FullName) -d $($MSIXFolder.FullName) | Out-Default
         } else {

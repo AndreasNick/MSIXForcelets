@@ -18,24 +18,18 @@ function Convert-MSIXPSFXML2JSON {
         $xslt_settings.EnableScript = 1;
         $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
         $xslt.Load($xsl, $xslt_settings, $XmlUrlResolver);
-        $xslt.Transform($xml, $output);
 
-        # Normalize: XSLT outputs path values (e.g. VFS\FONTS) and regex patterns (.*\.)
-        # with unescaped backslashes — invalid JSON. Double every lone backslash; the first
-        # alternative keeps an already-valid \\ pair intact (consumed as a unit). The following
-        # char must NOT be excluded for the JSON-escape letters (b f n r t u): a Windows path
-        # like 'Mozilla Firefox\firefox.exe' contains \f, which is a literal backslash here, not
-        # a form-feed escape — so it must be doubled too. Only an existing \\ pair is preserved.
-        $rawJson = [System.IO.File]::ReadAllText($output, [System.Text.Encoding]::UTF8)
-        $rawJson = [System.Text.RegularExpressions.Regex]::Replace(
-            $rawJson,
-            '(\\\\)|\\([^\\])',
-            [System.Text.RegularExpressions.MatchEvaluator]{
-                param($m)
-                if ($m.Groups[1].Success) { return $m.Value }
-                return '\\' + $m.Groups[2].Value
-            }
-        )
+        # config.json.xml stores plain values; Format.xsl escapes them for JSON (text output).
+        $jsonWriter = New-Object System.IO.StringWriter
+        try {
+            $xslt.Transform([string] $xml, [System.Xml.Xsl.XsltArgumentList] $null, [System.IO.TextWriter] $jsonWriter)
+            $rawJson = $jsonWriter.ToString()
+        }
+        finally {
+            $jsonWriter.Dispose()
+        }
+
+        # The round trip validates the JSON (ConvertFrom-Json throws on invalid output) and formats it.
         # ConvertTo-Json (PS 5.1) uses 4-space indentation with no -IndentSize option.
         # Reduce to 2-space indentation and collapse empty arrays/objects to one line.
         $formatted = $rawJson | ConvertFrom-Json | ConvertTo-Json -Depth 20

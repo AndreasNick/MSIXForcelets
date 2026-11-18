@@ -21,8 +21,8 @@
       - Filename contains "64" or path contains ProgramFilesX64  -> x64
       - Otherwise the value of -DefaultArchitecture is used (default: x64)
 
-    The filepath is stored with double backslashes so that the PSF XML-to-JSON
-    converter produces valid JSON output ("VFS\\...").
+    The filepath is stored as a plain package-relative path ('VFS\...');
+    Close-MSIXPackage escapes it for config.json.
 
 .PARAMETER MSIXFolder
     Path to the expanded MSIX package folder (must contain config.json.xml).
@@ -89,6 +89,9 @@
     )
 
     process {
+        # Values typed in JSON-escaped form (\\ for one backslash) are detected and unescaped;
+        # config.json.xml stores plain values and Format.xsl escapes them for JSON.
+        $Executable = $Executable.Replace('\\', '\')
         if (-not (Test-Path $MSIXFolder.FullName -PathType Container)) {
             Write-Error "MSIXFolder not found: $($MSIXFolder.FullName)"
             return
@@ -133,8 +136,6 @@
                     Write-Warning "DLL not found in package: $rel (entry is written anyway)."
                 }
 
-                $relPathDoubleSlash = $rel.Replace('\', '\\')
-
                 $arch = $DefaultArchitecture
                 if ($baseName -match '32') { $arch = 'x86' }
                 elseif ($baseName -match '64') { $arch = 'x64' }
@@ -143,7 +144,7 @@
 
                 $null = $pathEntries.Add([PSCustomObject]@{
                     Name     = $fileName
-                    FilePath = $relPathDoubleSlash
+                    FilePath = $rel
                     Arch     = $arch
                 })
                 Write-Verbose "Single DLL ($arch): $fileName -> $rel"
@@ -201,10 +202,8 @@
                 continue
             }
 
-            # Package-relative path with double backslashes for JSON compatibility.
-            # Use String.Replace (not -replace regex) so each \ becomes \\.
+            # Package-relative path, stored plain (Format.xsl escapes it for JSON).
             $relPath  = $fullPath.Substring($msixRoot.Length + 1)
-            $relPathDoubleSlash = $relPath.Replace('\', '\\')
 
             # Infer architecture from filename, then from path
             $arch = $DefaultArchitecture
@@ -223,7 +222,7 @@
 
             $null = $pathEntries.Add([PSCustomObject]@{
                 Name     = $fileName
-                FilePath = $relPathDoubleSlash
+                FilePath = $relPath
                 Arch     = $arch
             })
             Write-Verbose "Found DLL ($arch): $fileName -> $relPath"

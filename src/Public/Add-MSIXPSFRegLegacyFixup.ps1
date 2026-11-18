@@ -174,6 +174,16 @@
             return
         }
 
+        # Values typed in JSON-escaped form (\\ for one backslash) are detected and unescaped;
+        # config.json.xml stores plain values and Format.xsl escapes them for JSON.
+        $Executable = $Executable.Replace('\\', '\')
+        if ($PSBoundParameters.ContainsKey('Patterns')) {
+            $Patterns = @($Patterns | ForEach-Object { if ($_) { $_.Replace('\\', '\') } else { $_ } })
+        }
+        if ($PSBoundParameters.ContainsKey('Key')) {
+            $Key = $Key.Replace('\\', '\')
+        }
+
         if ($PSBoundParameters.ContainsKey('Patterns')) {
             foreach ($pat in $Patterns) {
                 if ([string]::IsNullOrEmpty($pat)) {

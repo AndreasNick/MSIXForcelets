@@ -11,16 +11,16 @@
     "applications" : [
     <xsl:for-each select="applications/application">
         {
-            "id": "<xsl:value-of select="id"/>"
+            "id": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="id"/></xsl:call-template>"
 			<!-- Andreas Nick 2026.04.22: executable is optional - PsfFtaCom Application entries have no child process -->
             <xsl:if test="executable">
-            ,"executable": "<xsl:value-of select="executable"/>"
+            ,"executable": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="executable"/></xsl:call-template>"
             </xsl:if>
             <xsl:if test="arguments">
-            ,"arguments": "<xsl:value-of select="normalize-space(arguments)"/>"
+            ,"arguments": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="normalize-space(arguments)"/></xsl:call-template>"
             </xsl:if>
             <xsl:if test="workingDirectory">
-            ,"workingDirectory": "<xsl:value-of select="normalize-space(workingDirectory)"/>"
+            ,"workingDirectory": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="normalize-space(workingDirectory)"/></xsl:call-template>"
             </xsl:if>
 			<!-- Andreas Nick 2026.04.22: Tim Mangan PSF - preventMultipleInstances, terminateChildren -->
             <xsl:if test="preventMultipleInstances">
@@ -39,14 +39,14 @@
 		    
 			<!-- Andreas Nick 2021.03.10 -->
             <xsl:if test="scriptExecutionMode">
-            ,"scriptExecutionMode": "<xsl:value-of select="scriptExecutionMode"/>"
+            ,"scriptExecutionMode": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="scriptExecutionMode"/></xsl:call-template>"
             </xsl:if>
 
             <xsl:if test="monitor">
             , "monitor" :
             {
-                "executable": "<xsl:value-of select="monitor/executable"/>"
-                , "arguments": "<xsl:value-of select="monitor/arguments"/>"
+                "executable": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="monitor/executable"/></xsl:call-template>"
+                , "arguments": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="monitor/arguments"/></xsl:call-template>"
                 <xsl:if test="monitor/asadmin">
                     , "asadmin": <xsl:value-of select="monitor/asadmin"/>
                 </xsl:if>
@@ -59,8 +59,8 @@
                 <xsl:variable name="startScriptHeader" select="startScript" />
                 ,"startScript":
                 {
-                     "scriptPath": "<xsl:value-of select="$startScriptHeader/scriptPath"/>"
-                    , "scriptArguments": "<xsl:value-of select="$startScriptHeader/scriptArguments"/>"
+                     "scriptPath": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="$startScriptHeader/scriptPath"/></xsl:call-template>"
+                    , "scriptArguments": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="$startScriptHeader/scriptArguments"/></xsl:call-template>"
                     <xsl:if test="$startScriptHeader/runInVirtualEnvironment">
                     , "runInVirtualEnvironment": <xsl:value-of select="$startScriptHeader/runInVirtualEnvironment"/>
                     </xsl:if>
@@ -85,8 +85,8 @@
                 <xsl:variable name="endScriptHeader" select="endScript" />
                 "endScript":
                 {
-                     "scriptPath": "<xsl:value-of select="$endScriptHeader/scriptPath"/>"
-                    , "scriptArguments": "<xsl:value-of select="$endScriptHeader/scriptArguments"/>"
+                     "scriptPath": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="$endScriptHeader/scriptPath"/></xsl:call-template>"
+                    , "scriptArguments": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="$endScriptHeader/scriptArguments"/></xsl:call-template>"
                     
                     <xsl:if test="$endScriptHeader/runInVirtualEnvironment">
                     , "runInVirtualEnvironment": <xsl:value-of select="$endScriptHeader/runInVirtualEnvironment"/>
@@ -117,13 +117,13 @@
     "processes" : [
     <xsl:for-each select="processes/process">
         {
-            "executable": "<xsl:value-of select="executable"/>"
+            "executable": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="executable"/></xsl:call-template>"
             <xsl:if test="fixups/fixup">
             ,"fixups": [
                 <xsl:for-each select="fixups/fixup">
                 {
                     <xsl:variable name="dllName" select="dll" />
-                    "dll": "<xsl:value-of select="dll"/>"
+                    "dll": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="dll"/></xsl:call-template>"
                     <xsl:if test="contains($dllName, 'WaitForDebuggerFixup')">
                         , "config" :
                         {
@@ -134,7 +134,7 @@
                         ,"config":
                         {
                             <xsl:if test="config/traceMethod">
-                                "traceMethod": "<xsl:value-of select="config/traceMethod"/>"
+                                "traceMethod": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="config/traceMethod"/></xsl:call-template>"
                             </xsl:if>
                             
                             <xsl:if test="config/traceLevels" >
@@ -145,11 +145,11 @@
                                 {
                                     <xsl:choose>
                                         <xsl:when test="config/traceLevels/traceLevel/@level='default'">
-                                            "default": "<xsl:value-of select="config/traceLevels/traceLevel"/>"
+                                            "default": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="config/traceLevels/traceLevel"/></xsl:call-template>"
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:for-each select="config/traceLevels/traceLevel">
-                                                "<xsl:value-of select="@level"/>": "<xsl:value-of select="current()"/>"
+                                                "<xsl:call-template name="json-string"><xsl:with-param name="s" select="@level"/></xsl:call-template>": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                                 <xsl:if test="position()!=last()">
                                                     ,
                                                 </xsl:if>
@@ -164,11 +164,11 @@
                                 {
                                     <xsl:choose>
                                         <xsl:when test="config/breakOn/break/@level='default'">
-                                            "default": "<xsl:value-of select="config/breakOn/break"/>"
+                                            "default": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="config/breakOn/break"/></xsl:call-template>"
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:for-each select="config/breakOn/break">
-                                                "<xsl:value-of select="@level"/>": "<xsl:value-of select="current()"/>"
+                                                "<xsl:call-template name="json-string"><xsl:with-param name="s" select="@level"/></xsl:call-template>": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                                 <xsl:if test="position()!=last()">
                                                     ,
                                                 </xsl:if>
@@ -201,7 +201,7 @@
                         ,"config":
                         {
                             "ilvAware": <xsl:value-of select="config/ilvAware"/>
-                            ,"overrideCOW": "<xsl:value-of select="config/overrideCOW"/>"
+                            ,"overrideCOW": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="config/overrideCOW"/></xsl:call-template>"
                         }
                     </xsl:if>
                     <!-- Andreas Nick 2026.04.23: DynamicLibraryFixup - forcePackageDllUse + relativeDllPaths -->
@@ -212,10 +212,10 @@
                             ,"relativeDllPaths": [
                             <xsl:for-each select="config/relativeDllPaths/relativeDllPath">
                             {
-                                "name": "<xsl:value-of select="name"/>",
-                                "filepath": "<xsl:value-of select="filepath"/>"
+                                "name": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="name"/></xsl:call-template>",
+                                "filepath": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="filepath"/></xsl:call-template>"
                                 <xsl:if test="architecture">
-                                ,"architecture": "<xsl:value-of select="architecture"/>"
+                                ,"architecture": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="architecture"/></xsl:call-template>"
                                 </xsl:if>
                             }
                             <xsl:if test="position()!=last()">,</xsl:if>
@@ -230,28 +230,28 @@
                             "remediation": [
                             <xsl:for-each select="config/remediationGroup/remediation">
                             {
-                                "type": "<xsl:value-of select="type"/>"
+                                "type": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="type"/></xsl:call-template>"
                                 <xsl:if test="hive">
-                                ,"hive": "<xsl:value-of select="hive"/>"
+                                ,"hive": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="hive"/></xsl:call-template>"
                                 </xsl:if>
                                 <xsl:if test="patterns/pattern">
                                 ,"patterns": [
                                     <xsl:for-each select="patterns/pattern">
-                                        "<xsl:value-of select="current()"/>"
+                                        "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                         <xsl:if test="position()!=last()">,</xsl:if>
                                     </xsl:for-each>
                                 ]
                                 </xsl:if>
                                 <xsl:if test="access">
-                                ,"access": "<xsl:value-of select="access"/>"
+                                ,"access": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="access"/></xsl:call-template>"
                                 </xsl:if>
                                 <xsl:if test="key">
-                                ,"key": "<xsl:value-of select="key"/>"
+                                ,"key": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="key"/></xsl:call-template>"
                                 </xsl:if>
                                 <xsl:if test="majorVersion">
-                                ,"majorVersion": "<xsl:value-of select="majorVersion"/>"
-                                ,"minorVersion": "<xsl:value-of select="minorVersion"/>"
-                                ,"updateVersion": "<xsl:value-of select="updateVersion"/>"
+                                ,"majorVersion": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="majorVersion"/></xsl:call-template>"
+                                ,"minorVersion": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="minorVersion"/></xsl:call-template>"
+                                ,"updateVersion": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="updateVersion"/></xsl:call-template>"
                                 </xsl:if>
                             }
                             <xsl:if test="position()!=last()">,</xsl:if>
@@ -268,10 +268,10 @@
                                     "packageRelative": [
                                     <xsl:for-each select="config/redirectedPaths/packageRelative">
                                         {
-                                            "base": "<xsl:value-of select="pathConfig/base"/>",
+                                            "base": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="pathConfig/base"/></xsl:call-template>",
                                             "patterns": [
                                                 <xsl:for-each select="pathConfig/patterns/pattern">
-                                                    "<xsl:value-of select="current()"/>"
+                                                    "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                                     <xsl:if test="position()!=last()">,</xsl:if>
                                                 </xsl:for-each>
                                             ]
@@ -286,7 +286,7 @@
 											</xsl:if>
 
 											<xsl:if test="pathConfig/redirectTargetBase">
-											, "redirectTargetBase": "<xsl:value-of select="pathConfig/redirectTargetBase"/>"
+											, "redirectTargetBase": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="pathConfig/redirectTargetBase"/></xsl:call-template>"
 											</xsl:if> <!-- -->
 
                                         }
@@ -300,10 +300,10 @@
                                     "packageDriveRelative": [
                                     <xsl:for-each select="config/redirectedPaths/packageDriveRelative">
                                         {
-                                            "base": "<xsl:value-of select="pathConfig/base"/>",
+                                            "base": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="pathConfig/base"/></xsl:call-template>",
                                             "patterns": [
                                                 <xsl:for-each select="pathConfig/patterns/pattern">
-                                                    "<xsl:value-of select="current()"/>"
+                                                    "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                                     <xsl:if test="position()!=last()">,</xsl:if>
                                                 </xsl:for-each>
                                             ]
@@ -314,7 +314,7 @@
                                             , "isReadOnly": <xsl:value-of select="pathConfig/isReadOnly"/>
                                             </xsl:if>
                                             <xsl:if test="pathConfig/redirectTargetBase">
-                                            , "redirectTargetBase": "<xsl:value-of select="pathConfig/redirectTargetBase"/>"
+                                            , "redirectTargetBase": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="pathConfig/redirectTargetBase"/></xsl:call-template>"
                                             </xsl:if>
                                         }
                                         <xsl:if test="position()!=last()">,</xsl:if>
@@ -328,14 +328,14 @@
                                     "knownFolders": [
                                     <xsl:for-each select="config/redirectedPaths/knownFolders/knownFolder">
                                         {
-                                            "id": "<xsl:value-of select="id"/>",
+                                            "id": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="id"/></xsl:call-template>",
                                             "relativePaths": [
                                             <xsl:for-each select="relativePaths/relativePath">
                                             {
-                                                "base": "<xsl:value-of select="base"/>",
+                                                "base": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="base"/></xsl:call-template>",
                                                 "patterns": [
                                                     <xsl:for-each select="patterns/pattern">
-                                                        "<xsl:value-of select="current()"/>"
+                                                        "<xsl:call-template name="json-string"><xsl:with-param name="s" select="current()"/></xsl:call-template>"
                                                         <xsl:if test="position()!=last()">
                                                             ,
                                                         </xsl:if>
@@ -351,7 +351,7 @@
 											</xsl:if> 
 											
 											<xsl:if test="redirectTargetBase">
-											, "redirectTargetBase": "<xsl:value-of select="redirectTargetBase"/>"
+											, "redirectTargetBase": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="redirectTargetBase"/></xsl:call-template>"
 											</xsl:if> <!-- -->
 											
                                             }
@@ -374,11 +374,13 @@
                     <xsl:if test="contains($dllName, 'EnvVarFixup')">
                         ,"config":
                         {
-                            "envVariables": [
+                            <!-- PSF reads "envVars"; every entry needs "useregistry" as a string (missing key = entry dropped). -->
+                            "envVars": [
                             <xsl:for-each select="config/envVariables/envVariable">
                             {
-                                "name": "<xsl:value-of select="name"/>",
-                                "value": "<xsl:value-of select="value"/>"
+                                "name": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="name"/></xsl:call-template>",
+                                "value": "<xsl:call-template name="json-string"><xsl:with-param name="s" select="value"/></xsl:call-template>",
+                                "useregistry": "<xsl:choose><xsl:when test="normalize-space(useregistry) != ''"><xsl:call-template name="json-string"><xsl:with-param name="s" select="normalize-space(useregistry)"/></xsl:call-template></xsl:when><xsl:otherwise>false</xsl:otherwise></xsl:choose>"
                             }
                             <xsl:if test="position()!=last()">,</xsl:if>
                             </xsl:for-each>
@@ -400,5 +402,66 @@
     ]
 }
     </xsl:template>
-    <xsl:output omit-xml-declaration="yes"/>
+    <!-- Text output: values are written as they are (no &amp; / &lt; entities); JSON escaping is done by json-string. -->
+    <xsl:output method="text" encoding="UTF-8"/>
+
+    <!-- Escapes a value for use inside a JSON string: backslash, double quote, TAB, CR and LF.
+         config.json.xml stores plain values, this is the only place they are escaped. -->
+    <xsl:template name="json-string">
+        <xsl:param name="s"/>
+        <xsl:variable name="backslash">
+            <xsl:call-template name="replace-all">
+                <xsl:with-param name="text" select="string($s)"/>
+                <xsl:with-param name="from" select="'\'"/>
+                <xsl:with-param name="to" select="'\\'"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="quote">
+            <xsl:call-template name="replace-all">
+                <xsl:with-param name="text" select="string($backslash)"/>
+                <xsl:with-param name="from" select="'&quot;'"/>
+                <xsl:with-param name="to" select="'\&quot;'"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="tab">
+            <xsl:call-template name="replace-all">
+                <xsl:with-param name="text" select="string($quote)"/>
+                <xsl:with-param name="from" select="'&#9;'"/>
+                <xsl:with-param name="to" select="'\t'"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="cr">
+            <xsl:call-template name="replace-all">
+                <xsl:with-param name="text" select="string($tab)"/>
+                <xsl:with-param name="from" select="'&#13;'"/>
+                <xsl:with-param name="to" select="'\r'"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:call-template name="replace-all">
+            <xsl:with-param name="text" select="string($cr)"/>
+            <xsl:with-param name="from" select="'&#10;'"/>
+            <xsl:with-param name="to" select="'\n'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- XSLT 1.0 string replace (recursive). -->
+    <xsl:template name="replace-all">
+        <xsl:param name="text"/>
+        <xsl:param name="from"/>
+        <xsl:param name="to"/>
+        <xsl:choose>
+            <xsl:when test="contains($text, $from)">
+                <xsl:value-of select="substring-before($text, $from)"/>
+                <xsl:value-of select="$to"/>
+                <xsl:call-template name="replace-all">
+                    <xsl:with-param name="text" select="substring-after($text, $from)"/>
+                    <xsl:with-param name="from" select="$from"/>
+                    <xsl:with-param name="to" select="$to"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 </xsl:stylesheet>

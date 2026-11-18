@@ -173,6 +173,8 @@ function Close-MSIXPackage {
                 }
             }
 
+            Assert-MSIXPackagingTool
+
             if($VerbosePreference -eq 'Continue'){
                 MakeAppx pack -o -p $MsixFile.FullName -d  $MSIXFolder.FullName | Out-Default
             } else {

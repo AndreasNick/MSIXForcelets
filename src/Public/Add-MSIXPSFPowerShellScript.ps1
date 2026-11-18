@@ -19,7 +19,7 @@ function Add-MSIXPSFPowerShellScript {
         [Parameter(Mandatory = $true)]
         [ArgumentCompleter( { 'Startscript.ps1', 'Endscript.ps1' })]
         [String]$ScriptPath, 
-        [ArgumentCompleter( { '%MsixWritablePackageRoot%\\VFS\LocalAppData\\Vendor' })]
+        [ArgumentCompleter( { '%MsixWritablePackageRoot%\VFS\LocalAppData\Vendor' })]
         [String] $ScriptArguments, 
         [ArgumentCompleter( { '-ExecutionPolicy Bypass' })]
         [String] $ScriptExecutionMode,
@@ -164,12 +164,13 @@ function Add-MSIXPSFPowerShellScript {
 
                     if ($ScriptArguments -ne "") {
                         $sw = $conxml.CreateElement("scriptArguments")
-                        $sw.InnerText = $ScriptArguments
+                        $sw.InnerText = $ScriptArguments.Replace('\\', '\')
                         $m.AppendChild($sw) | Out-Null
                     }   
 
                     $sp = $conxml.CreateElement("scriptPath")
-                    $sp.InnerText = $ScriptPath
+                    # A value typed in JSON-escaped form (\\ for one backslash) is unescaped; stored plain.
+                    $sp.InnerText = $ScriptPath.Replace('\\', '\')
                     $m.AppendChild($sp) | Out-Null
 
                     $appNode.ParentNode.AppendChild($m)

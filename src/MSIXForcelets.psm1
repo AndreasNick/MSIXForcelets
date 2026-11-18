@@ -490,3 +490,16 @@ Write-Host "  (c) 2020-2026 Andreas Nick" -ForegroundColor Green
 Write-Host "  Use at your own risk without any guarantee or warranty" -ForegroundColor Red
 Write-Host "===============================" -ForegroundColor Green
 Write-Host ""
+
+# The banner is Write-Host only and easily missed in logs and non-interactive sessions (agents,
+# scheduled tasks) - raise missing tooling as a real warning as well.
+$_missing = @($_summary | Where-Object { $_.Text -match '^\s*WARNING\s*:' } | ForEach-Object { $_.Text -replace '^\s*WARNING\s*:\s*', '' })
+if ($_missing.Count -gt 0) {
+    if ($_legacyTooling) {
+        $_fix = " - The tooling is still in the old module version $($_legacyTooling.Name): run Copy-MSIXTooling (no download$_elevated) or Install-MSIXForceletsAllRequirements."
+    }
+    else {
+        $_fix = ' - Run Install-MSIXForceletsAllRequirements.'
+    }
+    Write-Warning ("MSIXForcelets tooling is incomplete ($($Script:ToolingPath)): " + ($_missing -join ' | ') + $_fix)
+}

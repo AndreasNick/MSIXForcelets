@@ -118,11 +118,12 @@ function Add-MSIXPSFMonitor {
 
             $m = $conxml.CreateElement("monitor") 
             $m.AppendChild($conxml.CreateElement("executable")) | Out-Null
-            $m.executable = $Executable
+            # A value typed in JSON-escaped form (\\ for one backslash) is unescaped; stored plain.
+            $m.executable = $Executable.Replace('\\', '\')
 
             if ($Arguments -ne '') {
                 $m.AppendChild($conxml.CreateElement("arguments")) | Out-Null
-                $m.arguments = $Arguments
+                $m.arguments = ([string] $Arguments).Replace('\\', '\')
             }
             if ($Asadmin) {
                 $m.AppendChild($conxml.CreateElement("asadmin")) | Out-Null
